@@ -1,0 +1,11 @@
+com/fashionstore/repositories/ItemRepositoryTest.class
+com/fashionstore/repositories/CartItemRepositoryTest.class
+com/fashionstore/repositories/SizeRepositoryTest.class
+com/fashionstore/repositories/UserRepositoryTest.class
+com/fashionstore/repositories/CategoryRepositoryTest.class
+com/fashionstore/repositories/FavoriteRepositoryTest.class
+com/fashionstore/repositories/ItemVariantRepositoryTest.class
+com/fashionstore/repositories/ReviewRepositoryTest.class
+com/fashionstore/FashionStoreApplicationTests.class
+com/fashionstore/repositories/AddressRepositoryTest.class
+com/fashionstore/repositories/ColorRepositoryTest.class

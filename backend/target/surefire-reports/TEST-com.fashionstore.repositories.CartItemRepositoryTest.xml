@@ -1,0 +1,749 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.fashionstore.repositories.CartItemRepositoryTest" time="2.885" tests="6" errors="6" skipped="0" failures="0" flakes="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/target/test-classes:/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/target/classes:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter/4.0.5/spring-boot-starter-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-logging/4.0.5/spring-boot-starter-logging-4.0.5.jar:/home/mumugrig/.m2/repository/ch/qos/logback/logback-classic/1.5.32/logback-classic-1.5.32.jar:/home/mumugrig/.m2/repository/ch/qos/logback/logback-core/1.5.32/logback-core-1.5.32.jar:/home/mumugrig/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.25.3/log4j-to-slf4j-2.25.3.jar:/home/mumugrig/.m2/repository/org/apache/logging/log4j/log4j-api/2.25.3/log4j-api-2.25.3.jar:/home/mumugrig/.m2/repository/org/slf4j/jul-to-slf4j/2.0.17/jul-to-slf4j-2.0.17.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/4.0.5/spring-boot-autoconfigure-4.0.5.jar:/home/mumugrig/.m2/repository/jakarta/annotation/jakarta.annotation-api/3.0.0/jakarta.annotation-api-3.0.0.jar:/home/mumugrig/.m2/repository/org/yaml/snakeyaml/2.5/snakeyaml-2.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-test/4.0.5/spring-boot-starter-test-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-test/4.0.5/spring-boot-test-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/4.0.5/spring-boot-test-autoconfigure-4.0.5.jar:/home/mumugrig/.m2/repository/com/jayway/jsonpath/json-path/2.10.0/json-path-2.10.0.jar:/home/mumugrig/.m2/repository/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar:/home/mumugrig/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.4/jakarta.xml.bind-api-4.0.4.jar:/home/mumugrig/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.4/jakarta.activation-api-2.1.4.jar:/home/mumugrig/.m2/repository/net/minidev/json-smart/2.6.0/json-smart-2.6.0.jar:/home/mumugrig/.m2/repository/net/minidev/accessors-smart/2.6.0/accessors-smart-2.6.0.jar:/home/mumugrig/.m2/repository/org/ow2/asm/asm/9.7.1/asm-9.7.1.jar:/home/mumugrig/.m2/repository/org/assertj/assertj-core/3.27.7/assertj-core-3.27.7.jar:/home/mumugrig/.m2/repository/net/bytebuddy/byte-buddy/1.17.8/byte-buddy-1.17.8.jar:/home/mumugrig/.m2/repository/org/awaitility/awaitility/4.3.0/awaitility-4.3.0.jar:/home/mumugrig/.m2/repository/org/hamcrest/hamcrest/3.0/hamcrest-3.0.jar:/home/mumugrig/.m2/repository/org/junit/jupiter/junit-jupiter/6.0.3/junit-jupiter-6.0.3.jar:/home/mumugrig/.m2/repository/org/junit/jupiter/junit-jupiter-api/6.0.3/junit-jupiter-api-6.0.3.jar:/home/mumugrig/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/mumugrig/.m2/repository/org/junit/platform/junit-platform-commons/6.0.3/junit-platform-commons-6.0.3.jar:/home/mumugrig/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/mumugrig/.m2/repository/org/junit/jupiter/junit-jupiter-params/6.0.3/junit-jupiter-params-6.0.3.jar:/home/mumugrig/.m2/repository/org/junit/jupiter/junit-jupiter-engine/6.0.3/junit-jupiter-engine-6.0.3.jar:/home/mumugrig/.m2/repository/org/junit/platform/junit-platform-engine/6.0.3/junit-platform-engine-6.0.3.jar:/home/mumugrig/.m2/repository/org/mockito/mockito-core/5.20.0/mockito-core-5.20.0.jar:/home/mumugrig/.m2/repository/net/bytebuddy/byte-buddy-agent/1.17.8/byte-buddy-agent-1.17.8.jar:/home/mumugrig/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/mumugrig/.m2/repository/org/mockito/mockito-junit-jupiter/5.20.0/mockito-junit-jupiter-5.20.0.jar:/home/mumugrig/.m2/repository/org/skyscreamer/jsonassert/1.5.3/jsonassert-1.5.3.jar:/home/mumugrig/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar:/home/mumugrig/.m2/repository/org/springframework/spring-core/7.0.6/spring-core-7.0.6.jar:/home/mumugrig/.m2/repository/commons-logging/commons-logging/1.3.6/commons-logging-1.3.6.jar:/home/mumugrig/.m2/repository/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar:/home/mumugrig/.m2/repository/org/springframework/spring-test/7.0.6/spring-test-7.0.6.jar:/home/mumugrig/.m2/repository/org/xmlunit/xmlunit-core/2.10.4/xmlunit-core-2.10.4.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-web/4.0.5/spring-boot-starter-web-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-jackson/4.0.5/spring-boot-starter-jackson-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-jackson/4.0.5/spring-boot-jackson-4.0.5.jar:/home/mumugrig/.m2/repository/tools/jackson/core/jackson-databind/3.1.0/jackson-databind-3.1.0.jar:/home/mumugrig/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.21/jackson-annotations-2.21.jar:/home/mumugrig/.m2/repository/tools/jackson/core/jackson-core/3.1.0/jackson-core-3.1.0.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/4.0.5/spring-boot-starter-tomcat-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat-runtime/4.0.5/spring-boot-starter-tomcat-runtime-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-web-server/4.0.5/spring-boot-web-server-4.0.5.jar:/home/mumugrig/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/11.0.20/tomcat-embed-core-11.0.20.jar:/home/mumugrig/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/11.0.20/tomcat-embed-el-11.0.20.jar:/home/mumugrig/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/11.0.20/tomcat-embed-websocket-11.0.20.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-tomcat/4.0.5/spring-boot-tomcat-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-http-converter/4.0.5/spring-boot-http-converter-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/spring-web/7.0.6/spring-web-7.0.6.jar:/home/mumugrig/.m2/repository/org/springframework/spring-beans/7.0.6/spring-beans-7.0.6.jar:/home/mumugrig/.m2/repository/io/micrometer/micrometer-observation/1.16.4/micrometer-observation-1.16.4.jar:/home/mumugrig/.m2/repository/io/micrometer/micrometer-commons/1.16.4/micrometer-commons-1.16.4.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-webmvc/4.0.5/spring-boot-webmvc-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-servlet/4.0.5/spring-boot-servlet-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/spring-webmvc/7.0.6/spring-webmvc-7.0.6.jar:/home/mumugrig/.m2/repository/org/springframework/spring-aop/7.0.6/spring-aop-7.0.6.jar:/home/mumugrig/.m2/repository/org/springframework/spring-expression/7.0.6/spring-expression-7.0.6.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-data-jpa/4.0.5/spring-boot-starter-data-jpa-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-jdbc/4.0.5/spring-boot-starter-jdbc-4.0.5.jar:/home/mumugrig/.m2/repository/com/zaxxer/HikariCP/7.0.2/HikariCP-7.0.2.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-data-jpa/4.0.5/spring-boot-data-jpa-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-data-commons/4.0.5/spring-boot-data-commons-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-persistence/4.0.5/spring-boot-persistence-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/data/spring-data-commons/4.0.5/spring-data-commons-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-hibernate/4.0.5/spring-boot-hibernate-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-jpa/4.0.5/spring-boot-jpa-4.0.5.jar:/home/mumugrig/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.2.0/jakarta.persistence-api-3.2.0.jar:/home/mumugrig/.m2/repository/org/hibernate/orm/hibernate-core/7.2.7.Final/hibernate-core-7.2.7.Final.jar:/home/mumugrig/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/mumugrig/.m2/repository/org/jboss/logging/jboss-logging/3.6.3.Final/jboss-logging-3.6.3.Final.jar:/home/mumugrig/.m2/repository/org/hibernate/models/hibernate-models/1.0.1/hibernate-models-1.0.1.jar:/home/mumugrig/.m2/repository/com/fasterxml/classmate/1.7.3/classmate-1.7.3.jar:/home/mumugrig/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.6/jaxb-runtime-4.0.6.jar:/home/mumugrig/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.6/jaxb-core-4.0.6.jar:/home/mumugrig/.m2/repository/org/eclipse/angus/angus-activation/2.0.3/angus-activation-2.0.3.jar:/home/mumugrig/.m2/repository/org/glassfish/jaxb/txw2/4.0.6/txw2-4.0.6.jar:/home/mumugrig/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.2/istack-commons-runtime-4.1.2.jar:/home/mumugrig/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/mumugrig/.m2/repository/org/springframework/spring-orm/7.0.6/spring-orm-7.0.6.jar:/home/mumugrig/.m2/repository/org/springframework/data/spring-data-jpa/4.0.5/spring-data-jpa-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/spring-tx/7.0.6/spring-tx-7.0.6.jar:/home/mumugrig/.m2/repository/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/home/mumugrig/.m2/repository/org/springframework/spring-aspects/7.0.6/spring-aspects-7.0.6.jar:/home/mumugrig/.m2/repository/org/aspectj/aspectjweaver/1.9.25.1/aspectjweaver-1.9.25.1.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-jdbc/4.0.5/spring-boot-jdbc-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-sql/4.0.5/spring-boot-sql-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-transaction/4.0.5/spring-boot-transaction-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/spring-jdbc/7.0.6/spring-jdbc-7.0.6.jar:/home/mumugrig/.m2/repository/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar:/home/mumugrig/.m2/repository/com/h2database/h2/2.4.240/h2-2.4.240.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-devtools/4.0.5/spring-boot-devtools-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot/4.0.5/spring-boot-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/spring-context/7.0.6/spring-context-7.0.6.jar:"/>
+    <property name="java.vm.vendor" value="Debian"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://tracker.debian.org/openjdk-21"/>
+    <property name="user.timezone" value="Europe/Sofia"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="APPLICATION_NAME" value="FashionStore"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="GB"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-21-openjdk-amd64/lib"/>
+    <property name="sun.java.command" value="/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/target/surefire/surefirebooter-20260619002621887_3.jar /home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/target/surefire 2026-06-19T00-26-21_817-jvmRun1 surefire-20260619002621887_1tmp surefire_0-20260619002621887_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/target/test-classes:/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/target/classes:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter/4.0.5/spring-boot-starter-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-logging/4.0.5/spring-boot-starter-logging-4.0.5.jar:/home/mumugrig/.m2/repository/ch/qos/logback/logback-classic/1.5.32/logback-classic-1.5.32.jar:/home/mumugrig/.m2/repository/ch/qos/logback/logback-core/1.5.32/logback-core-1.5.32.jar:/home/mumugrig/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.25.3/log4j-to-slf4j-2.25.3.jar:/home/mumugrig/.m2/repository/org/apache/logging/log4j/log4j-api/2.25.3/log4j-api-2.25.3.jar:/home/mumugrig/.m2/repository/org/slf4j/jul-to-slf4j/2.0.17/jul-to-slf4j-2.0.17.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/4.0.5/spring-boot-autoconfigure-4.0.5.jar:/home/mumugrig/.m2/repository/jakarta/annotation/jakarta.annotation-api/3.0.0/jakarta.annotation-api-3.0.0.jar:/home/mumugrig/.m2/repository/org/yaml/snakeyaml/2.5/snakeyaml-2.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-test/4.0.5/spring-boot-starter-test-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-test/4.0.5/spring-boot-test-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/4.0.5/spring-boot-test-autoconfigure-4.0.5.jar:/home/mumugrig/.m2/repository/com/jayway/jsonpath/json-path/2.10.0/json-path-2.10.0.jar:/home/mumugrig/.m2/repository/org/slf4j/slf4j-api/2.0.17/slf4j-api-2.0.17.jar:/home/mumugrig/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.4/jakarta.xml.bind-api-4.0.4.jar:/home/mumugrig/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.4/jakarta.activation-api-2.1.4.jar:/home/mumugrig/.m2/repository/net/minidev/json-smart/2.6.0/json-smart-2.6.0.jar:/home/mumugrig/.m2/repository/net/minidev/accessors-smart/2.6.0/accessors-smart-2.6.0.jar:/home/mumugrig/.m2/repository/org/ow2/asm/asm/9.7.1/asm-9.7.1.jar:/home/mumugrig/.m2/repository/org/assertj/assertj-core/3.27.7/assertj-core-3.27.7.jar:/home/mumugrig/.m2/repository/net/bytebuddy/byte-buddy/1.17.8/byte-buddy-1.17.8.jar:/home/mumugrig/.m2/repository/org/awaitility/awaitility/4.3.0/awaitility-4.3.0.jar:/home/mumugrig/.m2/repository/org/hamcrest/hamcrest/3.0/hamcrest-3.0.jar:/home/mumugrig/.m2/repository/org/junit/jupiter/junit-jupiter/6.0.3/junit-jupiter-6.0.3.jar:/home/mumugrig/.m2/repository/org/junit/jupiter/junit-jupiter-api/6.0.3/junit-jupiter-api-6.0.3.jar:/home/mumugrig/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/mumugrig/.m2/repository/org/junit/platform/junit-platform-commons/6.0.3/junit-platform-commons-6.0.3.jar:/home/mumugrig/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/mumugrig/.m2/repository/org/junit/jupiter/junit-jupiter-params/6.0.3/junit-jupiter-params-6.0.3.jar:/home/mumugrig/.m2/repository/org/junit/jupiter/junit-jupiter-engine/6.0.3/junit-jupiter-engine-6.0.3.jar:/home/mumugrig/.m2/repository/org/junit/platform/junit-platform-engine/6.0.3/junit-platform-engine-6.0.3.jar:/home/mumugrig/.m2/repository/org/mockito/mockito-core/5.20.0/mockito-core-5.20.0.jar:/home/mumugrig/.m2/repository/net/bytebuddy/byte-buddy-agent/1.17.8/byte-buddy-agent-1.17.8.jar:/home/mumugrig/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/mumugrig/.m2/repository/org/mockito/mockito-junit-jupiter/5.20.0/mockito-junit-jupiter-5.20.0.jar:/home/mumugrig/.m2/repository/org/skyscreamer/jsonassert/1.5.3/jsonassert-1.5.3.jar:/home/mumugrig/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar:/home/mumugrig/.m2/repository/org/springframework/spring-core/7.0.6/spring-core-7.0.6.jar:/home/mumugrig/.m2/repository/commons-logging/commons-logging/1.3.6/commons-logging-1.3.6.jar:/home/mumugrig/.m2/repository/org/jspecify/jspecify/1.0.0/jspecify-1.0.0.jar:/home/mumugrig/.m2/repository/org/springframework/spring-test/7.0.6/spring-test-7.0.6.jar:/home/mumugrig/.m2/repository/org/xmlunit/xmlunit-core/2.10.4/xmlunit-core-2.10.4.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-web/4.0.5/spring-boot-starter-web-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-jackson/4.0.5/spring-boot-starter-jackson-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-jackson/4.0.5/spring-boot-jackson-4.0.5.jar:/home/mumugrig/.m2/repository/tools/jackson/core/jackson-databind/3.1.0/jackson-databind-3.1.0.jar:/home/mumugrig/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.21/jackson-annotations-2.21.jar:/home/mumugrig/.m2/repository/tools/jackson/core/jackson-core/3.1.0/jackson-core-3.1.0.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/4.0.5/spring-boot-starter-tomcat-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat-runtime/4.0.5/spring-boot-starter-tomcat-runtime-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-web-server/4.0.5/spring-boot-web-server-4.0.5.jar:/home/mumugrig/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/11.0.20/tomcat-embed-core-11.0.20.jar:/home/mumugrig/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/11.0.20/tomcat-embed-el-11.0.20.jar:/home/mumugrig/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/11.0.20/tomcat-embed-websocket-11.0.20.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-tomcat/4.0.5/spring-boot-tomcat-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-http-converter/4.0.5/spring-boot-http-converter-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/spring-web/7.0.6/spring-web-7.0.6.jar:/home/mumugrig/.m2/repository/org/springframework/spring-beans/7.0.6/spring-beans-7.0.6.jar:/home/mumugrig/.m2/repository/io/micrometer/micrometer-observation/1.16.4/micrometer-observation-1.16.4.jar:/home/mumugrig/.m2/repository/io/micrometer/micrometer-commons/1.16.4/micrometer-commons-1.16.4.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-webmvc/4.0.5/spring-boot-webmvc-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-servlet/4.0.5/spring-boot-servlet-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/spring-webmvc/7.0.6/spring-webmvc-7.0.6.jar:/home/mumugrig/.m2/repository/org/springframework/spring-aop/7.0.6/spring-aop-7.0.6.jar:/home/mumugrig/.m2/repository/org/springframework/spring-expression/7.0.6/spring-expression-7.0.6.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-data-jpa/4.0.5/spring-boot-starter-data-jpa-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-starter-jdbc/4.0.5/spring-boot-starter-jdbc-4.0.5.jar:/home/mumugrig/.m2/repository/com/zaxxer/HikariCP/7.0.2/HikariCP-7.0.2.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-data-jpa/4.0.5/spring-boot-data-jpa-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-data-commons/4.0.5/spring-boot-data-commons-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-persistence/4.0.5/spring-boot-persistence-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/data/spring-data-commons/4.0.5/spring-data-commons-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-hibernate/4.0.5/spring-boot-hibernate-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-jpa/4.0.5/spring-boot-jpa-4.0.5.jar:/home/mumugrig/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.2.0/jakarta.persistence-api-3.2.0.jar:/home/mumugrig/.m2/repository/org/hibernate/orm/hibernate-core/7.2.7.Final/hibernate-core-7.2.7.Final.jar:/home/mumugrig/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/mumugrig/.m2/repository/org/jboss/logging/jboss-logging/3.6.3.Final/jboss-logging-3.6.3.Final.jar:/home/mumugrig/.m2/repository/org/hibernate/models/hibernate-models/1.0.1/hibernate-models-1.0.1.jar:/home/mumugrig/.m2/repository/com/fasterxml/classmate/1.7.3/classmate-1.7.3.jar:/home/mumugrig/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.6/jaxb-runtime-4.0.6.jar:/home/mumugrig/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.6/jaxb-core-4.0.6.jar:/home/mumugrig/.m2/repository/org/eclipse/angus/angus-activation/2.0.3/angus-activation-2.0.3.jar:/home/mumugrig/.m2/repository/org/glassfish/jaxb/txw2/4.0.6/txw2-4.0.6.jar:/home/mumugrig/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.2/istack-commons-runtime-4.1.2.jar:/home/mumugrig/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/mumugrig/.m2/repository/org/springframework/spring-orm/7.0.6/spring-orm-7.0.6.jar:/home/mumugrig/.m2/repository/org/springframework/data/spring-data-jpa/4.0.5/spring-data-jpa-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/spring-tx/7.0.6/spring-tx-7.0.6.jar:/home/mumugrig/.m2/repository/org/antlr/antlr4-runtime/4.13.2/antlr4-runtime-4.13.2.jar:/home/mumugrig/.m2/repository/org/springframework/spring-aspects/7.0.6/spring-aspects-7.0.6.jar:/home/mumugrig/.m2/repository/org/aspectj/aspectjweaver/1.9.25.1/aspectjweaver-1.9.25.1.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-jdbc/4.0.5/spring-boot-jdbc-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-sql/4.0.5/spring-boot-sql-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-transaction/4.0.5/spring-boot-transaction-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/spring-jdbc/7.0.6/spring-jdbc-7.0.6.jar:/home/mumugrig/.m2/repository/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar:/home/mumugrig/.m2/repository/com/h2database/h2/2.4.240/h2-2.4.240.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot-devtools/4.0.5/spring-boot-devtools-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/boot/spring-boot/4.0.5/spring-boot-4.0.5.jar:/home/mumugrig/.m2/repository/org/springframework/spring-context/7.0.6/spring-context-7.0.6.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/mumugrig"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2026-04-21"/>
+    <property name="java.home" value="/usr/lib/jvm/java-21-openjdk-amd64"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="FILE_LOG_CHARSET" value="UTF-8"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/target/surefire/surefirebooter-20260619002621887_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.11+10-1-deb13u2-Debian"/>
+    <property name="user.name" value="mumugrig"/>
+    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="6.12.90+deb13.1-amd64"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="localRepository" value="/home/mumugrig/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://bugs.debian.org/openjdk-21"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="com.zaxxer.hikari.pool_number" value="1"/>
+    <property name="java.version" value="21.0.11"/>
+    <property name="user.dir" value="/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="59733"/>
+    <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vendor" value="Debian"/>
+    <property name="java.vm.version" value="21.0.11+10-1-deb13u2-Debian"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+    <property name="LOGGED_APPLICATION_NAME" value="[FashionStore] "/>
+  </properties>
+  <testcase name="testFindByUserId" classname="com.fashionstore.repositories.CartItemRepositoryTest" time="0.297">
+    <error message="could not execute statement [Unique index or primary key violation: &quot;PUBLIC.CONSTRAINT_4D PRIMARY KEY ON PUBLIC.USERS(ID) ( /* key:1 */ CAST(1 AS BIGINT), &apos;alice@example.com&apos;, &apos;Alice&apos;, &apos;Johnson&apos;, &apos;hash1&apos;, &apos;1234567890&apos;)&quot;; SQL statement:&#10;insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default) [23505-240]] [insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)]; SQL [insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)]; constraint [PUBLIC.CONSTRAINT_4D PRIMARY KEY]" type="org.springframework.dao.DataIntegrityViolationException"><![CDATA[org.springframework.dao.DataIntegrityViolationException: 
+could not execute statement [Unique index or primary key violation: "PUBLIC.CONSTRAINT_4D PRIMARY KEY ON PUBLIC.USERS(ID) ( /* key:1 */ CAST(1 AS BIGINT), 'alice@example.com', 'Alice', 'Johnson', 'hash1', '1234567890')"; SQL statement:
+insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default) [23505-240]] [insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)]; SQL [insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)]; constraint [PUBLIC.CONSTRAINT_4D PRIMARY KEY]
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:169)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105)
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:576)
+	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)
+	at org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:346)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:166)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:222)
+	at jdk.proxy2/jdk.proxy2.$Proxy160.save(Unknown Source)
+	at com.fashionstore.repositories.CartItemRepositoryTest.setUp(CartItemRepositoryTest.java:56)
+Caused by: org.hibernate.exception.ConstraintViolationException: could not execute statement [Unique index or primary key violation: "PUBLIC.CONSTRAINT_4D PRIMARY KEY ON PUBLIC.USERS(ID) ( /* key:1 */ CAST(1 AS BIGINT), 'alice@example.com', 'Alice', 'Johnson', 'hash1', '1234567890')"; SQL statement:
+insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default) [23505-240]] [insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)]
+	at org.hibernate.dialect.H2Dialect.lambda$buildSQLExceptionConversionDelegate$0(H2Dialect.java:832)
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:184)
+	at org.hibernate.id.insert.GetGeneratedKeysDelegate.performMutation(GetGeneratedKeysDelegate.java:103)
+	at org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:45)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:55)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.doStaticInserts(InsertCoordinatorStandard.java:180)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.coordinateInsert(InsertCoordinatorStandard.java:120)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.insert(InsertCoordinatorStandard.java:84)
+	at org.hibernate.action.internal.EntityIdentityInsertAction.execute(EntityIdentityInsertAction.java:85)
+	at org.hibernate.engine.spi.ActionQueue.execute(ActionQueue.java:667)
+	at org.hibernate.engine.spi.ActionQueue.addResolvedEntityInsertAction(ActionQueue.java:291)
+	at org.hibernate.engine.spi.ActionQueue.addInsertAction(ActionQueue.java:270)
+	at org.hibernate.engine.spi.ActionQueue.addAction(ActionQueue.java:322)
+	at org.hibernate.event.internal.AbstractSaveEventListener.addInsertAction(AbstractSaveEventListener.java:371)
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSaveOrReplicate(AbstractSaveEventListener.java:285)
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSave(AbstractSaveEventListener.java:215)
+	at org.hibernate.event.internal.AbstractSaveEventListener.saveWithGeneratedId(AbstractSaveEventListener.java:133)
+	at org.hibernate.event.internal.DefaultPersistEventListener.entityIsTransient(DefaultPersistEventListener.java:144)
+	at org.hibernate.event.internal.DefaultPersistEventListener.persist(DefaultPersistEventListener.java:90)
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:74)
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:50)
+	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:138)
+	at org.hibernate.internal.SessionImpl.firePersist(SessionImpl.java:692)
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:675)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityHandlerInvocationHandler.invokeMethod(SharedEntityManagerCreator.java:240)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:386)
+	at jdk.proxy2/jdk.proxy2.$Proxy140.persist(Unknown Source)
+	at org.springframework.data.jpa.repository.support.SimpleJpaRepository.save(SimpleJpaRepository.java:664)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker$RepositoryFragmentMethodInvoker.lambda$new$0(RepositoryMethodInvoker.java:278)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:169)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158)
+	at org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:545)
+	at org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:290)
+	at org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:690)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:171)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:146)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:69)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135)
+	... 6 more
+Caused by: org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.CONSTRAINT_4D PRIMARY KEY ON PUBLIC.USERS(ID) ( /* key:1 */ CAST(1 AS BIGINT), 'alice@example.com', 'Alice', 'Johnson', 'hash1', '1234567890')"; SQL statement:
+insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default) [23505-240]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.mvstore.db.MVPrimaryIndex.add(MVPrimaryIndex.java:121)
+	at org.h2.mvstore.db.MVTable.addRow(MVTable.java:520)
+	at org.h2.command.dml.Insert.insertRows(Insert.java:174)
+	at org.h2.command.dml.Insert.update(Insert.java:135)
+	at org.h2.command.CommandContainer.executeUpdateWithGeneratedKeys(CommandContainer.java:212)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:133)
+	at org.h2.command.Command.executeUpdate(Command.java:306)
+	at org.h2.command.Command.executeUpdate(Command.java:250)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:213)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:172)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:181)
+	... 55 more
+]]></error>
+    <system-out><![CDATA[00:26:22.443 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.fashionstore.repositories.CartItemRepositoryTest]: CartItemRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+00:26:22.503 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.fashionstore.FashionStoreApplication for test class com.fashionstore.repositories.CartItemRepositoryTest
+00:26:22.546 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.fashionstore.repositories.CartItemRepositoryTest]: CartItemRepositoryTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+00:26:22.548 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.fashionstore.FashionStoreApplication for test class com.fashionstore.repositories.CartItemRepositoryTest
+00:26:22.604 [main] INFO org.springframework.boot.devtools.restart.RestartApplicationListener -- Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.5)
+
+2026-06-19T00:26:22.749+03:00  INFO 59733 --- [FashionStore] [           main] c.f.repositories.CartItemRepositoryTest  : Starting CartItemRepositoryTest using Java 21.0.11 with PID 59733 (started by mumugrig in /home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend)
+2026-06-19T00:26:22.750+03:00  INFO 59733 --- [FashionStore] [           main] c.f.repositories.CartItemRepositoryTest  : No active profile set, falling back to 1 default profile: "default"
+2026-06-19T00:26:23.082+03:00  INFO 59733 --- [FashionStore] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-06-19T00:26:23.117+03:00  INFO 59733 --- [FashionStore] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 31 ms. Found 10 JPA repository interfaces.
+2026-06-19T00:26:23.329+03:00  INFO 59733 --- [FashionStore] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-06-19T00:26:23.355+03:00  INFO 59733 --- [FashionStore] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.7.Final
+2026-06-19T00:26:23.625+03:00  INFO 59733 --- [FashionStore] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-06-19T00:26:23.645+03:00  INFO 59733 --- [FashionStore] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-06-19T00:26:23.745+03:00  INFO 59733 --- [FashionStore] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:fashiondb user=SA
+2026-06-19T00:26:23.746+03:00  INFO 59733 --- [FashionStore] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-06-19T00:26:23.783+03:00  INFO 59733 --- [FashionStore] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:fashiondb]
+	Database driver: H2 JDBC Driver
+	Database dialect: H2Dialect
+	Database version: 2.4.240
+	Default catalog/schema: FASHIONDB/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-06-19T00:26:24.289+03:00  INFO 59733 --- [FashionStore] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: create table addresses (id bigint generated by default as identity, address_line varchar(255), city varchar(255), country varchar(255), postal_code integer, region varchar(255), user_id bigint, primary key (id))
+Hibernate: create table cart_items (id bigint generated by default as identity, quantity integer not null, item_variant_id bigint, user_id bigint, primary key (id))
+Hibernate: create table categories (id bigint generated by default as identity, name varchar(255), parent_id bigint, primary key (id))
+Hibernate: create table colors (id bigint generated by default as identity, image_url varchar(255), name varchar(255), color_value varchar(255), primary key (id))
+Hibernate: create table favourites (id bigint generated by default as identity, item_variant_id bigint, user_id bigint, primary key (id))
+Hibernate: create table item_variants (id bigint generated by default as identity, is_active boolean, stock_left integer, color_id bigint, item_id bigint, size_id bigint, primary key (id))
+Hibernate: create table items (id bigint generated by default as identity, audience enum ('KIDS','MEN','UNISEX','WOMEN'), description varchar(255), name varchar(255), price float(24) not null, category_id bigint, primary key (id))
+Hibernate: create table reviews (id bigint generated by default as identity, body varchar(255), comfort enum ('COMFORTABLE','UNCOMFORTABLE','VERY_COMFORTABLE'), quality enum ('AVERAGE','EXCELLENT','POOR'), size_fit enum ('RUNS_LARGE','RUNS_SMALL','TRUE_TO_SIZE'), item_variant_id bigint, user_id bigint, primary key (id))
+Hibernate: create table sizes (id bigint generated by default as identity, label varchar(255), size_system enum ('ALPHA','EU','UK','US'), primary key (id))
+Hibernate: create table users (id bigint generated by default as identity, email varchar(255) not null, first_name varchar(255) not null, last_name varchar(255) not null, password_hash varchar(255) not null, phone_number varchar(255), primary key (id))
+Hibernate: alter table if exists users drop constraint if exists UK6dotkott2kjsp8vw4d0m25fb7
+Hibernate: alter table if exists users add constraint UK6dotkott2kjsp8vw4d0m25fb7 unique (email)
+Hibernate: alter table if exists addresses add constraint FK1fa36y2oqhao3wgg2rw1pi459 foreign key (user_id) references users
+Hibernate: alter table if exists cart_items add constraint FKriv960rf4r5q76tmhxej4a6hj foreign key (item_variant_id) references item_variants
+Hibernate: alter table if exists cart_items add constraint FK709eickf3kc0dujx3ub9i7btf foreign key (user_id) references users
+Hibernate: alter table if exists categories add constraint FKsaok720gsu4u2wrgbk10b5n8d foreign key (parent_id) references categories
+Hibernate: alter table if exists favourites add constraint FK261n1b8bqifjvbaqnck7mjnpk foreign key (item_variant_id) references item_variants
+Hibernate: alter table if exists favourites add constraint FK6ffqdnwmm3ks4fenx2ml1uap8 foreign key (user_id) references users
+Hibernate: alter table if exists item_variants add constraint FKj8d6m7c3po5tdsk1g8galj1h foreign key (color_id) references colors
+Hibernate: alter table if exists item_variants add constraint FKjvwpj86cp0scxwm4va1yav3i foreign key (item_id) references items
+Hibernate: alter table if exists item_variants add constraint FKhjtjnbqjsd0igkw9opk909ife foreign key (size_id) references sizes
+Hibernate: alter table if exists items add constraint FKjcdcde7htb3tyjgouo4g9xbmr foreign key (category_id) references categories
+Hibernate: alter table if exists reviews add constraint FKtc7xwo89oja59irlj4n9jj04r foreign key (item_variant_id) references item_variants
+Hibernate: alter table if exists reviews add constraint FKcgy7qjc1r99dp117y9en6lxye foreign key (user_id) references users
+2026-06-19T00:26:24.341+03:00  INFO 59733 --- [FashionStore] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-19T00:26:24.396+03:00  WARN 59733 --- [FashionStore] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-19T00:26:24.626+03:00  INFO 59733 --- [FashionStore] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-06-19T00:26:24.847+03:00  INFO 59733 --- [FashionStore] [           main] c.f.repositories.CartItemRepositoryTest  : Started CartItemRepositoryTest in 2.255 seconds (process running for 2.923)
+Hibernate: insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)
+2026-06-19T00:26:25.138+03:00  WARN 59733 --- [FashionStore] [           main] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 23505, SQLState: 23505
+2026-06-19T00:26:25.138+03:00  WARN 59733 --- [FashionStore] [           main] org.hibernate.orm.jdbc.error             : Unique index or primary key violation: "PUBLIC.CONSTRAINT_4D PRIMARY KEY ON PUBLIC.USERS(ID) ( /* key:1 */ CAST(1 AS BIGINT), 'alice@example.com', 'Alice', 'Johnson', 'hash1', '1234567890')"; SQL statement:
+insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default) [23505-240]
+]]></system-out>
+    <system-err><![CDATA[Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (/home/mumugrig/.m2/repository/net/bytebuddy/byte-buddy-agent/1.17.8/byte-buddy-agent-1.17.8.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+  </testcase>
+  <testcase name="testFindByUserIdEmpty" classname="com.fashionstore.repositories.CartItemRepositoryTest" time="0.008">
+    <error message="could not execute statement [Unique index or primary key violation: &quot;PUBLIC.CONSTRAINT_4D PRIMARY KEY ON PUBLIC.USERS(ID) ( /* key:2 */ CAST(2 AS BIGINT), &apos;bob@example.com&apos;, &apos;Bob&apos;, &apos;Smith&apos;, &apos;hash2&apos;, &apos;0987654321&apos;)&quot;; SQL statement:&#10;insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default) [23505-240]] [insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)]; SQL [insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)]; constraint [PUBLIC.CONSTRAINT_4D PRIMARY KEY]" type="org.springframework.dao.DataIntegrityViolationException"><![CDATA[org.springframework.dao.DataIntegrityViolationException: 
+could not execute statement [Unique index or primary key violation: "PUBLIC.CONSTRAINT_4D PRIMARY KEY ON PUBLIC.USERS(ID) ( /* key:2 */ CAST(2 AS BIGINT), 'bob@example.com', 'Bob', 'Smith', 'hash2', '0987654321')"; SQL statement:
+insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default) [23505-240]] [insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)]; SQL [insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)]; constraint [PUBLIC.CONSTRAINT_4D PRIMARY KEY]
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:169)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105)
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:576)
+	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)
+	at org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:346)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:166)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:222)
+	at jdk.proxy2/jdk.proxy2.$Proxy160.save(Unknown Source)
+	at com.fashionstore.repositories.CartItemRepositoryTest.setUp(CartItemRepositoryTest.java:56)
+Caused by: org.hibernate.exception.ConstraintViolationException: could not execute statement [Unique index or primary key violation: "PUBLIC.CONSTRAINT_4D PRIMARY KEY ON PUBLIC.USERS(ID) ( /* key:2 */ CAST(2 AS BIGINT), 'bob@example.com', 'Bob', 'Smith', 'hash2', '0987654321')"; SQL statement:
+insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default) [23505-240]] [insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)]
+	at org.hibernate.dialect.H2Dialect.lambda$buildSQLExceptionConversionDelegate$0(H2Dialect.java:832)
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:184)
+	at org.hibernate.id.insert.GetGeneratedKeysDelegate.performMutation(GetGeneratedKeysDelegate.java:103)
+	at org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:45)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:55)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.doStaticInserts(InsertCoordinatorStandard.java:180)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.coordinateInsert(InsertCoordinatorStandard.java:120)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.insert(InsertCoordinatorStandard.java:84)
+	at org.hibernate.action.internal.EntityIdentityInsertAction.execute(EntityIdentityInsertAction.java:85)
+	at org.hibernate.engine.spi.ActionQueue.execute(ActionQueue.java:667)
+	at org.hibernate.engine.spi.ActionQueue.addResolvedEntityInsertAction(ActionQueue.java:291)
+	at org.hibernate.engine.spi.ActionQueue.addInsertAction(ActionQueue.java:270)
+	at org.hibernate.engine.spi.ActionQueue.addAction(ActionQueue.java:322)
+	at org.hibernate.event.internal.AbstractSaveEventListener.addInsertAction(AbstractSaveEventListener.java:371)
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSaveOrReplicate(AbstractSaveEventListener.java:285)
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSave(AbstractSaveEventListener.java:215)
+	at org.hibernate.event.internal.AbstractSaveEventListener.saveWithGeneratedId(AbstractSaveEventListener.java:133)
+	at org.hibernate.event.internal.DefaultPersistEventListener.entityIsTransient(DefaultPersistEventListener.java:144)
+	at org.hibernate.event.internal.DefaultPersistEventListener.persist(DefaultPersistEventListener.java:90)
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:74)
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:50)
+	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:138)
+	at org.hibernate.internal.SessionImpl.firePersist(SessionImpl.java:692)
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:675)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityHandlerInvocationHandler.invokeMethod(SharedEntityManagerCreator.java:240)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:386)
+	at jdk.proxy2/jdk.proxy2.$Proxy140.persist(Unknown Source)
+	at org.springframework.data.jpa.repository.support.SimpleJpaRepository.save(SimpleJpaRepository.java:664)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker$RepositoryFragmentMethodInvoker.lambda$new$0(RepositoryMethodInvoker.java:278)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:169)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158)
+	at org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:545)
+	at org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:290)
+	at org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:690)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:171)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:146)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:69)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135)
+	... 6 more
+Caused by: org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.CONSTRAINT_4D PRIMARY KEY ON PUBLIC.USERS(ID) ( /* key:2 */ CAST(2 AS BIGINT), 'bob@example.com', 'Bob', 'Smith', 'hash2', '0987654321')"; SQL statement:
+insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default) [23505-240]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.mvstore.db.MVPrimaryIndex.add(MVPrimaryIndex.java:121)
+	at org.h2.mvstore.db.MVTable.addRow(MVTable.java:520)
+	at org.h2.command.dml.Insert.insertRows(Insert.java:174)
+	at org.h2.command.dml.Insert.update(Insert.java:135)
+	at org.h2.command.CommandContainer.executeUpdateWithGeneratedKeys(CommandContainer.java:212)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:133)
+	at org.h2.command.Command.executeUpdate(Command.java:306)
+	at org.h2.command.Command.executeUpdate(Command.java:250)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:213)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:172)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:181)
+	... 55 more
+]]></error>
+    <system-out><![CDATA[Hibernate: insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)
+2026-06-19T00:26:25.161+03:00  WARN 59733 --- [FashionStore] [           main] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 23505, SQLState: 23505
+2026-06-19T00:26:25.162+03:00  WARN 59733 --- [FashionStore] [           main] org.hibernate.orm.jdbc.error             : Unique index or primary key violation: "PUBLIC.CONSTRAINT_4D PRIMARY KEY ON PUBLIC.USERS(ID) ( /* key:2 */ CAST(2 AS BIGINT), 'bob@example.com', 'Bob', 'Smith', 'hash2', '0987654321')"; SQL statement:
+insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default) [23505-240]
+]]></system-out>
+  </testcase>
+  <testcase name="testCountCartItems" classname="com.fashionstore.repositories.CartItemRepositoryTest" time="0.026">
+    <error message="could not execute statement [Unique index or primary key violation: &quot;PUBLIC.CONSTRAINT_6 PRIMARY KEY ON PUBLIC.CATEGORIES(ID) ( /* key:1 */ CAST(1 AS BIGINT), &apos;Tops&apos;, NULL)&quot;; SQL statement:&#10;insert into categories (name,parent_id,id) values (?,?,default) [23505-240]] [insert into categories (name,parent_id,id) values (?,?,default)]; SQL [insert into categories (name,parent_id,id) values (?,?,default)]; constraint [PUBLIC.CONSTRAINT_6 PRIMARY KEY]" type="org.springframework.dao.DataIntegrityViolationException"><![CDATA[org.springframework.dao.DataIntegrityViolationException: 
+could not execute statement [Unique index or primary key violation: "PUBLIC.CONSTRAINT_6 PRIMARY KEY ON PUBLIC.CATEGORIES(ID) ( /* key:1 */ CAST(1 AS BIGINT), 'Tops', NULL)"; SQL statement:
+insert into categories (name,parent_id,id) values (?,?,default) [23505-240]] [insert into categories (name,parent_id,id) values (?,?,default)]; SQL [insert into categories (name,parent_id,id) values (?,?,default)]; constraint [PUBLIC.CONSTRAINT_6 PRIMARY KEY]
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:169)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105)
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:576)
+	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)
+	at org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:346)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:166)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:222)
+	at jdk.proxy2/jdk.proxy2.$Proxy159.save(Unknown Source)
+	at com.fashionstore.repositories.CartItemRepositoryTest.setUp(CartItemRepositoryTest.java:60)
+Caused by: org.hibernate.exception.ConstraintViolationException: could not execute statement [Unique index or primary key violation: "PUBLIC.CONSTRAINT_6 PRIMARY KEY ON PUBLIC.CATEGORIES(ID) ( /* key:1 */ CAST(1 AS BIGINT), 'Tops', NULL)"; SQL statement:
+insert into categories (name,parent_id,id) values (?,?,default) [23505-240]] [insert into categories (name,parent_id,id) values (?,?,default)]
+	at org.hibernate.dialect.H2Dialect.lambda$buildSQLExceptionConversionDelegate$0(H2Dialect.java:832)
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:184)
+	at org.hibernate.id.insert.GetGeneratedKeysDelegate.performMutation(GetGeneratedKeysDelegate.java:103)
+	at org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:45)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:55)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.doStaticInserts(InsertCoordinatorStandard.java:180)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.coordinateInsert(InsertCoordinatorStandard.java:120)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.insert(InsertCoordinatorStandard.java:84)
+	at org.hibernate.action.internal.EntityIdentityInsertAction.execute(EntityIdentityInsertAction.java:85)
+	at org.hibernate.engine.spi.ActionQueue.execute(ActionQueue.java:667)
+	at org.hibernate.engine.spi.ActionQueue.addResolvedEntityInsertAction(ActionQueue.java:291)
+	at org.hibernate.engine.spi.ActionQueue.addInsertAction(ActionQueue.java:270)
+	at org.hibernate.engine.spi.ActionQueue.addAction(ActionQueue.java:322)
+	at org.hibernate.event.internal.AbstractSaveEventListener.addInsertAction(AbstractSaveEventListener.java:371)
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSaveOrReplicate(AbstractSaveEventListener.java:285)
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSave(AbstractSaveEventListener.java:215)
+	at org.hibernate.event.internal.AbstractSaveEventListener.saveWithGeneratedId(AbstractSaveEventListener.java:133)
+	at org.hibernate.event.internal.DefaultPersistEventListener.entityIsTransient(DefaultPersistEventListener.java:144)
+	at org.hibernate.event.internal.DefaultPersistEventListener.persist(DefaultPersistEventListener.java:90)
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:74)
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:50)
+	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:138)
+	at org.hibernate.internal.SessionImpl.firePersist(SessionImpl.java:692)
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:675)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityHandlerInvocationHandler.invokeMethod(SharedEntityManagerCreator.java:240)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:386)
+	at jdk.proxy2/jdk.proxy2.$Proxy140.persist(Unknown Source)
+	at org.springframework.data.jpa.repository.support.SimpleJpaRepository.save(SimpleJpaRepository.java:664)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker$RepositoryFragmentMethodInvoker.lambda$new$0(RepositoryMethodInvoker.java:278)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:169)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158)
+	at org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:545)
+	at org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:290)
+	at org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:690)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:171)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:146)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:69)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135)
+	... 6 more
+Caused by: org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.CONSTRAINT_6 PRIMARY KEY ON PUBLIC.CATEGORIES(ID) ( /* key:1 */ CAST(1 AS BIGINT), 'Tops', NULL)"; SQL statement:
+insert into categories (name,parent_id,id) values (?,?,default) [23505-240]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.mvstore.db.MVPrimaryIndex.add(MVPrimaryIndex.java:121)
+	at org.h2.mvstore.db.MVTable.addRow(MVTable.java:520)
+	at org.h2.command.dml.Insert.insertRows(Insert.java:174)
+	at org.h2.command.dml.Insert.update(Insert.java:135)
+	at org.h2.command.CommandContainer.executeUpdateWithGeneratedKeys(CommandContainer.java:212)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:133)
+	at org.h2.command.Command.executeUpdate(Command.java:306)
+	at org.h2.command.Command.executeUpdate(Command.java:250)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:213)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:172)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:181)
+	... 55 more
+]]></error>
+    <system-out><![CDATA[Hibernate: insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)
+Hibernate: insert into categories (name,parent_id,id) values (?,?,default)
+2026-06-19T00:26:25.193+03:00  WARN 59733 --- [FashionStore] [           main] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 23505, SQLState: 23505
+2026-06-19T00:26:25.193+03:00  WARN 59733 --- [FashionStore] [           main] org.hibernate.orm.jdbc.error             : Unique index or primary key violation: "PUBLIC.CONSTRAINT_6 PRIMARY KEY ON PUBLIC.CATEGORIES(ID) ( /* key:1 */ CAST(1 AS BIGINT), 'Tops', NULL)"; SQL statement:
+insert into categories (name,parent_id,id) values (?,?,default) [23505-240]
+]]></system-out>
+  </testcase>
+  <testcase name="testSaveCartItem" classname="com.fashionstore.repositories.CartItemRepositoryTest" time="0.006">
+    <error message="could not execute statement [Unique index or primary key violation: &quot;PUBLIC.CONSTRAINT_6 PRIMARY KEY ON PUBLIC.CATEGORIES(ID) ( /* key:2 */ CAST(2 AS BIGINT), &apos;Shirts&apos;, CAST(1 AS BIGINT))&quot;; SQL statement:&#10;insert into categories (name,parent_id,id) values (?,?,default) [23505-240]] [insert into categories (name,parent_id,id) values (?,?,default)]; SQL [insert into categories (name,parent_id,id) values (?,?,default)]; constraint [PUBLIC.CONSTRAINT_6 PRIMARY KEY]" type="org.springframework.dao.DataIntegrityViolationException"><![CDATA[org.springframework.dao.DataIntegrityViolationException: 
+could not execute statement [Unique index or primary key violation: "PUBLIC.CONSTRAINT_6 PRIMARY KEY ON PUBLIC.CATEGORIES(ID) ( /* key:2 */ CAST(2 AS BIGINT), 'Shirts', CAST(1 AS BIGINT))"; SQL statement:
+insert into categories (name,parent_id,id) values (?,?,default) [23505-240]] [insert into categories (name,parent_id,id) values (?,?,default)]; SQL [insert into categories (name,parent_id,id) values (?,?,default)]; constraint [PUBLIC.CONSTRAINT_6 PRIMARY KEY]
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:169)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105)
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:576)
+	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)
+	at org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:346)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:166)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:222)
+	at jdk.proxy2/jdk.proxy2.$Proxy159.save(Unknown Source)
+	at com.fashionstore.repositories.CartItemRepositoryTest.setUp(CartItemRepositoryTest.java:60)
+Caused by: org.hibernate.exception.ConstraintViolationException: could not execute statement [Unique index or primary key violation: "PUBLIC.CONSTRAINT_6 PRIMARY KEY ON PUBLIC.CATEGORIES(ID) ( /* key:2 */ CAST(2 AS BIGINT), 'Shirts', CAST(1 AS BIGINT))"; SQL statement:
+insert into categories (name,parent_id,id) values (?,?,default) [23505-240]] [insert into categories (name,parent_id,id) values (?,?,default)]
+	at org.hibernate.dialect.H2Dialect.lambda$buildSQLExceptionConversionDelegate$0(H2Dialect.java:832)
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:184)
+	at org.hibernate.id.insert.GetGeneratedKeysDelegate.performMutation(GetGeneratedKeysDelegate.java:103)
+	at org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:45)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:55)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.doStaticInserts(InsertCoordinatorStandard.java:180)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.coordinateInsert(InsertCoordinatorStandard.java:120)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.insert(InsertCoordinatorStandard.java:84)
+	at org.hibernate.action.internal.EntityIdentityInsertAction.execute(EntityIdentityInsertAction.java:85)
+	at org.hibernate.engine.spi.ActionQueue.execute(ActionQueue.java:667)
+	at org.hibernate.engine.spi.ActionQueue.addResolvedEntityInsertAction(ActionQueue.java:291)
+	at org.hibernate.engine.spi.ActionQueue.addInsertAction(ActionQueue.java:270)
+	at org.hibernate.engine.spi.ActionQueue.addAction(ActionQueue.java:322)
+	at org.hibernate.event.internal.AbstractSaveEventListener.addInsertAction(AbstractSaveEventListener.java:371)
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSaveOrReplicate(AbstractSaveEventListener.java:285)
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSave(AbstractSaveEventListener.java:215)
+	at org.hibernate.event.internal.AbstractSaveEventListener.saveWithGeneratedId(AbstractSaveEventListener.java:133)
+	at org.hibernate.event.internal.DefaultPersistEventListener.entityIsTransient(DefaultPersistEventListener.java:144)
+	at org.hibernate.event.internal.DefaultPersistEventListener.persist(DefaultPersistEventListener.java:90)
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:74)
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:50)
+	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:138)
+	at org.hibernate.internal.SessionImpl.firePersist(SessionImpl.java:692)
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:675)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityHandlerInvocationHandler.invokeMethod(SharedEntityManagerCreator.java:240)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:386)
+	at jdk.proxy2/jdk.proxy2.$Proxy140.persist(Unknown Source)
+	at org.springframework.data.jpa.repository.support.SimpleJpaRepository.save(SimpleJpaRepository.java:664)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker$RepositoryFragmentMethodInvoker.lambda$new$0(RepositoryMethodInvoker.java:278)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:169)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158)
+	at org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:545)
+	at org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:290)
+	at org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:690)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:171)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:146)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:69)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135)
+	... 6 more
+Caused by: org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.CONSTRAINT_6 PRIMARY KEY ON PUBLIC.CATEGORIES(ID) ( /* key:2 */ CAST(2 AS BIGINT), 'Shirts', CAST(1 AS BIGINT))"; SQL statement:
+insert into categories (name,parent_id,id) values (?,?,default) [23505-240]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.mvstore.db.MVPrimaryIndex.add(MVPrimaryIndex.java:121)
+	at org.h2.mvstore.db.MVTable.addRow(MVTable.java:520)
+	at org.h2.command.dml.Insert.insertRows(Insert.java:174)
+	at org.h2.command.dml.Insert.update(Insert.java:135)
+	at org.h2.command.CommandContainer.executeUpdateWithGeneratedKeys(CommandContainer.java:212)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:133)
+	at org.h2.command.Command.executeUpdate(Command.java:306)
+	at org.h2.command.Command.executeUpdate(Command.java:250)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:213)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:172)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:181)
+	... 55 more
+]]></error>
+    <system-out><![CDATA[Hibernate: insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)
+Hibernate: insert into categories (name,parent_id,id) values (?,?,default)
+2026-06-19T00:26:25.201+03:00  WARN 59733 --- [FashionStore] [           main] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 23505, SQLState: 23505
+2026-06-19T00:26:25.201+03:00  WARN 59733 --- [FashionStore] [           main] org.hibernate.orm.jdbc.error             : Unique index or primary key violation: "PUBLIC.CONSTRAINT_6 PRIMARY KEY ON PUBLIC.CATEGORIES(ID) ( /* key:2 */ CAST(2 AS BIGINT), 'Shirts', CAST(1 AS BIGINT))"; SQL statement:
+insert into categories (name,parent_id,id) values (?,?,default) [23505-240]
+]]></system-out>
+  </testcase>
+  <testcase name="testDeleteCartItem" classname="com.fashionstore.repositories.CartItemRepositoryTest" time="0.008">
+    <error message="could not execute statement [Unique index or primary key violation: &quot;PUBLIC.CONSTRAINT_4 PRIMARY KEY ON PUBLIC.ITEMS(ID) ( /* key:1 */ CAST(1 AS BIGINT), CAST(&apos;UNISEX&apos; AS ENUM(&apos;KIDS&apos;, &apos;MEN&apos;, &apos;UNISEX&apos;, &apos;WOMEN&apos;)), &apos;A comfortable casual shirt.&apos;, &apos;Casual Shirt&apos;, CAST(29.99 AS REAL), CAST(2 AS BIGINT))&quot;; SQL statement:&#10;insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default) [23505-240]] [insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default)]; SQL [insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default)]; constraint [PUBLIC.CONSTRAINT_4 PRIMARY KEY]" type="org.springframework.dao.DataIntegrityViolationException"><![CDATA[org.springframework.dao.DataIntegrityViolationException: 
+could not execute statement [Unique index or primary key violation: "PUBLIC.CONSTRAINT_4 PRIMARY KEY ON PUBLIC.ITEMS(ID) ( /* key:1 */ CAST(1 AS BIGINT), CAST('UNISEX' AS ENUM('KIDS', 'MEN', 'UNISEX', 'WOMEN')), 'A comfortable casual shirt.', 'Casual Shirt', CAST(29.99 AS REAL), CAST(2 AS BIGINT))"; SQL statement:
+insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default) [23505-240]] [insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default)]; SQL [insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default)]; constraint [PUBLIC.CONSTRAINT_4 PRIMARY KEY]
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:169)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105)
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:576)
+	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)
+	at org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:346)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:166)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:222)
+	at jdk.proxy2/jdk.proxy2.$Proxy155.save(Unknown Source)
+	at com.fashionstore.repositories.CartItemRepositoryTest.setUp(CartItemRepositoryTest.java:67)
+Caused by: org.hibernate.exception.ConstraintViolationException: could not execute statement [Unique index or primary key violation: "PUBLIC.CONSTRAINT_4 PRIMARY KEY ON PUBLIC.ITEMS(ID) ( /* key:1 */ CAST(1 AS BIGINT), CAST('UNISEX' AS ENUM('KIDS', 'MEN', 'UNISEX', 'WOMEN')), 'A comfortable casual shirt.', 'Casual Shirt', CAST(29.99 AS REAL), CAST(2 AS BIGINT))"; SQL statement:
+insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default) [23505-240]] [insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default)]
+	at org.hibernate.dialect.H2Dialect.lambda$buildSQLExceptionConversionDelegate$0(H2Dialect.java:832)
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:184)
+	at org.hibernate.id.insert.GetGeneratedKeysDelegate.performMutation(GetGeneratedKeysDelegate.java:103)
+	at org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:45)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:55)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.doStaticInserts(InsertCoordinatorStandard.java:180)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.coordinateInsert(InsertCoordinatorStandard.java:120)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.insert(InsertCoordinatorStandard.java:84)
+	at org.hibernate.action.internal.EntityIdentityInsertAction.execute(EntityIdentityInsertAction.java:85)
+	at org.hibernate.engine.spi.ActionQueue.execute(ActionQueue.java:667)
+	at org.hibernate.engine.spi.ActionQueue.addResolvedEntityInsertAction(ActionQueue.java:291)
+	at org.hibernate.engine.spi.ActionQueue.addInsertAction(ActionQueue.java:270)
+	at org.hibernate.engine.spi.ActionQueue.addAction(ActionQueue.java:322)
+	at org.hibernate.event.internal.AbstractSaveEventListener.addInsertAction(AbstractSaveEventListener.java:371)
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSaveOrReplicate(AbstractSaveEventListener.java:285)
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSave(AbstractSaveEventListener.java:215)
+	at org.hibernate.event.internal.AbstractSaveEventListener.saveWithGeneratedId(AbstractSaveEventListener.java:133)
+	at org.hibernate.event.internal.DefaultPersistEventListener.entityIsTransient(DefaultPersistEventListener.java:144)
+	at org.hibernate.event.internal.DefaultPersistEventListener.persist(DefaultPersistEventListener.java:90)
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:74)
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:50)
+	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:138)
+	at org.hibernate.internal.SessionImpl.firePersist(SessionImpl.java:692)
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:675)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityHandlerInvocationHandler.invokeMethod(SharedEntityManagerCreator.java:240)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:386)
+	at jdk.proxy2/jdk.proxy2.$Proxy140.persist(Unknown Source)
+	at org.springframework.data.jpa.repository.support.SimpleJpaRepository.save(SimpleJpaRepository.java:664)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker$RepositoryFragmentMethodInvoker.lambda$new$0(RepositoryMethodInvoker.java:278)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:169)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158)
+	at org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:545)
+	at org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:290)
+	at org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:690)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:171)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:146)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:69)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135)
+	... 6 more
+Caused by: org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.CONSTRAINT_4 PRIMARY KEY ON PUBLIC.ITEMS(ID) ( /* key:1 */ CAST(1 AS BIGINT), CAST('UNISEX' AS ENUM('KIDS', 'MEN', 'UNISEX', 'WOMEN')), 'A comfortable casual shirt.', 'Casual Shirt', CAST(29.99 AS REAL), CAST(2 AS BIGINT))"; SQL statement:
+insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default) [23505-240]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.mvstore.db.MVPrimaryIndex.add(MVPrimaryIndex.java:121)
+	at org.h2.mvstore.db.MVTable.addRow(MVTable.java:520)
+	at org.h2.command.dml.Insert.insertRows(Insert.java:174)
+	at org.h2.command.dml.Insert.update(Insert.java:135)
+	at org.h2.command.CommandContainer.executeUpdateWithGeneratedKeys(CommandContainer.java:212)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:133)
+	at org.h2.command.Command.executeUpdate(Command.java:306)
+	at org.h2.command.Command.executeUpdate(Command.java:250)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:213)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:172)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:181)
+	... 55 more
+]]></error>
+    <system-out><![CDATA[Hibernate: insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)
+Hibernate: insert into categories (name,parent_id,id) values (?,?,default)
+Hibernate: insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default)
+2026-06-19T00:26:25.211+03:00  WARN 59733 --- [FashionStore] [           main] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 23505, SQLState: 23505
+2026-06-19T00:26:25.211+03:00  WARN 59733 --- [FashionStore] [           main] org.hibernate.orm.jdbc.error             : Unique index or primary key violation: "PUBLIC.CONSTRAINT_4 PRIMARY KEY ON PUBLIC.ITEMS(ID) ( /* key:1 */ CAST(1 AS BIGINT), CAST('UNISEX' AS ENUM('KIDS', 'MEN', 'UNISEX', 'WOMEN')), 'A comfortable casual shirt.', 'Casual Shirt', CAST(29.99 AS REAL), CAST(2 AS BIGINT))"; SQL statement:
+insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default) [23505-240]
+]]></system-out>
+  </testcase>
+  <testcase name="testFindCartItemById" classname="com.fashionstore.repositories.CartItemRepositoryTest" time="0.007">
+    <error message="could not execute statement [Unique index or primary key violation: &quot;PUBLIC.CONSTRAINT_4 PRIMARY KEY ON PUBLIC.ITEMS(ID) ( /* key:2 */ CAST(2 AS BIGINT), CAST(&apos;MEN&apos; AS ENUM(&apos;KIDS&apos;, &apos;MEN&apos;, &apos;UNISEX&apos;, &apos;WOMEN&apos;)), &apos;Basic cotton t-shirt.&apos;, &apos;T-Shirt&apos;, CAST(19.99 AS REAL), CAST(1 AS BIGINT))&quot;; SQL statement:&#10;insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default) [23505-240]] [insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default)]; SQL [insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default)]; constraint [PUBLIC.CONSTRAINT_4 PRIMARY KEY]" type="org.springframework.dao.DataIntegrityViolationException"><![CDATA[org.springframework.dao.DataIntegrityViolationException: 
+could not execute statement [Unique index or primary key violation: "PUBLIC.CONSTRAINT_4 PRIMARY KEY ON PUBLIC.ITEMS(ID) ( /* key:2 */ CAST(2 AS BIGINT), CAST('MEN' AS ENUM('KIDS', 'MEN', 'UNISEX', 'WOMEN')), 'Basic cotton t-shirt.', 'T-Shirt', CAST(19.99 AS REAL), CAST(1 AS BIGINT))"; SQL statement:
+insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default) [23505-240]] [insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default)]; SQL [insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default)]; constraint [PUBLIC.CONSTRAINT_4 PRIMARY KEY]
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:169)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.convertHibernateAccessException(HibernateExceptionTranslator.java:131)
+	at org.springframework.orm.jpa.hibernate.HibernateExceptionTranslator.translateExceptionIfPossible(HibernateExceptionTranslator.java:105)
+	at org.springframework.orm.jpa.vendor.HibernateJpaDialect.translateExceptionIfPossible(HibernateJpaDialect.java:223)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.translateExceptionIfPossible(AbstractEntityManagerFactoryBean.java:576)
+	at org.springframework.dao.support.ChainedPersistenceExceptionTranslator.translateExceptionIfPossible(ChainedPersistenceExceptionTranslator.java:61)
+	at org.springframework.dao.support.DataAccessUtils.translateIfNecessary(DataAccessUtils.java:346)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:157)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.jpa.repository.support.CrudMethodMetadataPostProcessor$CrudMethodMetadataPopulatingMethodInterceptor.invoke(CrudMethodMetadataPostProcessor.java:166)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:222)
+	at jdk.proxy2/jdk.proxy2.$Proxy155.save(Unknown Source)
+	at com.fashionstore.repositories.CartItemRepositoryTest.setUp(CartItemRepositoryTest.java:67)
+Caused by: org.hibernate.exception.ConstraintViolationException: could not execute statement [Unique index or primary key violation: "PUBLIC.CONSTRAINT_4 PRIMARY KEY ON PUBLIC.ITEMS(ID) ( /* key:2 */ CAST(2 AS BIGINT), CAST('MEN' AS ENUM('KIDS', 'MEN', 'UNISEX', 'WOMEN')), 'Basic cotton t-shirt.', 'T-Shirt', CAST(19.99 AS REAL), CAST(1 AS BIGINT))"; SQL statement:
+insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default) [23505-240]] [insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default)]
+	at org.hibernate.dialect.H2Dialect.lambda$buildSQLExceptionConversionDelegate$0(H2Dialect.java:832)
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:34)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:115)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:184)
+	at org.hibernate.id.insert.GetGeneratedKeysDelegate.performMutation(GetGeneratedKeysDelegate.java:103)
+	at org.hibernate.engine.jdbc.mutation.internal.MutationExecutorSingleNonBatched.performNonBatchedOperations(MutationExecutorSingleNonBatched.java:45)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:66)
+	at org.hibernate.engine.jdbc.mutation.internal.AbstractMutationExecutor.execute(AbstractMutationExecutor.java:55)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.doStaticInserts(InsertCoordinatorStandard.java:180)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.coordinateInsert(InsertCoordinatorStandard.java:120)
+	at org.hibernate.persister.entity.mutation.InsertCoordinatorStandard.insert(InsertCoordinatorStandard.java:84)
+	at org.hibernate.action.internal.EntityIdentityInsertAction.execute(EntityIdentityInsertAction.java:85)
+	at org.hibernate.engine.spi.ActionQueue.execute(ActionQueue.java:667)
+	at org.hibernate.engine.spi.ActionQueue.addResolvedEntityInsertAction(ActionQueue.java:291)
+	at org.hibernate.engine.spi.ActionQueue.addInsertAction(ActionQueue.java:270)
+	at org.hibernate.engine.spi.ActionQueue.addAction(ActionQueue.java:322)
+	at org.hibernate.event.internal.AbstractSaveEventListener.addInsertAction(AbstractSaveEventListener.java:371)
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSaveOrReplicate(AbstractSaveEventListener.java:285)
+	at org.hibernate.event.internal.AbstractSaveEventListener.performSave(AbstractSaveEventListener.java:215)
+	at org.hibernate.event.internal.AbstractSaveEventListener.saveWithGeneratedId(AbstractSaveEventListener.java:133)
+	at org.hibernate.event.internal.DefaultPersistEventListener.entityIsTransient(DefaultPersistEventListener.java:144)
+	at org.hibernate.event.internal.DefaultPersistEventListener.persist(DefaultPersistEventListener.java:90)
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:74)
+	at org.hibernate.event.internal.DefaultPersistEventListener.onPersist(DefaultPersistEventListener.java:50)
+	at org.hibernate.event.service.internal.EventListenerGroupImpl.fireEventOnEachListener(EventListenerGroupImpl.java:138)
+	at org.hibernate.internal.SessionImpl.firePersist(SessionImpl.java:692)
+	at org.hibernate.internal.SessionImpl.persist(SessionImpl.java:675)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityHandlerInvocationHandler.invokeMethod(SharedEntityManagerCreator.java:240)
+	at org.springframework.orm.jpa.SharedEntityManagerCreator$SharedEntityManagerInvocationHandler.invoke(SharedEntityManagerCreator.java:386)
+	at jdk.proxy2/jdk.proxy2.$Proxy140.persist(Unknown Source)
+	at org.springframework.data.jpa.repository.support.SimpleJpaRepository.save(SimpleJpaRepository.java:664)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:359)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker$RepositoryFragmentMethodInvoker.lambda$new$0(RepositoryMethodInvoker.java:278)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.doInvoke(RepositoryMethodInvoker.java:169)
+	at org.springframework.data.repository.core.support.RepositoryMethodInvoker.invoke(RepositoryMethodInvoker.java:158)
+	at org.springframework.data.repository.core.support.RepositoryComposition$RepositoryFragments.invoke(RepositoryComposition.java:545)
+	at org.springframework.data.repository.core.support.RepositoryComposition.invoke(RepositoryComposition.java:290)
+	at org.springframework.data.repository.core.support.RepositoryFactorySupport$ImplementationMethodExecutionInterceptor.invoke(RepositoryFactorySupport.java:690)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.doInvoke(QueryExecutorMethodInterceptor.java:171)
+	at org.springframework.data.repository.core.support.QueryExecutorMethodInterceptor.invoke(QueryExecutorMethodInterceptor.java:146)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.data.projection.DefaultMethodInvokingMethodInterceptor.invoke(DefaultMethodInvokingMethodInterceptor.java:69)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.transaction.interceptor.TransactionInterceptor$1.proceedWithInvocation(TransactionInterceptor.java:133)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:130)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:179)
+	at org.springframework.dao.support.PersistenceExceptionTranslationInterceptor.invoke(PersistenceExceptionTranslationInterceptor.java:135)
+	... 6 more
+Caused by: org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException: Unique index or primary key violation: "PUBLIC.CONSTRAINT_4 PRIMARY KEY ON PUBLIC.ITEMS(ID) ( /* key:2 */ CAST(2 AS BIGINT), CAST('MEN' AS ENUM('KIDS', 'MEN', 'UNISEX', 'WOMEN')), 'Basic cotton t-shirt.', 'T-Shirt', CAST(19.99 AS REAL), CAST(1 AS BIGINT))"; SQL statement:
+insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default) [23505-240]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:520)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	at org.h2.message.DbException.get(DbException.java:223)
+	at org.h2.message.DbException.get(DbException.java:199)
+	at org.h2.mvstore.db.MVPrimaryIndex.add(MVPrimaryIndex.java:121)
+	at org.h2.mvstore.db.MVTable.addRow(MVTable.java:520)
+	at org.h2.command.dml.Insert.insertRows(Insert.java:174)
+	at org.h2.command.dml.Insert.update(Insert.java:135)
+	at org.h2.command.CommandContainer.executeUpdateWithGeneratedKeys(CommandContainer.java:212)
+	at org.h2.command.CommandContainer.update(CommandContainer.java:133)
+	at org.h2.command.Command.executeUpdate(Command.java:306)
+	at org.h2.command.Command.executeUpdate(Command.java:250)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdateInternal(JdbcPreparedStatement.java:213)
+	at org.h2.jdbc.JdbcPreparedStatement.executeUpdate(JdbcPreparedStatement.java:172)
+	at com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+	at com.zaxxer.hikari.pool.HikariProxyPreparedStatement.executeUpdate(HikariProxyPreparedStatement.java)
+	at org.hibernate.engine.jdbc.internal.ResultSetReturnImpl.executeUpdate(ResultSetReturnImpl.java:181)
+	... 55 more
+]]></error>
+    <system-out><![CDATA[Hibernate: insert into users (email,first_name,last_name,password_hash,phone_number,id) values (?,?,?,?,?,default)
+Hibernate: insert into categories (name,parent_id,id) values (?,?,default)
+Hibernate: insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default)
+2026-06-19T00:26:25.218+03:00  WARN 59733 --- [FashionStore] [           main] org.hibernate.orm.jdbc.error             : HHH000247: ErrorCode: 23505, SQLState: 23505
+2026-06-19T00:26:25.219+03:00  WARN 59733 --- [FashionStore] [           main] org.hibernate.orm.jdbc.error             : Unique index or primary key violation: "PUBLIC.CONSTRAINT_4 PRIMARY KEY ON PUBLIC.ITEMS(ID) ( /* key:2 */ CAST(2 AS BIGINT), CAST('MEN' AS ENUM('KIDS', 'MEN', 'UNISEX', 'WOMEN')), 'Basic cotton t-shirt.', 'T-Shirt', CAST(19.99 AS REAL), CAST(1 AS BIGINT))"; SQL statement:
+insert into items (audience,category_id,description,name,price,id) values (?,?,?,?,?,default) [23505-240]
+]]></system-out>
+  </testcase>
+</testsuite>

@@ -1,0 +1,11 @@
+/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/src/test/java/com/fashionstore/FashionStoreApplicationTests.java
+/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/src/test/java/com/fashionstore/repositories/AddressRepositoryTest.java
+/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/src/test/java/com/fashionstore/repositories/CartItemRepositoryTest.java
+/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/src/test/java/com/fashionstore/repositories/CategoryRepositoryTest.java
+/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/src/test/java/com/fashionstore/repositories/ColorRepositoryTest.java
+/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/src/test/java/com/fashionstore/repositories/FavoriteRepositoryTest.java
+/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/src/test/java/com/fashionstore/repositories/ItemRepositoryTest.java
+/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/src/test/java/com/fashionstore/repositories/ItemVariantRepositoryTest.java
+/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/src/test/java/com/fashionstore/repositories/ReviewRepositoryTest.java
+/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/src/test/java/com/fashionstore/repositories/SizeRepositoryTest.java
+/home/mumugrig/Coding/GitHubRepos/Fashion-Store/backend/src/test/java/com/fashionstore/repositories/UserRepositoryTest.java
