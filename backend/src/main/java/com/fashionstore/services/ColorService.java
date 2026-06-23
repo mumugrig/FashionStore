@@ -1,5 +1,6 @@
 package com.fashionstore.services;
 
+import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.models.Color;
 import com.fashionstore.dto.request.ColorRequest;
 import com.fashionstore.dto.response.ColorResponse;
@@ -38,12 +39,12 @@ public class ColorService {
             Color updatedColor = colorRepository.save(color);
             return ColorResponse.from(updatedColor);
         }
-        return null;
+        throw new NotFoundException("Color", id);
     }
 
     public ColorResponse getColorById(Long id) {
         Optional<Color> colorOptional = colorRepository.findById(id);
-        return colorOptional.map(ColorResponse::from).orElse(null);
+        return colorOptional.map(ColorResponse::from).orElseThrow(() -> new NotFoundException("Color", id));
     }
 
     public List<ColorResponse> getAllColors() {

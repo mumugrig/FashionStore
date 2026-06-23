@@ -2,6 +2,7 @@ package com.fashionstore.services;
 
 import com.fashionstore.dto.request.ReviewRequest;
 import com.fashionstore.dto.response.ReviewResponse;
+import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.models.Review;
 import com.fashionstore.repositories.ItemVariantRepository;
 import com.fashionstore.repositories.ReviewRepository;
@@ -9,11 +10,14 @@ import com.fashionstore.repositories.UserRepository;
 import com.fashionstore.vo.Comfort;
 import com.fashionstore.vo.Quality;
 import com.fashionstore.vo.SizeFit;
+import org.hibernate.annotations.SecondaryRow;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Service
 public class ReviewService {
     private ReviewRepository reviewRepository;
     private UserRepository userRepository;
@@ -50,13 +54,13 @@ public class ReviewService {
             Review updatedReview = reviewRepository.save(review);
             return ReviewResponse.from(updatedReview);
         }
-        return null;
+        throw new NotFoundException("Review", id);
     }
 
     public ReviewResponse getReviewById(Long id) {
         return reviewRepository.findById(id)
                 .map(ReviewResponse::from)
-                .orElse(null);
+                .orElseThrow(() -> new NotFoundException("Review", id));
     }
 
     public List<ReviewResponse> getAllReviews() {

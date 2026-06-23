@@ -2,6 +2,7 @@ package com.fashionstore.services;
 
 import com.fashionstore.dto.request.FavoriteRequest;
 import com.fashionstore.dto.response.FavoriteResponse;
+import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.models.Favorite;
 import com.fashionstore.repositories.FavoriteRepository;
 import com.fashionstore.repositories.ItemVariantRepository;
@@ -37,11 +38,18 @@ public class FavoriteService {
             itemVariantRepository.findById(favoriteRequest.getItemVariantId()).ifPresent(favorite::setItemVariant);
             Favorite savedFavorite = favoriteRepository.save(favorite);
             return FavoriteResponse.from(savedFavorite);
-        }).orElse(null);
+        }).orElseThrow(() -> new NotFoundException("Favorite", id));
     }
 
     public FavoriteResponse getFavoriteById(Long id) {
-        return favoriteRepository.findById(id).map(FavoriteResponse::from).orElse(null);
+        return favoriteRepository.findById(id).map(FavoriteResponse::from).orElseThrow(() -> new NotFoundException("Favorite", id));
+    }
+
+    public List<FavoriteResponse> getFavoriteByUserId(Long userId){
+        return favoriteRepository.findByUserId(userId)
+                .stream()
+                .map(FavoriteResponse::from)
+                .collect(Collectors.toList());
     }
 
     public List<FavoriteResponse> getAllFavorites() {

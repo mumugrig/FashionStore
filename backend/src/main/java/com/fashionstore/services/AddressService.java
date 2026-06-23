@@ -2,6 +2,7 @@ package com.fashionstore.services;
 
 import com.fashionstore.dto.request.AddressRequest;
 import com.fashionstore.dto.response.AddressResponse;
+import com.fashionstore.exceptions.NotFoundException;
 import org.springframework.stereotype.Service;
 import com.fashionstore.models.Address;
 import com.fashionstore.repositories.AddressRepository;
@@ -31,7 +32,7 @@ public class AddressService {
 
     public AddressResponse getAddressById(Long id) {
         Optional<Address> address = addressRepository.findById(id);
-        return  address.map(AddressResponse::from).orElse(null);
+        return  address.map(AddressResponse::from).orElseThrow(() -> new NotFoundException("Address", id));
     }
 
     public List<AddressResponse> getAllAddresses() {
@@ -53,7 +54,7 @@ public class AddressService {
             Address savedAddress = addressRepository.save(updatedAddress);
             return AddressResponse.from(savedAddress);
         }
-        return null;
+        throw new NotFoundException("Address", id);
     }
 
     public void deleteAddress(Long id){

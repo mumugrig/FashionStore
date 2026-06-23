@@ -1,5 +1,6 @@
 package com.fashionstore.services;
 
+import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.models.ItemVariant;
 import com.fashionstore.models.Item;
 import com.fashionstore.models.Size;
@@ -69,12 +70,12 @@ public class ItemVariantService {
             ItemVariant updatedItemVariant = itemVariantRepository.save(itemVariant);
             return ItemVariantResponse.from(updatedItemVariant);
         }
-        return null;
+        throw new NotFoundException("ItemVariant", id);
     }
 
     public ItemVariantResponse getItemVariantById(Long id) {
         Optional<ItemVariant> itemVariantOptional = itemVariantRepository.findById(id);
-        return itemVariantOptional.map(ItemVariantResponse::from).orElse(null);
+        return itemVariantOptional.map(ItemVariantResponse::from).orElseThrow(() -> new NotFoundException("ItemVariant", id));
     }
 
     public List<ItemVariantResponse> getAllItemVariants() {

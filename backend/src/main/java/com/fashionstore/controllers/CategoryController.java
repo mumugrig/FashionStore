@@ -20,11 +20,7 @@ public class CategoryController {
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long id) {
         CategoryResponse categoryResponse = categoryService.getCategoryById(id);
-        if (categoryResponse != null) {
-            return ResponseEntity.ok(categoryResponse);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(categoryResponse);
     }
 
     @GetMapping
@@ -35,5 +31,17 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(categoryRequest));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryRequest categoryRequest) {
+        CategoryResponse categoryResponse = categoryService.updateCategory(id, categoryRequest);
+        return ResponseEntity.ok(categoryResponse);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
     }
 }

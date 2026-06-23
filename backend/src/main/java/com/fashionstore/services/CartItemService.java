@@ -1,5 +1,6 @@
 package com.fashionstore.services;
 
+import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.models.CartItem;
 import com.fashionstore.models.ItemVariant;
 import com.fashionstore.models.User;
@@ -56,12 +57,12 @@ public class CartItemService {
             CartItem updatedCartItem = cartItemRepository.save(cartItem);
             return CartItemResponse.from(updatedCartItem);
         }
-        return null;
+        throw new NotFoundException("CartItem", id);
     }
 
     public CartItemResponse getCartItemById(Long id) {
         Optional<CartItem> cartItemOptional = cartItemRepository.findById(id);
-        return cartItemOptional.map(CartItemResponse::from).orElse(null);
+        return cartItemOptional.map(CartItemResponse::from).orElseThrow(() -> new NotFoundException("CartItem", id));
     }
 
     public List<CartItemResponse> getAllCartItems() {

@@ -1,5 +1,6 @@
 package com.fashionstore.services;
 
+import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.models.User;
 import com.fashionstore.dto.request.UserRequest;
 import com.fashionstore.dto.response.UserResponse;
@@ -42,12 +43,12 @@ public class UserService {
             User updatedUser = userRepository.save(user);
             return UserResponse.from(updatedUser);
         }
-        return null;
+        throw new NotFoundException("User", id);
     }
 
     public UserResponse getUserById(Long id) {
         Optional<User> userOptional = userRepository.findById(id);
-        return userOptional.map(UserResponse::from).orElse(null);
+        return userOptional.map(UserResponse::from).orElseThrow(() -> new NotFoundException("User", id));
     }
 
     public List<UserResponse> getAllUsers() {

@@ -1,5 +1,6 @@
 package com.fashionstore.services;
 
+import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.models.Item;
 import com.fashionstore.models.Category;
 import com.fashionstore.vo.Audience;
@@ -51,12 +52,12 @@ public class ItemService {
             Item updatedItem = itemRepository.save(item);
             return ItemResponse.from(updatedItem);
         }
-        return null;
+        throw new NotFoundException("Item", id);
     }
 
     public ItemResponse getItemById(Long id) {
         Optional<Item> itemOptional = itemRepository.findById(id);
-        return itemOptional.map(ItemResponse::from).orElse(null);
+        return itemOptional.map(ItemResponse::from).orElseThrow(() -> new NotFoundException("Item", id));
     }
 
     public List<ItemResponse> getAllItems() {

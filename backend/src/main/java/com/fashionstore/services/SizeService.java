@@ -1,5 +1,6 @@
 package com.fashionstore.services;
 
+import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.models.Size;
 import com.fashionstore.vo.SizeSystem;
 import com.fashionstore.dto.request.SizeRequest;
@@ -37,12 +38,12 @@ public class SizeService {
             Size updatedSize = sizeRepository.save(size);
             return SizeResponse.from(updatedSize);
         }
-        return null;
+        throw new NotFoundException("Size", id);
     }
 
     public SizeResponse getSizeById(Long id) {
         Optional<Size> sizeOptional = sizeRepository.findById(id);
-        return sizeOptional.map(SizeResponse::from).orElse(null);
+        return sizeOptional.map(SizeResponse::from).orElseThrow(() -> new NotFoundException("Size", id));
     }
 
     public List<SizeResponse> getAllSizes() {
