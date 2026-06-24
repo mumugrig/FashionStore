@@ -9,5 +9,8 @@ import java.util.List;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByItemVariantId(Long itemVariantId);
+    boolean existsByItemVariantId(Long itemVariantId);
+    boolean existsByItemVariantItemId(Long itemId);
+    void deleteByUserId(Long userId);
 }
 

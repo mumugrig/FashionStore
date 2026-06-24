@@ -1,0 +1,8 @@
+/.idea/
+/backend/target/
+/backend/*.log
+
+*.iml
+*.log
+.env
+.env.*

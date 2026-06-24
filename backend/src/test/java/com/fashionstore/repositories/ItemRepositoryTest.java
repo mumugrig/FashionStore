@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,7 +39,7 @@ class ItemRepositoryTest {
     void testSaveItem() {
         Item item = new Item();
         item.setName("Laptop");
-        item.setPrice(999.99f);
+        item.setPrice(BigDecimal.valueOf(999.99f));
         item.setDescription("High performance laptop");
         item.setAudience(Audience.UNISEX);
         item.setCategory(category);
@@ -47,14 +48,14 @@ class ItemRepositoryTest {
 
         assertNotNull(savedItem.getId());
         assertEquals("Laptop", savedItem.getName());
-        assertEquals(999.99f, savedItem.getPrice());
+        assertEquals(BigDecimal.valueOf(999.99f), savedItem.getPrice());
     }
 
     @Test
     void testFindItemById() {
         Item item = new Item();
         item.setName("Mouse");
-        item.setPrice(29.99f);
+        item.setPrice(BigDecimal.valueOf(29.99f));
         item.setDescription("Wireless mouse");
         item.setAudience(Audience.UNISEX);
         item.setCategory(category);
@@ -70,19 +71,19 @@ class ItemRepositoryTest {
     void testFindByNameContainingIgnoreCase() {
         Item item1 = new Item();
         item1.setName("Samsung Laptop");
-        item1.setPrice(899.99f);
+        item1.setPrice(BigDecimal.valueOf(899.99f));
         item1.setAudience(Audience.UNISEX);
         item1.setCategory(category);
 
         Item item2 = new Item();
         item2.setName("LAPTOP Stand");
-        item2.setPrice(49.99f);
+        item2.setPrice(BigDecimal.valueOf(49.99f));
         item2.setAudience(Audience.UNISEX);
         item2.setCategory(category);
 
         Item item3 = new Item();
         item3.setName("USB Cable");
-        item3.setPrice(9.99f);
+        item3.setPrice(BigDecimal.valueOf(9.99f));
         item3.setAudience(Audience.UNISEX);
         item3.setCategory(category);
 
@@ -104,19 +105,19 @@ class ItemRepositoryTest {
 
         Item item1 = new Item();
         item1.setName("Item1");
-        item1.setPrice(19.99f);
+        item1.setPrice(BigDecimal.valueOf(19.99f));
         item1.setAudience(Audience.UNISEX);
         item1.setCategory(category);
 
         Item item2 = new Item();
         item2.setName("Item2");
-        item2.setPrice(29.99f);
+        item2.setPrice(BigDecimal.valueOf(29.99f));
         item2.setAudience(Audience.UNISEX);
         item2.setCategory(category);
 
         Item item3 = new Item();
         item3.setName("Item3");
-        item3.setPrice(39.99f);
+        item3.setPrice(BigDecimal.valueOf(39.99f));
         item3.setAudience(Audience.UNISEX);
         item3.setCategory(category2);
 
@@ -133,7 +134,7 @@ class ItemRepositoryTest {
     void testDeleteItem() {
         Item item = new Item();
         item.setName("ToDelete");
-        item.setPrice(9.99f);
+        item.setPrice(BigDecimal.valueOf(9.99f));
         item.setAudience(Audience.UNISEX);
         item.setCategory(category);
         Item savedItem = itemRepository.save(item);
@@ -147,13 +148,13 @@ class ItemRepositoryTest {
     void testCountItems() {
         Item item1 = new Item();
         item1.setName("Item1");
-        item1.setPrice(19.99f);
+        item1.setPrice(BigDecimal.valueOf(19.99f));
         item1.setAudience(Audience.UNISEX);
         item1.setCategory(category);
 
         Item item2 = new Item();
         item2.setName("Item2");
-        item2.setPrice(29.99f);
+        item2.setPrice(BigDecimal.valueOf(29.99f));
         item2.setAudience(Audience.UNISEX);
         item2.setCategory(category);
 

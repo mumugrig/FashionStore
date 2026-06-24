@@ -1,6 +1,6 @@
--- Seed users
-INSERT INTO users (first_name, last_name, email, phone_number, password_hash) VALUES ('Alice', 'Johnson', 'alice@example.com', '1234567890', 'hash1');
-INSERT INTO users (first_name, last_name, email, phone_number, password_hash) VALUES ('Bob', 'Smith', 'bob@example.com', '0987654321', 'hash2');
+-- Seed users. Password for both users is "password".
+INSERT INTO users (first_name, last_name, email, phone_number, password_hash, role) VALUES ('Alice', 'Johnson', 'alice@example.com', '1234567890', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'ADMIN');
+INSERT INTO users (first_name, last_name, email, phone_number, password_hash, role) VALUES ('Bob', 'Smith', 'bob@example.com', '0987654321', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'USER');
 
 -- Categories
 INSERT INTO categories (name, parent_id) VALUES ('Tops', NULL);
@@ -26,7 +26,7 @@ INSERT INTO item_variants (is_active, stock_left, item_id, size_id, color_id) VA
 INSERT INTO addresses (country, region, city, postal_code, address_line, user_id) VALUES ( 'USA', 'California', 'San Francisco', 94105, '123 Market St', 1);
 
 -- Favorites
-INSERT INTO favourites (item_variant_id, user_id) VALUES (1, 1);
+INSERT INTO favorites (item_variant_id, user_id) VALUES (1, 1);
 
 -- Cart items
 INSERT INTO cart_items (quantity, item_variant_id, user_id) VALUES (2, 1, 2);

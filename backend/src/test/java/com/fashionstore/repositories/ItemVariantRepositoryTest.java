@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +51,7 @@ class ItemVariantRepositoryTest {
 
         item = new Item();
         item.setName("Test Item");
-        item.setPrice(99.99f);
+        item.setPrice(BigDecimal.valueOf(99.99f));
         item.setAudience(Audience.UNISEX);
         item.setCategory(category);
         itemRepository.save(item);
@@ -117,6 +118,23 @@ class ItemVariantRepositoryTest {
 
         assertEquals(1, activeVariants.size());
         assertTrue(activeVariants.get(0).isActive());
+    }
+
+    @Test
+    void testFindByItemIdAndExistsBySizeAndColor() {
+        ItemVariant variant = new ItemVariant();
+        variant.setItem(item);
+        variant.setColor(color);
+        variant.setSize(size);
+        variant.setActive(true);
+        variant.setStockLeft(10);
+        itemVariantRepository.save(variant);
+
+        List<ItemVariant> variants = itemVariantRepository.findByItemId(item.getId());
+
+        assertEquals(1, variants.size());
+        assertTrue(itemVariantRepository.existsBySizeId(size.getId()));
+        assertTrue(itemVariantRepository.existsByColorId(color.getId()));
     }
 
     @Test

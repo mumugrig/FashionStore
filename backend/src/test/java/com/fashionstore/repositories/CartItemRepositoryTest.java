@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -61,7 +62,7 @@ class CartItemRepositoryTest {
 
         Item item = new Item();
         item.setName("Product");
-        item.setPrice(29.99f);
+        item.setPrice(BigDecimal.valueOf(29.99f));
         item.setAudience(Audience.UNISEX);
         item.setCategory(category);
         itemRepository.save(item);
@@ -140,6 +141,8 @@ class CartItemRepositoryTest {
 
         assertEquals(2, userCartItems.size());
         assertTrue(userCartItems.stream().allMatch(c -> c.getUser().getId().equals(user.getId())));
+        assertTrue(cartItemRepository.existsByItemVariantId(itemVariant.getId()));
+        assertTrue(cartItemRepository.existsByItemVariantItemId(itemVariant.getItem().getId()));
     }
 
     @Test
@@ -167,6 +170,19 @@ class CartItemRepositoryTest {
         cartItemRepository.deleteById(savedCartItem.getId());
 
         assertFalse(cartItemRepository.existsById(savedCartItem.getId()));
+    }
+
+    @Test
+    void testDeleteByUserId() {
+        CartItem cartItem = new CartItem();
+        cartItem.setQuantity(1);
+        cartItem.setItemVariant(itemVariant);
+        cartItem.setUser(user);
+        cartItemRepository.save(cartItem);
+
+        cartItemRepository.deleteByUserId(user.getId());
+
+        assertTrue(cartItemRepository.findByUserId(user.getId()).isEmpty());
     }
 
     @Test

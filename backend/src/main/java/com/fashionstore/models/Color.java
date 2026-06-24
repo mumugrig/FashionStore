@@ -18,9 +18,10 @@ public class Color {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 50)
     private String name;
 
-    @Column(name = "color_value")
+    @Column(name = "color_value", nullable = false, length = 7)
     private String value;
 
     @Column(name = "image_url")

@@ -21,19 +21,22 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 50)
     private String country;
 
+    @Column(nullable = false, length = 100)
     private String region;
 
+    @Column(nullable = false, length = 100)
     private String city;
 
-    @Column(name = "postal_code")
+    @Column(name = "postal_code", nullable = false)
     private int postalCode;
 
-    @Column(name = "address_line")
+    @Column(name = "address_line", nullable = false)
     private String addressLine;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

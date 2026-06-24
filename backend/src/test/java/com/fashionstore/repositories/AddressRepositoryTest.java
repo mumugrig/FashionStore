@@ -142,6 +142,22 @@ class AddressRepositoryTest {
     }
 
     @Test
+    void testDeleteByUserId() {
+        Address address = new Address();
+        address.setCountry("USA");
+        address.setRegion("FL");
+        address.setCity("Miami");
+        address.setPostalCode(33101);
+        address.setAddressLine("999 Beach");
+        address.setUser(user);
+        addressRepository.save(address);
+
+        addressRepository.deleteByUserId(user.getId());
+
+        assertTrue(addressRepository.findByUserId(user.getId()).isEmpty());
+    }
+
+    @Test
     void testCountAddresses() {
         Address address1 = new Address();
         address1.setCountry("USA");

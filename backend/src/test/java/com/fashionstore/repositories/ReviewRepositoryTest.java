@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -66,7 +67,7 @@ class ReviewRepositoryTest {
 
         Item item = new Item();
         item.setName("Review Item");
-        item.setPrice(49.99f);
+        item.setPrice(BigDecimal.valueOf(49.99f));
         item.setAudience(Audience.UNISEX);
         item.setCategory(category);
         itemRepository.save(item);
@@ -162,6 +163,8 @@ class ReviewRepositoryTest {
 
         assertEquals(2, variantReviews.size());
         assertTrue(variantReviews.stream().allMatch(r -> r.getItemVariant().getId().equals(itemVariant.getId())));
+        assertTrue(reviewRepository.existsByItemVariantId(itemVariant.getId()));
+        assertTrue(reviewRepository.existsByItemVariantItemId(itemVariant.getItem().getId()));
     }
 
     @Test
@@ -193,6 +196,22 @@ class ReviewRepositoryTest {
         reviewRepository.deleteById(savedReview.getId());
 
         assertFalse(reviewRepository.existsById(savedReview.getId()));
+    }
+
+    @Test
+    void testDeleteByUserId() {
+        Review review = new Review();
+        review.setBody("To Delete By User");
+        review.setSizeFit(SizeFit.TRUE_TO_SIZE);
+        review.setQuality(Quality.EXCELLENT);
+        review.setComfort(Comfort.VERY_COMFORTABLE);
+        review.setUser(user);
+        review.setItemVariant(itemVariant);
+        reviewRepository.save(review);
+
+        reviewRepository.deleteByUserId(user.getId());
+
+        assertTrue(reviewRepository.findAll().stream().noneMatch(r -> r.getUser().getId().equals(user.getId())));
     }
 
     @Test

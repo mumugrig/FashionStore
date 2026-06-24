@@ -1,18 +1,12 @@
 package com.fashionstore.models;
 
 import com.fashionstore.vo.Audience;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "items")
@@ -25,14 +19,20 @@ public class Item {
 
     private String name;
 
-    private float price;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
 
+    @Column(nullable = false)
     private String description;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
     private Audience audience;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "item", orphanRemoval = true)
+    private List<ItemVariant> variants;
 }

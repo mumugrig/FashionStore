@@ -3,6 +3,7 @@ package com.fashionstore.models;
 import com.fashionstore.vo.Comfort;
 import com.fashionstore.vo.Quality;
 import com.fashionstore.vo.SizeFit;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -25,22 +26,26 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 5000)
     private String body;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
     private SizeFit sizeFit;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
     private Quality quality;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
     private Comfort comfort;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_variant_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "item_variant_id", nullable = false)
     private ItemVariant itemVariant;
 }

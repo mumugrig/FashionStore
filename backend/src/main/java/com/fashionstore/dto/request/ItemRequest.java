@@ -1,5 +1,6 @@
 package com.fashionstore.dto.request;
 
+import com.fashionstore.vo.Audience;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.DecimalMax;
+
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -21,14 +24,14 @@ public class ItemRequest {
 
     @DecimalMin(value = "0.01", message = "Price must be greater than 0")
     @DecimalMax(value = "999999.99", message = "Price cannot exceed 999999.99")
-    private float price;
+    private BigDecimal price;
 
     @NotBlank(message = "Item description is required")
     @Size(min = 10, max = 5000, message = "Item description must be between 10 and 5000 characters")
     private String description;
 
-    @NotBlank(message = "Audience is required")
-    private String audience;
+    @NotNull(message = "Audience is required")
+    private Audience audience;
 
     @NotNull(message = "Category ID is required")
     private Long categoryId;

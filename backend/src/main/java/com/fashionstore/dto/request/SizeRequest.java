@@ -1,10 +1,12 @@
 package com.fashionstore.dto.request;
 
+import com.fashionstore.vo.SizeSystem;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Getter
@@ -16,8 +18,7 @@ public class SizeRequest {
     @Size(min = 1, max = 50, message = "Size label must be between 1 and 50 characters")
     private String label;
 
-    @NotBlank(message = "Size system is required")
-    @Size(min = 1, max = 50, message = "Size system must be between 1 and 50 characters")
-    private String sizeSystem;
+    @NotNull(message = "Size system is required")
+    private SizeSystem sizeSystem;
 }
 

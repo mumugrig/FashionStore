@@ -21,9 +21,10 @@ public class Size {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 50)
     private String label;
 
-    @Column(name = "size_system")
+    @Column(name = "size_system", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private SizeSystem sizeSystem;
 }

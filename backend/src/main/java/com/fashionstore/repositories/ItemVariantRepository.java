@@ -9,7 +9,10 @@ import java.util.Optional;
 
 @Repository
 public interface ItemVariantRepository extends JpaRepository<ItemVariant, Long> {
+    List<ItemVariant> findByItemId(Long itemId);
     List<ItemVariant> findByItemIdAndIsActiveTrue(Long itemId);
     Optional<ItemVariant> findByIdAndIsActiveTrue(Long id);
+    boolean existsBySizeId(Long sizeId);
+    boolean existsByColorId(Long colorId);
 }
 

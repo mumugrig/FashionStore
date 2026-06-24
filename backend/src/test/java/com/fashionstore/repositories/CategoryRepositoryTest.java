@@ -66,6 +66,7 @@ class CategoryRepositoryTest {
 
         assertEquals(2, children.size());
         assertTrue(children.stream().allMatch(c -> c.getParent().getId().equals(savedParent.getId())));
+        assertTrue(categoryRepository.existsByParentId(savedParent.getId()));
     }
 
     @Test
@@ -77,6 +78,7 @@ class CategoryRepositoryTest {
         List<Category> children = categoryRepository.findByParentId(orphanCategory.getId());
 
         assertEquals(0, children.size());
+        assertFalse(categoryRepository.existsByParentId(orphanCategory.getId()));
     }
 
     @Test

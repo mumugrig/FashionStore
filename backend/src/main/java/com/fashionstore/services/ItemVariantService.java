@@ -1,6 +1,7 @@
 package com.fashionstore.services;
 
 import com.fashionstore.exceptions.NotFoundException;
+import com.fashionstore.exceptions.ConflictException;
 import com.fashionstore.models.ItemVariant;
 import com.fashionstore.models.Item;
 import com.fashionstore.models.Size;
@@ -11,7 +12,11 @@ import com.fashionstore.repositories.ItemVariantRepository;
 import com.fashionstore.repositories.ItemRepository;
 import com.fashionstore.repositories.SizeRepository;
 import com.fashionstore.repositories.ColorRepository;
+import com.fashionstore.repositories.CartItemRepository;
+import com.fashionstore.repositories.FavoriteRepository;
+import com.fashionstore.repositories.ReviewRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,35 +27,49 @@ public class ItemVariantService {
     private final ItemRepository itemRepository;
     private final SizeRepository sizeRepository;
     private final ColorRepository colorRepository;
+    private final CartItemRepository cartItemRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final ReviewRepository reviewRepository;
 
     public ItemVariantService(ItemVariantRepository itemVariantRepository,
                             ItemRepository itemRepository,
                             SizeRepository sizeRepository,
-                            ColorRepository colorRepository) {
+                            ColorRepository colorRepository,
+                            CartItemRepository cartItemRepository,
+                            FavoriteRepository favoriteRepository,
+                            ReviewRepository reviewRepository) {
         this.itemVariantRepository = itemVariantRepository;
         this.itemRepository = itemRepository;
         this.sizeRepository = sizeRepository;
         this.colorRepository = colorRepository;
+        this.cartItemRepository = cartItemRepository;
+        this.favoriteRepository = favoriteRepository;
+        this.reviewRepository = reviewRepository;
     }
 
+    @Transactional
     public ItemVariantResponse createItemVariant(ItemVariantRequest itemVariantRequest) {
         ItemVariant itemVariant = new ItemVariant();
         itemVariant.setActive(itemVariantRequest.isActive());
         itemVariant.setStockLeft(itemVariantRequest.getStockLeft());
 
-        Optional<Item> item = itemRepository.findById(itemVariantRequest.getItemId());
-        item.ifPresent(itemVariant::setItem);
+        Item item = itemRepository.findById(itemVariantRequest.getItemId())
+                .orElseThrow(() -> new NotFoundException("Item", itemVariantRequest.getItemId()));
+        itemVariant.setItem(item);
 
-        Optional<Size> size = sizeRepository.findById(itemVariantRequest.getSizeId());
-        size.ifPresent(itemVariant::setSize);
+        Size size = sizeRepository.findById(itemVariantRequest.getSizeId())
+                .orElseThrow(() -> new NotFoundException("Size", itemVariantRequest.getSizeId()));
+        itemVariant.setSize(size);
 
-        Optional<Color> color = colorRepository.findById(itemVariantRequest.getColorId());
-        color.ifPresent(itemVariant::setColor);
+        Color color = colorRepository.findById(itemVariantRequest.getColorId())
+                .orElseThrow(() -> new NotFoundException("Color", itemVariantRequest.getColorId()));
+        itemVariant.setColor(color);
 
         ItemVariant savedItemVariant = itemVariantRepository.save(itemVariant);
         return ItemVariantResponse.from(savedItemVariant);
     }
 
+    @Transactional
     public ItemVariantResponse updateItemVariant(Long id, ItemVariantRequest itemVariantRequest) {
         Optional<ItemVariant> itemVariantOptional = itemVariantRepository.findById(id);
         if (itemVariantOptional.isPresent()) {
@@ -58,14 +77,17 @@ public class ItemVariantService {
             itemVariant.setActive(itemVariantRequest.isActive());
             itemVariant.setStockLeft(itemVariantRequest.getStockLeft());
 
-            Optional<Item> item = itemRepository.findById(itemVariantRequest.getItemId());
-            item.ifPresent(itemVariant::setItem);
+            Item item = itemRepository.findById(itemVariantRequest.getItemId())
+                    .orElseThrow(() -> new NotFoundException("Item", itemVariantRequest.getItemId()));
+            itemVariant.setItem(item);
 
-            Optional<Size> size = sizeRepository.findById(itemVariantRequest.getSizeId());
-            size.ifPresent(itemVariant::setSize);
+            Size size = sizeRepository.findById(itemVariantRequest.getSizeId())
+                    .orElseThrow(() -> new NotFoundException("Size", itemVariantRequest.getSizeId()));
+            itemVariant.setSize(size);
 
-            Optional<Color> color = colorRepository.findById(itemVariantRequest.getColorId());
-            color.ifPresent(itemVariant::setColor);
+            Color color = colorRepository.findById(itemVariantRequest.getColorId())
+                    .orElseThrow(() -> new NotFoundException("Color", itemVariantRequest.getColorId()));
+            itemVariant.setColor(color);
 
             ItemVariant updatedItemVariant = itemVariantRepository.save(itemVariant);
             return ItemVariantResponse.from(updatedItemVariant);
@@ -73,11 +95,13 @@ public class ItemVariantService {
         throw new NotFoundException("ItemVariant", id);
     }
 
+    @Transactional(readOnly = true)
     public ItemVariantResponse getItemVariantById(Long id) {
         Optional<ItemVariant> itemVariantOptional = itemVariantRepository.findById(id);
         return itemVariantOptional.map(ItemVariantResponse::from).orElseThrow(() -> new NotFoundException("ItemVariant", id));
     }
 
+    @Transactional(readOnly = true)
     public List<ItemVariantResponse> getAllItemVariants() {
         return itemVariantRepository.findAll()
                 .stream()
@@ -85,6 +109,7 @@ public class ItemVariantService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<ItemVariantResponse> getActiveVariantsByItem(Long itemId) {
         return itemVariantRepository.findByItemIdAndIsActiveTrue(itemId)
                 .stream()
@@ -92,7 +117,20 @@ public class ItemVariantService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void deleteItemVariant(Long id) {
+        if (!itemVariantRepository.existsById(id)) {
+            throw new NotFoundException("ItemVariant", id);
+        }
+        if (cartItemRepository.existsByItemVariantId(id)) {
+            throw new ConflictException("Cannot delete item variant because it is in carts. Remove those cart items first.");
+        }
+        if (favoriteRepository.existsByItemVariantId(id)) {
+            throw new ConflictException("Cannot delete item variant because it is in favourites. Remove those favourites first.");
+        }
+        if (reviewRepository.existsByItemVariantId(id)) {
+            throw new ConflictException("Cannot delete item variant because it has reviews. Delete those reviews first.");
+        }
         itemVariantRepository.deleteById(id);
     }
 }

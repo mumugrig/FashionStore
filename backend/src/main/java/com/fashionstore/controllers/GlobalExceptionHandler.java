@@ -9,6 +9,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -50,6 +53,12 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(400, message, request.getRequestURI());
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleUnreadableMessage(HttpMessageNotReadableException ex, HttpServletRequest request) {
+        return new ErrorResponse(400, "Malformed request body", request.getRequestURI());
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleGeneral(Exception ex, HttpServletRequest request) {
@@ -69,5 +78,17 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleConflict(ConflictException ex, HttpServletRequest request) {
         //log.warn("Conflict: {}", ex.getMessage());
         return new ErrorResponse(409, ex.getMessage(), request.getRequestURI());
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorResponse handleAuthentication(AuthenticationException ex, HttpServletRequest request) {
+        return new ErrorResponse(401, "Invalid credentials", request.getRequestURI());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
+        return new ErrorResponse(403, "Access denied", request.getRequestURI());
     }
 }

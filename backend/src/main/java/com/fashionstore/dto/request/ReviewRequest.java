@@ -1,5 +1,8 @@
 package com.fashionstore.dto.request;
 
+import com.fashionstore.vo.Comfort;
+import com.fashionstore.vo.Quality;
+import com.fashionstore.vo.SizeFit;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -17,11 +20,14 @@ public class ReviewRequest {
     @Size(min = 10, max = 5000, message = "Review body must be between 10 and 5000 characters")
     private String body;
 
-    private String sizeFit;
+    @NotNull(message = "Size fit is required")
+    private SizeFit sizeFit;
 
-    private String quality;
+    @NotNull(message = "Quality is required")
+    private Quality quality;
 
-    private String comfort;
+    @NotNull(message = "Comfort is required")
+    private Comfort comfort;
 
     @NotNull(message = "User ID is required")
     private Long userId;

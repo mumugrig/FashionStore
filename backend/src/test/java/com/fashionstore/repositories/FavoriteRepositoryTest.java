@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -63,7 +64,7 @@ class FavoriteRepositoryTest {
 
         Item item = new Item();
         item.setName("Favorite Item");
-        item.setPrice(99.99f);
+        item.setPrice(BigDecimal.valueOf(99.99f));
         item.setAudience(Audience.UNISEX);
         item.setCategory(category);
         itemRepository.save(item);
@@ -137,6 +138,8 @@ class FavoriteRepositoryTest {
 
         assertEquals(2, userFavorites.size());
         assertTrue(userFavorites.stream().allMatch(f -> f.getUser().getId().equals(user.getId())));
+        assertTrue(favoriteRepository.existsByItemVariantId(itemVariant.getId()));
+        assertTrue(favoriteRepository.existsByItemVariantItemId(itemVariant.getItem().getId()));
     }
 
     @Test
@@ -163,6 +166,18 @@ class FavoriteRepositoryTest {
         favoriteRepository.deleteById(savedFavorite.getId());
 
         assertFalse(favoriteRepository.existsById(savedFavorite.getId()));
+    }
+
+    @Test
+    void testDeleteByUserId() {
+        Favorite favorite = new Favorite();
+        favorite.setItemVariant(itemVariant);
+        favorite.setUser(user);
+        favoriteRepository.save(favorite);
+
+        favoriteRepository.deleteByUserId(user.getId());
+
+        assertTrue(favoriteRepository.findByUserId(user.getId()).isEmpty());
     }
 
     @Test
