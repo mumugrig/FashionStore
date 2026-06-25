@@ -19,6 +19,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -46,7 +47,7 @@ class UserControllerAuthTest {
     @Test
     void usersMeRequiresAuthentication() throws Exception {
         HttpResponse<String> response = httpClient.send(
-                HttpRequest.newBuilder(URI.create(url("/users/me"))).GET().build(),
+                HttpRequest.newBuilder(URI.create(url("/api/users/me"))).GET().build(),
                 HttpResponse.BodyHandlers.ofString()
         );
 
@@ -56,7 +57,7 @@ class UserControllerAuthTest {
     @Test
     void usersMeReturnsCurrentUser() throws Exception {
         AuthResponse authResponse = authService.register(registerRequest("me@example.com"));
-        HttpRequest request = HttpRequest.newBuilder(URI.create(url("/users/me")))
+        HttpRequest request = HttpRequest.newBuilder(URI.create(url("/api/users/me")))
                 .header("Authorization", "Bearer " + authResponse.getAccessToken())
                 .GET()
                 .build();
@@ -69,7 +70,7 @@ class UserControllerAuthTest {
 
     @Test
     void registerEndpointCreatesUser() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder(URI.create(url("/auth/register")))
+        HttpRequest request = HttpRequest.newBuilder(URI.create(url("/api/auth/register")))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(registerRequest("endpoint@example.com"))))
                 .build();
@@ -85,7 +86,7 @@ class UserControllerAuthTest {
 
     @Test
     void logoutRequiresAuthentication() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder(URI.create(url("/auth/logout")))
+        HttpRequest request = HttpRequest.newBuilder(URI.create(url("/api/auth/logout")))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString("{\"refreshToken\":\"unused\"}"))
                 .build();
@@ -101,11 +102,11 @@ class UserControllerAuthTest {
         AuthResponse adminAuth = createAdminAndLogin("admin@example.com");
 
         HttpResponse<String> userResponse = httpClient.send(
-                getWithBearer("/users/1", userAuth.getAccessToken()),
+                getWithBearer("/api/admin/users/1", userAuth.getAccessToken()),
                 HttpResponse.BodyHandlers.ofString()
         );
         HttpResponse<String> adminResponse = httpClient.send(
-                getWithBearer("/users/1", adminAuth.getAccessToken()),
+                getWithBearer("/api/admin/users/1", adminAuth.getAccessToken()),
                 HttpResponse.BodyHandlers.ofString()
         );
 
@@ -147,6 +148,60 @@ class UserControllerAuthTest {
         }
     }
 
+    @Test
+    void adminGetEndpointsRejectRegularUsers() throws Exception {
+        AuthResponse userAuth = authService.register(registerRequest("regular-admin-get@example.com"));
+
+        for (String endpoint : adminGetEndpoints()) {
+            HttpResponse<String> response = httpClient.send(
+                    getWithBearer(endpoint, userAuth.getAccessToken()),
+                    HttpResponse.BodyHandlers.ofString()
+            );
+
+            assertEquals(403, response.statusCode(), endpoint);
+        }
+    }
+
+    @Test
+    void adminGetEndpointsAllowAdminsToReachController() throws Exception {
+        AuthResponse adminAuth = createAdminAndLogin("admin-get@example.com");
+
+        for (String endpoint : adminGetEndpoints()) {
+            HttpResponse<String> response = httpClient.send(
+                    getWithBearer(endpoint, adminAuth.getAccessToken()),
+                    HttpResponse.BodyHandlers.ofString()
+            );
+
+            assertTrue(response.statusCode() != 401 && response.statusCode() != 403, endpoint);
+        }
+    }
+
+    @Test
+    void catalogGetEndpointsRequireAuthentication() throws Exception {
+        for (String endpoint : catalogGetEndpoints()) {
+            HttpResponse<String> response = httpClient.send(
+                    HttpRequest.newBuilder(URI.create(url(endpoint))).GET().build(),
+                    HttpResponse.BodyHandlers.ofString()
+            );
+
+            assertStatusIn(response.statusCode(), 401, 403);
+        }
+    }
+
+    @Test
+    void catalogGetEndpointsAllowAuthenticatedUsers() throws Exception {
+        AuthResponse userAuth = authService.register(registerRequest("catalog-reader@example.com"));
+
+        for (String endpoint : catalogGetEndpoints()) {
+            HttpResponse<String> response = httpClient.send(
+                    getWithBearer(endpoint, userAuth.getAccessToken()),
+                    HttpResponse.BodyHandlers.ofString()
+            );
+
+            assertTrue(response.statusCode() != 401 && response.statusCode() != 403, endpoint);
+        }
+    }
+
     private String url(String path) {
         return "http://localhost:" + port + path;
     }
@@ -176,10 +231,33 @@ class UserControllerAuthTest {
 
     private Map<String, String> adminOnlyPayloads() {
         return Map.of(
-                "/items", "{\"name\":\"Test Item\",\"price\":10.0,\"description\":\"Valid test description\",\"audience\":\"MEN\",\"categoryId\":1}",
-                "/sizes", "{\"label\":\"XL\",\"sizeSystem\":\"US\"}",
-                "/api/categories", "{\"name\":\"Test Category\"}",
-                "/api/colors", "{\"name\":\"Black\",\"value\":\"#000000\",\"imageUrl\":\"https://example.com/black.png\"}"
+                "/api/admin/items", "{\"name\":\"Test Item\",\"price\":10.0,\"description\":\"Valid test description\",\"audience\":\"MEN\",\"categoryId\":1}",
+                "/api/admin/sizes", "{\"label\":\"XL\",\"sizeSystem\":\"US\"}",
+                "/api/admin/categories", "{\"name\":\"Test Category\"}",
+                "/api/admin/colors", "{\"name\":\"Black\",\"value\":\"#000000\",\"imageUrl\":\"https://example.com/black.png\"}"
+        );
+    }
+
+    private List<String> adminGetEndpoints() {
+        return List.of(
+                "/api/admin/users",
+                "/api/admin/items",
+                "/api/admin/categories",
+                "/api/admin/colors",
+                "/api/admin/sizes",
+                "/api/admin/cart",
+                "/api/admin/favorites",
+                "/api/admin/addresses",
+                "/api/admin/reviews"
+        );
+    }
+
+    private List<String> catalogGetEndpoints() {
+        return List.of(
+                "/api/items",
+                "/api/categories",
+                "/api/colors",
+                "/api/sizes"
         );
     }
 

@@ -6,11 +6,13 @@ import com.fashionstore.models.Item;
 import com.fashionstore.models.Category;
 import com.fashionstore.dto.request.ItemRequest;
 import com.fashionstore.dto.response.ItemResponse;
+import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.repositories.ItemRepository;
 import com.fashionstore.repositories.CategoryRepository;
 import com.fashionstore.repositories.CartItemRepository;
 import com.fashionstore.repositories.FavoriteRepository;
 import com.fashionstore.repositories.ReviewRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -18,24 +20,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ItemService {
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
     private final CartItemRepository cartItemRepository;
     private final FavoriteRepository favoriteRepository;
     private final ReviewRepository reviewRepository;
-
-    public ItemService(ItemRepository itemRepository,
-                       CategoryRepository categoryRepository,
-                       CartItemRepository cartItemRepository,
-                       FavoriteRepository favoriteRepository,
-                       ReviewRepository reviewRepository) {
-        this.itemRepository = itemRepository;
-        this.categoryRepository = categoryRepository;
-        this.cartItemRepository = cartItemRepository;
-        this.favoriteRepository = favoriteRepository;
-        this.reviewRepository = reviewRepository;
-    }
 
     @Transactional
     public ItemResponse createItem(ItemRequest itemRequest) {
@@ -74,11 +65,8 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public List<ItemResponse> getAllItems() {
-        return itemRepository.findAll()
-                .stream()
-                .map(ItemResponse::from)
-                .collect(Collectors.toList());
+    public PageResponse<ItemResponse> getPagedItems(int page, int size) {
+        return PageResponse.from(itemRepository.findAll(PageRequestFactory.create(page, size)), ItemResponse::from);
     }
 
     @Transactional(readOnly = true)

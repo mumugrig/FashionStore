@@ -8,10 +8,12 @@ import com.fashionstore.models.ItemVariant;
 import com.fashionstore.models.Size;
 import com.fashionstore.models.User;
 import com.fashionstore.vo.Audience;
+import com.fashionstore.vo.SizeSystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,15 +67,19 @@ class FavoriteRepositoryTest {
         Item item = new Item();
         item.setName("Favorite Item");
         item.setPrice(BigDecimal.valueOf(99.99f));
+        item.setDescription("Favorite item description");
         item.setAudience(Audience.UNISEX);
         item.setCategory(category);
         itemRepository.save(item);
 
         Color color = new Color();
         color.setName("White");
+        color.setValue("#ffffff");
         colorRepository.save(color);
 
         Size size = new Size();
+        size.setLabel("M");
+        size.setSizeSystem(SizeSystem.ALPHA);
         sizeRepository.save(size);
 
         itemVariant = new ItemVariant();
@@ -86,7 +92,7 @@ class FavoriteRepositoryTest {
     }
 
     @Test
-    void testSaveFavorite() {
+    void save_whenFavoriteIsValid_persistsFavorite() {
         Favorite favorite = new Favorite();
         favorite.setItemVariant(itemVariant);
         favorite.setUser(user);
@@ -98,7 +104,7 @@ class FavoriteRepositoryTest {
     }
 
     @Test
-    void testFindFavoriteById() {
+    void findById_whenFavoriteExists_returnsFavorite() {
         Favorite favorite = new Favorite();
         favorite.setItemVariant(itemVariant);
         favorite.setUser(user);
@@ -111,7 +117,7 @@ class FavoriteRepositoryTest {
     }
 
     @Test
-    void testFindByUserId() {
+    void findByUserId_whenRecordsExist_returnsUserRecords() {
         User user2 = new User();
         user2.setFirstName("Another");
         user2.setLastName("Person");
@@ -137,13 +143,14 @@ class FavoriteRepositoryTest {
         List<Favorite> userFavorites = favoriteRepository.findByUserId(user.getId());
 
         assertEquals(2, userFavorites.size());
+        assertEquals(2, favoriteRepository.findByUserId(user.getId(), PageRequest.of(0, 20)).getTotalElements());
         assertTrue(userFavorites.stream().allMatch(f -> f.getUser().getId().equals(user.getId())));
         assertTrue(favoriteRepository.existsByItemVariantId(itemVariant.getId()));
         assertTrue(favoriteRepository.existsByItemVariantItemId(itemVariant.getItem().getId()));
     }
 
     @Test
-    void testFindByUserIdEmpty() {
+    void findByUserId_whenRecordsAreMissing_returnsEmptyList() {
         User emptyUser = new User();
         emptyUser.setFirstName("No");
         emptyUser.setLastName("Favorites");
@@ -157,7 +164,7 @@ class FavoriteRepositoryTest {
     }
 
     @Test
-    void testDeleteFavorite() {
+    void deleteById_whenFavoriteExists_removesFavorite() {
         Favorite favorite = new Favorite();
         favorite.setItemVariant(itemVariant);
         favorite.setUser(user);
@@ -169,7 +176,7 @@ class FavoriteRepositoryTest {
     }
 
     @Test
-    void testDeleteByUserId() {
+    void deleteByUserId_whenUserHasRecords_removesUserRecords() {
         Favorite favorite = new Favorite();
         favorite.setItemVariant(itemVariant);
         favorite.setUser(user);
@@ -181,7 +188,7 @@ class FavoriteRepositoryTest {
     }
 
     @Test
-    void testCountFavorites() {
+    void count_whenFavoritesExist_returnsFavoriteCount() {
         Favorite favorite1 = new Favorite();
         favorite1.setItemVariant(itemVariant);
         favorite1.setUser(user);

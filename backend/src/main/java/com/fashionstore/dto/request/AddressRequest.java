@@ -5,7 +5,6 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Min;
 
@@ -33,7 +32,5 @@ public class AddressRequest {
     @Size(min = 5, max = 255, message = "Address line must be between 5 and 255 characters")
     private String addressLine;
 
-    @NotNull(message = "User ID is required")
     private Long userId;
 }
-

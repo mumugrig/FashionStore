@@ -29,9 +29,6 @@ public class ReviewRequest {
     @NotNull(message = "Comfort is required")
     private Comfort comfort;
 
-    @NotNull(message = "User ID is required")
-    private Long userId;
-
     @NotNull(message = "Item variant ID is required")
     private Long itemVariantId;
 }

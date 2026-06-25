@@ -5,11 +5,13 @@ import com.fashionstore.exceptions.ConflictException;
 import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.repositories.ColorRepository;
 import com.fashionstore.repositories.ItemVariantRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,42 +26,73 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ColorServiceTest extends ServiceTestSupport {
-    @Mock private ColorRepository colorRepository;
-    @Mock private ItemVariantRepository itemVariantRepository;
-    @InjectMocks private ColorService colorService;
+    @Mock private ColorRepository colorRepositoryMock;
+    @Mock private ItemVariantRepository itemVariantRepositoryMock;
+    private ColorService objectUnderTest;
+
+    @BeforeEach
+    void setUp() {
+        objectUnderTest = new ColorService(colorRepositoryMock, itemVariantRepositoryMock);
+    }
 
     @Test
-    void createsUpdatesListsAndDeletesColors() {
+    void createColor_whenRequestIsValid_returnsCreatedColor() {
+        var createdColor = color(1L, "Red", "#ff0000");
+
+        when(colorRepositoryMock.save(any())).thenReturn(createdColor);
+
+        ColorResponse response = objectUnderTest.createColor(colorRequest("Red", "#ff0000"));
+
+        assertEquals("Red", response.getName(), "Created color name should match saved entity");
+    }
+
+    @Test
+    void updateColor_whenColorExists_returnsUpdatedColor() {
         var createdColor = color(1L, "Red", "#ff0000");
         var updatedColor = color(1L, "Blue", "#0000ff");
-        when(colorRepository.save(any())).thenReturn(createdColor);
-        ColorResponse created = colorService.createColor(colorRequest("Red", "#ff0000"));
 
-        when(colorRepository.findById(created.getId())).thenReturn(Optional.of(createdColor));
-        when(colorRepository.save(createdColor)).thenReturn(updatedColor);
-        ColorResponse updated = colorService.updateColor(created.getId(), colorRequest("Blue", "#0000ff"));
+        when(colorRepositoryMock.findById(1L)).thenReturn(Optional.of(createdColor));
+        when(colorRepositoryMock.save(createdColor)).thenReturn(updatedColor);
 
-        when(colorRepository.findAll()).thenReturn(List.of(updatedColor));
-        assertEquals("Blue", updated.getName());
-        assertFalse(colorService.getAllColors().isEmpty());
+        ColorResponse response = objectUnderTest.updateColor(1L, colorRequest("Blue", "#0000ff"));
 
-        when(itemVariantRepository.existsByColorId(created.getId())).thenReturn(false);
-        colorService.deleteColor(created.getId());
-        verify(colorRepository).deleteById(created.getId());
+        assertEquals("Blue", response.getName(), "Updated color name should match saved entity");
     }
 
     @Test
-    void throwsWhenColorIsMissing() {
-        when(colorRepository.findById(1L)).thenReturn(Optional.empty());
+    void getPagedColors_whenColorsExist_returnsPagedColors() {
+        var updatedColor = color(1L, "Blue", "#0000ff");
 
-        assertThrows(NotFoundException.class, () -> colorService.getColorById(1L));
+        when(colorRepositoryMock.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(updatedColor)));
+
+        var response = objectUnderTest.getPagedColors(1, 20);
+
+        assertFalse(response.getContent().isEmpty(), "Color page should contain repository results");
     }
 
     @Test
-    void blocksDeletingColorUsedByVariants() {
-        when(itemVariantRepository.existsByColorId(1L)).thenReturn(true);
+    void deleteColor_whenColorIsUnused_deletesColor() {
+        when(colorRepositoryMock.existsById(1L)).thenReturn(true);
+        when(itemVariantRepositoryMock.existsByColorId(1L)).thenReturn(false);
 
-        assertThrows(ConflictException.class, () -> colorService.deleteColor(1L));
-        verify(colorRepository, never()).deleteById(1L);
+        objectUnderTest.deleteColor(1L);
+
+        verify(colorRepositoryMock).deleteById(1L);
+    }
+
+    @Test
+    void getColorById_whenColorIsMissing_throwsNotFoundException() {
+        when(colorRepositoryMock.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> objectUnderTest.getColorById(1L));
+    }
+
+    @Test
+    void deleteColor_whenColorIsUsedByVariants_throwsConflictException() {
+        when(colorRepositoryMock.existsById(1L)).thenReturn(true);
+        when(itemVariantRepositoryMock.existsByColorId(1L)).thenReturn(true);
+
+        assertThrows(ConflictException.class, () -> objectUnderTest.deleteColor(1L));
+        verify(colorRepositoryMock, never()).deleteById(1L);
     }
 }

@@ -103,7 +103,6 @@ abstract class ServiceTestSupport {
 
     protected ReviewRequest reviewRequest(Long userId, Long itemVariantId, String body) {
         ReviewRequest request = new ReviewRequest();
-        request.setUserId(userId);
         request.setItemVariantId(itemVariantId);
         request.setBody(body);
         request.setSizeFit(SizeFit.TRUE_TO_SIZE);

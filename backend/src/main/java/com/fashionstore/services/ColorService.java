@@ -4,24 +4,20 @@ import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.models.Color;
 import com.fashionstore.dto.request.ColorRequest;
 import com.fashionstore.dto.response.ColorResponse;
+import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.exceptions.ConflictException;
 import com.fashionstore.repositories.ColorRepository;
 import com.fashionstore.repositories.ItemVariantRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ColorService {
     private final ColorRepository colorRepository;
     private final ItemVariantRepository itemVariantRepository;
-
-    public ColorService(ColorRepository colorRepository, ItemVariantRepository itemVariantRepository) {
-        this.colorRepository = colorRepository;
-        this.itemVariantRepository = itemVariantRepository;
-    }
 
     @Transactional
     public ColorResponse createColor(ColorRequest colorRequest) {
@@ -56,11 +52,8 @@ public class ColorService {
     }
 
     @Transactional(readOnly = true)
-    public List<ColorResponse> getAllColors() {
-        return colorRepository.findAll()
-                .stream()
-                .map(ColorResponse::from)
-                .collect(Collectors.toList());
+    public PageResponse<ColorResponse> getPagedColors(int page, int size) {
+        return PageResponse.from(colorRepository.findAll(PageRequestFactory.create(page, size)), ColorResponse::from);
     }
 
     @Transactional

@@ -36,7 +36,7 @@ class ItemRepositoryTest {
     }
 
     @Test
-    void testSaveItem() {
+    void save_whenItemIsValid_persistsItem() {
         Item item = new Item();
         item.setName("Laptop");
         item.setPrice(BigDecimal.valueOf(999.99f));
@@ -52,7 +52,7 @@ class ItemRepositoryTest {
     }
 
     @Test
-    void testFindItemById() {
+    void findById_whenItemExists_returnsItem() {
         Item item = new Item();
         item.setName("Mouse");
         item.setPrice(BigDecimal.valueOf(29.99f));
@@ -68,22 +68,25 @@ class ItemRepositoryTest {
     }
 
     @Test
-    void testFindByNameContainingIgnoreCase() {
+    void findByNameContainingIgnoreCase_whenNameMatches_returnsItems() {
         Item item1 = new Item();
         item1.setName("Samsung Laptop");
         item1.setPrice(BigDecimal.valueOf(899.99f));
+        item1.setDescription("Samsung laptop description");
         item1.setAudience(Audience.UNISEX);
         item1.setCategory(category);
 
         Item item2 = new Item();
         item2.setName("LAPTOP Stand");
         item2.setPrice(BigDecimal.valueOf(49.99f));
+        item2.setDescription("Laptop stand description");
         item2.setAudience(Audience.UNISEX);
         item2.setCategory(category);
 
         Item item3 = new Item();
         item3.setName("USB Cable");
         item3.setPrice(BigDecimal.valueOf(9.99f));
+        item3.setDescription("USB cable description");
         item3.setAudience(Audience.UNISEX);
         item3.setCategory(category);
 
@@ -98,7 +101,7 @@ class ItemRepositoryTest {
     }
 
     @Test
-    void testFindByCategoryId() {
+    void findByCategoryId_whenItemsExist_returnsCategoryItems() {
         Category category2 = new Category();
         category2.setName("Accessories");
         categoryRepository.save(category2);
@@ -106,18 +109,21 @@ class ItemRepositoryTest {
         Item item1 = new Item();
         item1.setName("Item1");
         item1.setPrice(BigDecimal.valueOf(19.99f));
+        item1.setDescription("First category item");
         item1.setAudience(Audience.UNISEX);
         item1.setCategory(category);
 
         Item item2 = new Item();
         item2.setName("Item2");
         item2.setPrice(BigDecimal.valueOf(29.99f));
+        item2.setDescription("Second category item");
         item2.setAudience(Audience.UNISEX);
         item2.setCategory(category);
 
         Item item3 = new Item();
         item3.setName("Item3");
         item3.setPrice(BigDecimal.valueOf(39.99f));
+        item3.setDescription("Third category item");
         item3.setAudience(Audience.UNISEX);
         item3.setCategory(category2);
 
@@ -131,10 +137,11 @@ class ItemRepositoryTest {
     }
 
     @Test
-    void testDeleteItem() {
+    void deleteById_whenItemExists_removesItem() {
         Item item = new Item();
         item.setName("ToDelete");
         item.setPrice(BigDecimal.valueOf(9.99f));
+        item.setDescription("Item to delete");
         item.setAudience(Audience.UNISEX);
         item.setCategory(category);
         Item savedItem = itemRepository.save(item);
@@ -145,16 +152,18 @@ class ItemRepositoryTest {
     }
 
     @Test
-    void testCountItems() {
+    void count_whenItemsExist_returnsItemCount() {
         Item item1 = new Item();
         item1.setName("Item1");
         item1.setPrice(BigDecimal.valueOf(19.99f));
+        item1.setDescription("Count item one");
         item1.setAudience(Audience.UNISEX);
         item1.setCategory(category);
 
         Item item2 = new Item();
         item2.setName("Item2");
         item2.setPrice(BigDecimal.valueOf(29.99f));
+        item2.setDescription("Count item two");
         item2.setAudience(Audience.UNISEX);
         item2.setCategory(category);
 

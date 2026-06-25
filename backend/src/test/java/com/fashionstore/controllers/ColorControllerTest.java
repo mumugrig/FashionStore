@@ -1,14 +1,13 @@
 package com.fashionstore.controllers;
 
 import com.fashionstore.services.ColorService;
+import com.fashionstore.controllers.admin.AdminColorController;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -17,24 +16,48 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ColorControllerTest extends ControllerTestSupport {
-    @Mock private ColorService colorService;
-    @InjectMocks private ColorController colorController;
+    @Mock private ColorService colorServiceMock;
+    private AdminColorController objectUnderTest;
+
+    @BeforeEach
+    void setUp() {
+        objectUnderTest = new AdminColorController(colorServiceMock);
+    }
 
     @Test
-    void createsUpdatesListsAndDeletesColors() {
-        when(colorService.createColor(any())).thenReturn(colorResponse(1L, "Black", "#000000"));
-        when(colorService.updateColor(org.mockito.ArgumentMatchers.eq(1L), any())).thenReturn(colorResponse(1L, "White", "#ffffff"));
-        when(colorService.getAllColors()).thenReturn(List.of(colorResponse(1L, "White", "#ffffff")));
+    void createColor_whenRequestIsValid_returnsCreatedColor() {
+        when(colorServiceMock.createColor(any())).thenReturn(colorResponse(1L, "Black", "#000000"));
 
-        var created = colorController.createColor(colorRequest("Black", "#000000"));
-        var updated = colorController.updateColor(1L, colorRequest("White", "#ffffff"));
-        var listed = colorController.getColors();
-        var deleted = colorController.deleteColor(1L);
+        var response = objectUnderTest.createColor(colorRequest("Black", "#000000"));
 
-        assertEquals(HttpStatus.CREATED, created.getStatusCode());
-        assertEquals("White", updated.getBody().getName());
-        assertEquals(1, listed.getBody().size());
-        assertEquals(HttpStatus.NO_CONTENT, deleted.getStatusCode());
-        verify(colorService).deleteColor(1L);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode(), "Color creation should return HTTP 201");
+        assertEquals("Black", response.getBody().getName(), "Created color name should match service response");
+    }
+
+    @Test
+    void updateColor_whenColorExists_returnsUpdatedColor() {
+        when(colorServiceMock.updateColor(org.mockito.ArgumentMatchers.eq(1L), any()))
+                .thenReturn(colorResponse(1L, "White", "#ffffff"));
+
+        var response = objectUnderTest.updateColor(1L, colorRequest("White", "#ffffff"));
+
+        assertEquals("White", response.getBody().getName(), "Updated color name should match service response");
+    }
+
+    @Test
+    void getColors_whenPageIsRequested_returnsPagedColors() {
+        when(colorServiceMock.getPagedColors(1, 20)).thenReturn(pageResponse(colorResponse(1L, "White", "#ffffff")));
+
+        var response = objectUnderTest.getPagedColors(1, 20);
+
+        assertEquals(1, response.getBody().getContent().size(), "Color page should contain service results");
+    }
+
+    @Test
+    void deleteColor_whenColorExists_returnsNoContent() {
+        var response = objectUnderTest.deleteColor(1L);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode(), "Color deletion should return HTTP 204");
+        verify(colorServiceMock).deleteColor(1L);
     }
 }

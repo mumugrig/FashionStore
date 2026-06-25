@@ -20,7 +20,6 @@ public class CartItemRequest {
     @NotNull(message = "Item variant ID is required")
     private Long itemVariantId;
 
-    @NotNull(message = "User ID is required")
     private Long userId;
 }
 

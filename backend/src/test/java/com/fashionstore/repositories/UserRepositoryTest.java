@@ -20,7 +20,7 @@ class UserRepositoryTest {
     private UserRepository userRepository;
 
     @Test
-    void testSaveUser() {
+    void save_whenUserIsValid_persistsUser() {
         User user = new User();
         user.setFirstName("John");
         user.setLastName("Doe");
@@ -35,7 +35,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    void testFindUserById() {
+    void findById_whenUserExists_returnsUser() {
         User user = new User();
         user.setFirstName("Jane");
         user.setLastName("Smith");
@@ -50,7 +50,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    void testFindByEmail() {
+    void findByEmail_whenUserExists_returnsUser() {
         User user = new User();
         user.setFirstName("Bob");
         user.setLastName("Johnson");
@@ -65,14 +65,14 @@ class UserRepositoryTest {
     }
 
     @Test
-    void testFindByEmailNotFound() {
+    void findByEmail_whenUserIsMissing_returnsEmpty() {
         Optional<User> foundUser = userRepository.findByEmail("nonexistent@example.com");
 
         assertFalse(foundUser.isPresent());
     }
 
     @Test
-    void testDeleteUser() {
+    void deleteById_whenUserExists_removesUser() {
         User user = new User();
         user.setFirstName("Test");
         user.setLastName("Delete");
@@ -87,7 +87,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    void testCountUsers() {
+    void count_whenUsersExist_returnsUserCount() {
         User user1 = new User();
         user1.setFirstName("User1");
         user1.setLastName("Last1");
@@ -108,7 +108,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    void testExistsByIdTrue() {
+    void existsById_whenUserExists_returnsTrue() {
         User user = new User();
         user.setFirstName("Exists");
         user.setLastName("Test");
@@ -121,7 +121,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    void testExistsByIdFalse() {
+    void existsById_whenUserIsMissing_returnsFalse() {
         boolean exists = userRepository.existsById(99999L);
         assertFalse(exists);
     }

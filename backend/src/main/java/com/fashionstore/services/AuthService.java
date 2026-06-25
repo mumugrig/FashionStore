@@ -13,6 +13,7 @@ import com.fashionstore.repositories.RefreshTokenRepository;
 import com.fashionstore.repositories.UserRepository;
 import com.fashionstore.security.JwtService;
 import com.fashionstore.vo.UserRole;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,33 +24,21 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.HexFormat;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-    private final Duration refreshTokenTtl;
 
-    public AuthService(UserRepository userRepository,
-                       RefreshTokenRepository refreshTokenRepository,
-                       PasswordEncoder passwordEncoder,
-                       AuthenticationManager authenticationManager,
-                       JwtService jwtService,
-                       @Value("${app.jwt.refresh-token-ttl-days:7}") long refreshTokenTtlDays) {
-        this.userRepository = userRepository;
-        this.refreshTokenRepository = refreshTokenRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
-        this.refreshTokenTtl = Duration.ofDays(refreshTokenTtlDays);
-    }
+    @Value("${app.jwt.refresh-token-ttl-days:7}")
+    private long refreshTokenTtlDays = 7;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -110,7 +99,7 @@ public class AuthService {
         RefreshToken persistedRefreshToken = new RefreshToken();
         persistedRefreshToken.setUser(user);
         persistedRefreshToken.setTokenHash(hashToken(refreshToken));
-        persistedRefreshToken.setExpiresAt(Instant.now().plus(refreshTokenTtl));
+        persistedRefreshToken.setExpiresAt(Instant.now().plusSeconds(refreshTokenTtlDays * 24 * 60 * 60));
         refreshTokenRepository.save(persistedRefreshToken);
 
         return new AuthResponse(

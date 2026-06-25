@@ -8,10 +8,12 @@ import com.fashionstore.models.ItemVariant;
 import com.fashionstore.models.Size;
 import com.fashionstore.models.User;
 import com.fashionstore.vo.Audience;
+import com.fashionstore.vo.SizeSystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -63,15 +65,19 @@ class CartItemRepositoryTest {
         Item item = new Item();
         item.setName("Product");
         item.setPrice(BigDecimal.valueOf(29.99f));
+        item.setDescription("Cart product description");
         item.setAudience(Audience.UNISEX);
         item.setCategory(category);
         itemRepository.save(item);
 
         Color color = new Color();
         color.setName("Black");
+        color.setValue("#000000");
         colorRepository.save(color);
 
         Size size = new Size();
+        size.setLabel("M");
+        size.setSizeSystem(SizeSystem.ALPHA);
         sizeRepository.save(size);
 
         itemVariant = new ItemVariant();
@@ -84,7 +90,7 @@ class CartItemRepositoryTest {
     }
 
     @Test
-    void testSaveCartItem() {
+    void save_whenCartItemIsValid_persistsCartItem() {
         CartItem cartItem = new CartItem();
         cartItem.setQuantity(2);
         cartItem.setItemVariant(itemVariant);
@@ -97,7 +103,7 @@ class CartItemRepositoryTest {
     }
 
     @Test
-    void testFindCartItemById() {
+    void findById_whenCartItemExists_returnsCartItem() {
         CartItem cartItem = new CartItem();
         cartItem.setQuantity(3);
         cartItem.setItemVariant(itemVariant);
@@ -111,7 +117,7 @@ class CartItemRepositoryTest {
     }
 
     @Test
-    void testFindByUserId() {
+    void findByUserId_whenRecordsExist_returnsUserRecords() {
         User user2 = new User();
         user2.setFirstName("Another");
         user2.setLastName("User");
@@ -140,13 +146,14 @@ class CartItemRepositoryTest {
         List<CartItem> userCartItems = cartItemRepository.findByUserId(user.getId());
 
         assertEquals(2, userCartItems.size());
+        assertEquals(2, cartItemRepository.findByUserId(user.getId(), PageRequest.of(0, 20)).getTotalElements());
         assertTrue(userCartItems.stream().allMatch(c -> c.getUser().getId().equals(user.getId())));
         assertTrue(cartItemRepository.existsByItemVariantId(itemVariant.getId()));
         assertTrue(cartItemRepository.existsByItemVariantItemId(itemVariant.getItem().getId()));
     }
 
     @Test
-    void testFindByUserIdEmpty() {
+    void findByUserId_whenRecordsAreMissing_returnsEmptyList() {
         User emptyUser = new User();
         emptyUser.setFirstName("Empty");
         emptyUser.setLastName("Cart");
@@ -160,7 +167,7 @@ class CartItemRepositoryTest {
     }
 
     @Test
-    void testDeleteCartItem() {
+    void deleteById_whenCartItemExists_removesCartItem() {
         CartItem cartItem = new CartItem();
         cartItem.setQuantity(1);
         cartItem.setItemVariant(itemVariant);
@@ -173,7 +180,7 @@ class CartItemRepositoryTest {
     }
 
     @Test
-    void testDeleteByUserId() {
+    void deleteByUserId_whenUserHasRecords_removesUserRecords() {
         CartItem cartItem = new CartItem();
         cartItem.setQuantity(1);
         cartItem.setItemVariant(itemVariant);
@@ -186,7 +193,7 @@ class CartItemRepositoryTest {
     }
 
     @Test
-    void testCountCartItems() {
+    void count_whenCartItemsExist_returnsCartItemCount() {
         CartItem cartItem1 = new CartItem();
         cartItem1.setQuantity(1);
         cartItem1.setItemVariant(itemVariant);

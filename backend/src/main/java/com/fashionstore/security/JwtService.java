@@ -1,6 +1,7 @@
 package com.fashionstore.security;
 
 import com.fashionstore.models.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -14,19 +15,16 @@ import java.time.Instant;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService {
     private final JwtEncoder jwtEncoder;
-    private final Duration accessTokenTtl;
 
-    public JwtService(JwtEncoder jwtEncoder,
-                      @Value("${app.jwt.access-token-ttl-minutes:15}") long accessTokenTtlMinutes) {
-        this.jwtEncoder = jwtEncoder;
-        this.accessTokenTtl = Duration.ofMinutes(accessTokenTtlMinutes);
-    }
+    @Value("${app.jwt.access-token-ttl-minutes:15}")
+    private long accessTokenTtlMinutes = 15;
 
     public TokenResult createAccessToken(User user) {
         Instant issuedAt = Instant.now();
-        Instant expiresAt = issuedAt.plus(accessTokenTtl);
+        Instant expiresAt = issuedAt.plus(Duration.ofMinutes(accessTokenTtlMinutes));
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("fashionstore")
                 .issuedAt(issuedAt)

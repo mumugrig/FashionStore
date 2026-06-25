@@ -20,7 +20,7 @@ class CategoryRepositoryTest {
     private CategoryRepository categoryRepository;
 
     @Test
-    void testSaveCategory() {
+    void save_whenCategoryIsValid_persistsCategory() {
         Category category = new Category();
         category.setName("Clothing");
 
@@ -31,7 +31,7 @@ class CategoryRepositoryTest {
     }
 
     @Test
-    void testFindCategoryById() {
+    void findById_whenCategoryExists_returnsCategory() {
         Category category = new Category();
         category.setName("Shoes");
         Category savedCategory = categoryRepository.save(category);
@@ -43,7 +43,7 @@ class CategoryRepositoryTest {
     }
 
     @Test
-    void testFindByParentId() {
+    void findByParentId_whenChildrenExist_returnsChildCategories() {
         Category parent = new Category();
         parent.setName("Fashion");
         Category savedParent = categoryRepository.save(parent);
@@ -70,7 +70,7 @@ class CategoryRepositoryTest {
     }
 
     @Test
-    void testFindByParentIdEmpty() {
+    void findByParentId_whenChildrenAreMissing_returnsEmptyList() {
         Category orphanCategory = new Category();
         orphanCategory.setName("NoChildren");
         categoryRepository.save(orphanCategory);
@@ -82,7 +82,7 @@ class CategoryRepositoryTest {
     }
 
     @Test
-    void testDeleteCategory() {
+    void deleteById_whenCategoryExists_removesCategory() {
         Category category = new Category();
         category.setName("ToDelete");
         Category savedCategory = categoryRepository.save(category);
@@ -93,7 +93,7 @@ class CategoryRepositoryTest {
     }
 
     @Test
-    void testCountCategories() {
+    void count_whenCategoriesExist_returnsCategoryCount() {
         Category cat1 = new Category();
         cat1.setName("Category1");
         categoryRepository.save(cat1);

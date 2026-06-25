@@ -5,11 +5,13 @@ import com.fashionstore.exceptions.ConflictException;
 import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.repositories.ItemVariantRepository;
 import com.fashionstore.repositories.SizeRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,42 +26,73 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SizeServiceTest extends ServiceTestSupport {
-    @Mock private SizeRepository sizeRepository;
-    @Mock private ItemVariantRepository itemVariantRepository;
-    @InjectMocks private SizeService sizeService;
+    @Mock private SizeRepository sizeRepositoryMock;
+    @Mock private ItemVariantRepository itemVariantRepositoryMock;
+    private SizeService objectUnderTest;
+
+    @BeforeEach
+    void setUp() {
+        objectUnderTest = new SizeService(sizeRepositoryMock, itemVariantRepositoryMock);
+    }
 
     @Test
-    void createsUpdatesListsAndDeletesSizes() {
+    void createSize_whenRequestIsValid_returnsCreatedSize() {
+        var createdSize = size(1L, "M");
+
+        when(sizeRepositoryMock.save(any())).thenReturn(createdSize);
+
+        SizeResponse response = objectUnderTest.createSize(sizeRequest("M"));
+
+        assertEquals("M", response.getLabel(), "Created size label should match saved entity");
+    }
+
+    @Test
+    void updateSize_whenSizeExists_returnsUpdatedSize() {
         var createdSize = size(1L, "M");
         var updatedSize = size(1L, "L");
-        when(sizeRepository.save(any())).thenReturn(createdSize);
-        SizeResponse created = sizeService.createSize(sizeRequest("M"));
 
-        when(sizeRepository.findById(created.getId())).thenReturn(Optional.of(createdSize));
-        when(sizeRepository.save(createdSize)).thenReturn(updatedSize);
-        SizeResponse updated = sizeService.updateSize(created.getId(), sizeRequest("L"));
+        when(sizeRepositoryMock.findById(1L)).thenReturn(Optional.of(createdSize));
+        when(sizeRepositoryMock.save(createdSize)).thenReturn(updatedSize);
 
-        when(sizeRepository.findAll()).thenReturn(List.of(updatedSize));
-        assertEquals("L", updated.getLabel());
-        assertFalse(sizeService.getAllSizes().isEmpty());
+        SizeResponse response = objectUnderTest.updateSize(1L, sizeRequest("L"));
 
-        when(itemVariantRepository.existsBySizeId(created.getId())).thenReturn(false);
-        sizeService.deleteSize(created.getId());
-        verify(sizeRepository).deleteById(created.getId());
+        assertEquals("L", response.getLabel(), "Updated size label should match saved entity");
     }
 
     @Test
-    void throwsWhenSizeIsMissing() {
-        when(sizeRepository.findById(1L)).thenReturn(Optional.empty());
+    void getPagedSizes_whenSizesExist_returnsPagedSizes() {
+        var updatedSize = size(1L, "L");
 
-        assertThrows(NotFoundException.class, () -> sizeService.getSizeById(1L));
+        when(sizeRepositoryMock.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(updatedSize)));
+
+        var response = objectUnderTest.getPagedSizes(1, 20);
+
+        assertFalse(response.getContent().isEmpty(), "Size page should contain repository results");
     }
 
     @Test
-    void blocksDeletingSizeUsedByVariants() {
-        when(itemVariantRepository.existsBySizeId(1L)).thenReturn(true);
+    void deleteSize_whenSizeIsUnused_deletesSize() {
+        when(sizeRepositoryMock.existsById(1L)).thenReturn(true);
+        when(itemVariantRepositoryMock.existsBySizeId(1L)).thenReturn(false);
 
-        assertThrows(ConflictException.class, () -> sizeService.deleteSize(1L));
-        verify(sizeRepository, never()).deleteById(1L);
+        objectUnderTest.deleteSize(1L);
+
+        verify(sizeRepositoryMock).deleteById(1L);
+    }
+
+    @Test
+    void getSizeById_whenSizeIsMissing_throwsNotFoundException() {
+        when(sizeRepositoryMock.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> objectUnderTest.getSizeById(1L));
+    }
+
+    @Test
+    void deleteSize_whenSizeIsUsedByVariants_throwsConflictException() {
+        when(sizeRepositoryMock.existsById(1L)).thenReturn(true);
+        when(itemVariantRepositoryMock.existsBySizeId(1L)).thenReturn(true);
+
+        assertThrows(ConflictException.class, () -> objectUnderTest.deleteSize(1L));
+        verify(sizeRepositoryMock, never()).deleteById(1L);
     }
 }

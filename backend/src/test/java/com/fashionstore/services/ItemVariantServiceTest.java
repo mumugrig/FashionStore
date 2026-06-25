@@ -10,9 +10,9 @@ import com.fashionstore.repositories.ItemRepository;
 import com.fashionstore.repositories.ItemVariantRepository;
 import com.fashionstore.repositories.ReviewRepository;
 import com.fashionstore.repositories.SizeRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -29,17 +29,41 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ItemVariantServiceTest extends ServiceTestSupport {
-    @Mock private ItemVariantRepository itemVariantRepository;
-    @Mock private ItemRepository itemRepository;
-    @Mock private SizeRepository sizeRepository;
-    @Mock private ColorRepository colorRepository;
-    @Mock private CartItemRepository cartItemRepository;
-    @Mock private FavoriteRepository favoriteRepository;
-    @Mock private ReviewRepository reviewRepository;
-    @InjectMocks private ItemVariantService itemVariantService;
+    @Mock private ItemVariantRepository itemVariantRepositoryMock;
+    @Mock private ItemRepository itemRepositoryMock;
+    @Mock private SizeRepository sizeRepositoryMock;
+    @Mock private ColorRepository colorRepositoryMock;
+    @Mock private CartItemRepository cartItemRepositoryMock;
+    @Mock private FavoriteRepository favoriteRepositoryMock;
+    @Mock private ReviewRepository reviewRepositoryMock;
+    private ItemVariantService objectUnderTest;
+
+    @BeforeEach
+    void setUp() {
+        objectUnderTest = new ItemVariantService(itemVariantRepositoryMock, itemRepositoryMock, sizeRepositoryMock,
+                colorRepositoryMock, cartItemRepositoryMock, favoriteRepositoryMock, reviewRepositoryMock);
+    }
 
     @Test
-    void createsUpdatesAndQueriesActiveVariantsByItem() {
+    void createItemVariant_whenReferencesExist_returnsCreatedVariant() {
+        var category = category(1L, "Shirts");
+        var item = item(1L, "Variant Shirt", category);
+        var size = size(1L, "M");
+        var color = color(1L, "Blue", "#0000ff");
+        var variant = itemVariant(1L, item, size, color);
+
+        when(itemRepositoryMock.findById(1L)).thenReturn(Optional.of(item));
+        when(sizeRepositoryMock.findById(1L)).thenReturn(Optional.of(size));
+        when(colorRepositoryMock.findById(1L)).thenReturn(Optional.of(color));
+        when(itemVariantRepositoryMock.save(any())).thenReturn(variant);
+
+        ItemVariantResponse response = objectUnderTest.createItemVariant(itemVariantRequest(1L, 1L, 1L));
+
+        assertEquals(item.getId(), response.getItemId(), "Created variant should reference the requested item");
+    }
+
+    @Test
+    void updateItemVariant_whenVariantExists_returnsUpdatedVariant() {
         var category = category(1L, "Shirts");
         var item = item(1L, "Variant Shirt", category);
         var size = size(1L, "M");
@@ -48,64 +72,78 @@ class ItemVariantServiceTest extends ServiceTestSupport {
         var inactiveVariant = itemVariant(1L, item, size, color);
         inactiveVariant.setActive(false);
 
-        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
-        when(sizeRepository.findById(1L)).thenReturn(Optional.of(size));
-        when(colorRepository.findById(1L)).thenReturn(Optional.of(color));
-        when(itemVariantRepository.save(any())).thenReturn(variant);
-        ItemVariantResponse created = itemVariantService.createItemVariant(itemVariantRequest(1L, 1L, 1L));
+        when(itemVariantRepositoryMock.findById(1L)).thenReturn(Optional.of(variant));
+        when(itemRepositoryMock.findById(1L)).thenReturn(Optional.of(item));
+        when(sizeRepositoryMock.findById(1L)).thenReturn(Optional.of(size));
+        when(colorRepositoryMock.findById(1L)).thenReturn(Optional.of(color));
+        when(itemVariantRepositoryMock.save(variant)).thenReturn(inactiveVariant);
 
-        when(itemVariantRepository.findById(created.getId())).thenReturn(Optional.of(variant));
-        when(itemVariantRepository.save(variant)).thenReturn(inactiveVariant);
-        ItemVariantResponse updated = itemVariantService.updateItemVariant(created.getId(), itemVariantRequest(1L, 1L, 1L, false, 3));
+        ItemVariantResponse response = objectUnderTest.updateItemVariant(1L, itemVariantRequest(1L, 1L, 1L, false, 3));
 
-        when(itemVariantRepository.findByItemIdAndIsActiveTrue(1L)).thenReturn(List.of(variant));
-        assertEquals(item.getId(), created.getItemId());
-        assertFalse(updated.isActive());
-        assertEquals(1, itemVariantService.getActiveVariantsByItem(1L).size());
+        assertFalse(response.isActive(), "Updated variant should reflect saved active flag");
     }
 
     @Test
-    void throwsWhenVariantIsMissing() {
-        when(itemVariantRepository.findById(99999L)).thenReturn(Optional.empty());
+    void getActiveVariantsByItem_whenActiveVariantsExist_returnsActiveVariants() {
+        var category = category(1L, "Shirts");
+        var item = item(1L, "Variant Shirt", category);
+        var size = size(1L, "M");
+        var color = color(1L, "Blue", "#0000ff");
+        var variant = itemVariant(1L, item, size, color);
 
-        assertThrows(NotFoundException.class, () -> itemVariantService.getItemVariantById(99999L));
+        when(itemVariantRepositoryMock.findByItemIdAndIsActiveTrue(1L)).thenReturn(List.of(variant));
+
+        var response = objectUnderTest.getActiveVariantsByItem(1L);
+
+        assertEquals(1, response.size(), "Active variant query should return repository variants");
     }
 
     @Test
-    void deletesVariant() {
-        when(cartItemRepository.existsByItemVariantId(1L)).thenReturn(false);
-        when(favoriteRepository.existsByItemVariantId(1L)).thenReturn(false);
-        when(reviewRepository.existsByItemVariantId(1L)).thenReturn(false);
+    void getItemVariantById_whenVariantIsMissing_throwsNotFoundException() {
+        when(itemVariantRepositoryMock.findById(99999L)).thenReturn(Optional.empty());
 
-        itemVariantService.deleteItemVariant(1L);
-
-        verify(itemVariantRepository).deleteById(1L);
+        assertThrows(NotFoundException.class, () -> objectUnderTest.getItemVariantById(99999L));
     }
 
     @Test
-    void blocksDeletingVariantInCart() {
-        when(cartItemRepository.existsByItemVariantId(1L)).thenReturn(true);
+    void deleteItemVariant_whenVariantIsUnused_deletesVariant() {
+        when(itemVariantRepositoryMock.existsById(1L)).thenReturn(true);
+        when(cartItemRepositoryMock.existsByItemVariantId(1L)).thenReturn(false);
+        when(favoriteRepositoryMock.existsByItemVariantId(1L)).thenReturn(false);
+        when(reviewRepositoryMock.existsByItemVariantId(1L)).thenReturn(false);
 
-        assertThrows(ConflictException.class, () -> itemVariantService.deleteItemVariant(1L));
-        verify(itemVariantRepository, never()).deleteById(1L);
+        objectUnderTest.deleteItemVariant(1L);
+
+        verify(itemVariantRepositoryMock).deleteById(1L);
     }
 
     @Test
-    void blocksDeletingVariantInFavourites() {
-        when(cartItemRepository.existsByItemVariantId(1L)).thenReturn(false);
-        when(favoriteRepository.existsByItemVariantId(1L)).thenReturn(true);
+    void deleteItemVariant_whenVariantIsInCart_throwsConflictException() {
+        when(itemVariantRepositoryMock.existsById(1L)).thenReturn(true);
+        when(cartItemRepositoryMock.existsByItemVariantId(1L)).thenReturn(true);
 
-        assertThrows(ConflictException.class, () -> itemVariantService.deleteItemVariant(1L));
-        verify(itemVariantRepository, never()).deleteById(1L);
+        assertThrows(ConflictException.class, () -> objectUnderTest.deleteItemVariant(1L));
+        verify(itemVariantRepositoryMock, never()).deleteById(1L);
     }
 
     @Test
-    void blocksDeletingVariantWithReviews() {
-        when(cartItemRepository.existsByItemVariantId(1L)).thenReturn(false);
-        when(favoriteRepository.existsByItemVariantId(1L)).thenReturn(false);
-        when(reviewRepository.existsByItemVariantId(1L)).thenReturn(true);
+    void deleteItemVariant_whenVariantIsInFavourites_throwsConflictException() {
+        when(itemVariantRepositoryMock.existsById(1L)).thenReturn(true);
+        when(cartItemRepositoryMock.existsByItemVariantId(1L)).thenReturn(false);
+        when(favoriteRepositoryMock.existsByItemVariantId(1L)).thenReturn(true);
 
-        assertThrows(ConflictException.class, () -> itemVariantService.deleteItemVariant(1L));
-        verify(itemVariantRepository, never()).deleteById(1L);
+        assertThrows(ConflictException.class, () -> objectUnderTest.deleteItemVariant(1L));
+        verify(itemVariantRepositoryMock, never()).deleteById(1L);
+    }
+
+    @Test
+    void deleteItemVariant_whenVariantHasReviews_throwsConflictException() {
+        when(itemVariantRepositoryMock.existsById(1L)).thenReturn(true);
+        when(cartItemRepositoryMock.existsByItemVariantId(1L)).thenReturn(false);
+        when(favoriteRepositoryMock.existsByItemVariantId(1L)).thenReturn(false);
+        when(reviewRepositoryMock.existsByItemVariantId(1L)).thenReturn(true);
+
+        assertThrows(ConflictException.class, () -> objectUnderTest.deleteItemVariant(1L));
+        verify(itemVariantRepositoryMock, never()).deleteById(1L);
     }
 }

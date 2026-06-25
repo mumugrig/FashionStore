@@ -5,23 +5,19 @@ import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.models.Category;
 import com.fashionstore.dto.request.CategoryRequest;
 import com.fashionstore.dto.response.CategoryResponse;
+import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.repositories.CategoryRepository;
 import com.fashionstore.repositories.ItemRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final ItemRepository itemRepository;
-
-    public CategoryService(CategoryRepository categoryRepository, ItemRepository itemRepository) {
-        this.categoryRepository = categoryRepository;
-        this.itemRepository = itemRepository;
-    }
 
     @Transactional
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
@@ -64,11 +60,8 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public List<CategoryResponse> getAllCategories() {
-        return categoryRepository.findAll()
-                .stream()
-                .map(CategoryResponse::from)
-                .collect(Collectors.toList());
+    public PageResponse<CategoryResponse> getPagedCategories(int page, int size) {
+        return PageResponse.from(categoryRepository.findAll(PageRequestFactory.create(page, size)), CategoryResponse::from);
     }
 
     @Transactional

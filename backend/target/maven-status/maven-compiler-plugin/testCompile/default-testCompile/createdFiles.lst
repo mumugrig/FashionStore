@@ -1,12 +1,2 @@
-com\fashionstore\controllers\ItemControllerTest.class
-com\fashionstore\FashionStoreApplicationTests.class
-com\fashionstore\controllers\AddressControllerTest.class
-com\fashionstore\repositories\AddressRepositoryTest.class
-com\fashionstore\controllers\ControllerTestSupport.class
-com\fashionstore\controllers\SizeControllerTest.class
-com\fashionstore\controllers\UserControllerAuthTest.class
-com\fashionstore\controllers\ColorControllerTest.class
-com\fashionstore\controllers\CartItemControllerTest.class
-com\fashionstore\controllers\CategoryControllerTest.class
-com\fashionstore\controllers\ReviewControllerTest.class
-com\fashionstore\controllers\FavoriteControllerTest.class
+com\fashionstore\controllers\UserOwnedControllerTest.class
+com\fashionstore\controllers\AdminUserControllerTest.class

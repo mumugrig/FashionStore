@@ -38,103 +38,104 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest extends ServiceTestSupport {
-    @Mock private UserRepository userRepository;
-    @Mock private RefreshTokenRepository refreshTokenRepository;
-    @Mock private PasswordEncoder passwordEncoder;
-    @Mock private AuthenticationManager authenticationManager;
-    @Mock private JwtService jwtService;
+    @Mock private UserRepository userRepositoryMock;
+    @Mock private RefreshTokenRepository refreshTokenRepositoryMock;
+    @Mock private PasswordEncoder passwordEncoderMock;
+    @Mock private AuthenticationManager authenticationManagerMock;
+    @Mock private JwtService jwtServiceMock;
 
     @Test
-    void registerCreatesUserWithHashedPasswordAndTokens() {
+    void register_whenEmailIsNew_returnsTokensAndCreatedUser() {
         AuthService authService = authService();
         User savedUser = user(1L, "new@example.com");
         savedUser.setPasswordHash("encoded-password");
-        when(userRepository.findByEmail("new@example.com")).thenReturn(Optional.empty());
-        when(passwordEncoder.encode("password")).thenReturn("encoded-password");
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
-        when(jwtService.createAccessToken(savedUser)).thenReturn(tokenResult());
+        when(userRepositoryMock.findByEmail("new@example.com")).thenReturn(Optional.empty());
+        when(passwordEncoderMock.encode("password")).thenReturn("encoded-password");
+        when(userRepositoryMock.save(any(User.class))).thenReturn(savedUser);
+        when(jwtServiceMock.createAccessToken(savedUser)).thenReturn(tokenResult());
 
         AuthResponse response = authService.register(registerRequest("new@example.com"));
 
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userRepository).save(userCaptor.capture());
-        assertEquals("encoded-password", userCaptor.getValue().getPasswordHash());
-        assertNotEquals("password", userCaptor.getValue().getPasswordHash());
-        assertEquals("access-token", response.getAccessToken());
-        assertNotNull(response.getRefreshToken());
-        assertEquals("Bearer", response.getTokenType());
-        assertEquals("new@example.com", response.getUser().getEmail());
+        verify(userRepositoryMock).save(userCaptor.capture());
+        assertEquals("encoded-password", userCaptor.getValue().getPasswordHash(), "Registered user should store encoded password");
+        assertNotEquals("password", userCaptor.getValue().getPasswordHash(), "Registered user should not store raw password");
+        assertEquals("access-token", response.getAccessToken(), "Registration should return access token");
+        assertNotNull(response.getRefreshToken(), "Registration should return refresh token");
+        assertEquals("Bearer", response.getTokenType(), "Registration should return bearer token type");
+        assertEquals("new@example.com", response.getUser().getEmail(), "Registration response should include created user email");
     }
 
     @Test
-    void registerRejectsDuplicateEmail() {
+    void register_whenEmailExists_throwsConflictException() {
         AuthService authService = authService();
-        when(userRepository.findByEmail("duplicate@example.com")).thenReturn(Optional.of(user(1L, "duplicate@example.com")));
+        when(userRepositoryMock.findByEmail("duplicate@example.com")).thenReturn(Optional.of(user(1L, "duplicate@example.com")));
 
         assertThrows(ConflictException.class, () -> authService.register(registerRequest("duplicate@example.com")));
     }
 
     @Test
-    void loginReturnsTokensForValidCredentials() {
+    void login_whenCredentialsAreValid_returnsTokens() {
         AuthService authService = authService();
         User user = user(1L, "login@example.com");
-        when(userRepository.findByEmail("login@example.com")).thenReturn(Optional.of(user));
-        when(jwtService.createAccessToken(user)).thenReturn(tokenResult());
+        when(userRepositoryMock.findByEmail("login@example.com")).thenReturn(Optional.of(user));
+        when(jwtServiceMock.createAccessToken(user)).thenReturn(tokenResult());
 
         AuthResponse response = authService.login(loginRequest("login@example.com", "password"));
 
-        verify(authenticationManager).authenticate(any());
-        assertEquals("access-token", response.getAccessToken());
-        assertNotNull(response.getRefreshToken());
+        verify(authenticationManagerMock).authenticate(any());
+        assertEquals("access-token", response.getAccessToken(), "Login should return access token");
+        assertNotNull(response.getRefreshToken(), "Login should return refresh token");
     }
 
     @Test
-    void loginRejectsInvalidCredentials() {
+    void login_whenCredentialsAreInvalid_throwsAuthenticationException() {
         AuthService authService = authService();
-        when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("bad"));
+        when(authenticationManagerMock.authenticate(any())).thenThrow(new BadCredentialsException("bad"));
 
         assertThrows(AuthenticationException.class, () -> authService.login(loginRequest("bad-login@example.com", "wrong-password")));
     }
 
     @Test
-    void refreshRotatesRefreshToken() {
+    void refresh_whenRefreshTokenIsValid_rotatesRefreshToken() {
         AuthService authService = authService();
         User user = user(1L, "refresh@example.com");
         RefreshToken currentToken = refreshToken(user, "refresh-token", null);
-        when(refreshTokenRepository.findByTokenHash(hashToken("refresh-token"))).thenReturn(Optional.of(currentToken));
-        when(jwtService.createAccessToken(user)).thenReturn(tokenResult());
+        when(refreshTokenRepositoryMock.findByTokenHash(hashToken("refresh-token"))).thenReturn(Optional.of(currentToken));
+        when(jwtServiceMock.createAccessToken(user)).thenReturn(tokenResult());
 
         AuthResponse refreshed = authService.refresh(refreshTokenRequest("refresh-token"));
 
-        assertNotNull(refreshed.getAccessToken());
-        assertNotEquals("refresh-token", refreshed.getRefreshToken());
-        assertNotNull(currentToken.getRevokedAt());
-        verify(refreshTokenRepository).save(currentToken);
+        assertNotNull(refreshed.getAccessToken(), "Refresh should return a new access token");
+        assertNotEquals("refresh-token", refreshed.getRefreshToken(), "Refresh should rotate the refresh token");
+        assertNotNull(currentToken.getRevokedAt(), "Refresh should revoke the old refresh token");
+        verify(refreshTokenRepositoryMock).save(currentToken);
     }
 
     @Test
-    void refreshRejectsRevokedRefreshToken() {
+    void refresh_whenRefreshTokenIsRevoked_throwsValidationException() {
         AuthService authService = authService();
         RefreshToken revokedToken = refreshToken(user(1L, "refresh@example.com"), "refresh-token", Instant.now());
-        when(refreshTokenRepository.findByTokenHash(hashToken("refresh-token"))).thenReturn(Optional.of(revokedToken));
+        when(refreshTokenRepositoryMock.findByTokenHash(hashToken("refresh-token"))).thenReturn(Optional.of(revokedToken));
 
         assertThrows(ValidationException.class, () -> authService.refresh(refreshTokenRequest("refresh-token")));
     }
 
     @Test
-    void logoutRevokesRefreshToken() {
+    void logout_whenRefreshTokenExists_revokesRefreshToken() {
         AuthService authService = authService();
         RefreshToken token = refreshToken(user(1L, "logout@example.com"), "refresh-token", null);
-        when(refreshTokenRepository.findByTokenHash(hashToken("refresh-token"))).thenReturn(Optional.of(token));
+        when(refreshTokenRepositoryMock.findByTokenHash(hashToken("refresh-token"))).thenReturn(Optional.of(token));
 
         authService.logout(refreshTokenRequest("refresh-token"));
 
-        assertTrue(token.getRevokedAt() != null);
-        verify(refreshTokenRepository).save(token);
+        assertTrue(token.getRevokedAt() != null, "Logout should revoke the refresh token");
+        verify(refreshTokenRepositoryMock).save(token);
     }
 
     private AuthService authService() {
-        return new AuthService(userRepository, refreshTokenRepository, passwordEncoder, authenticationManager, jwtService, 7);
+        return new AuthService(userRepositoryMock, refreshTokenRepositoryMock, passwordEncoderMock,
+                authenticationManagerMock, jwtServiceMock);
     }
 
     private RegisterRequest registerRequest(String email) {

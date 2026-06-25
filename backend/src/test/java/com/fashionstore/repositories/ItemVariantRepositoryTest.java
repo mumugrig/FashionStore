@@ -6,6 +6,7 @@ import com.fashionstore.models.Item;
 import com.fashionstore.models.ItemVariant;
 import com.fashionstore.models.Size;
 import com.fashionstore.vo.Audience;
+import com.fashionstore.vo.SizeSystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,20 +53,24 @@ class ItemVariantRepositoryTest {
         item = new Item();
         item.setName("Test Item");
         item.setPrice(BigDecimal.valueOf(99.99f));
+        item.setDescription("Variant item description");
         item.setAudience(Audience.UNISEX);
         item.setCategory(category);
         itemRepository.save(item);
 
         color = new Color();
         color.setName("Red");
+        color.setValue("#ff0000");
         colorRepository.save(color);
 
         size = new Size();
+        size.setLabel("M");
+        size.setSizeSystem(SizeSystem.ALPHA);
         sizeRepository.save(size);
     }
 
     @Test
-    void testSaveItemVariant() {
+    void save_whenItemVariantIsValid_persistsItemVariant() {
         ItemVariant variant = new ItemVariant();
         variant.setItem(item);
         variant.setColor(color);
@@ -81,7 +86,7 @@ class ItemVariantRepositoryTest {
     }
 
     @Test
-    void testFindItemVariantById() {
+    void findById_whenItemVariantExists_returnsItemVariant() {
         ItemVariant variant = new ItemVariant();
         variant.setItem(item);
         variant.setColor(color);
@@ -97,7 +102,7 @@ class ItemVariantRepositoryTest {
     }
 
     @Test
-    void testFindByItemIdAndIsActiveTrue() {
+    void findByItemIdAndIsActiveTrue_whenActiveVariantsExist_returnsActiveVariants() {
         ItemVariant activeVariant = new ItemVariant();
         activeVariant.setItem(item);
         activeVariant.setColor(color);
@@ -121,7 +126,7 @@ class ItemVariantRepositoryTest {
     }
 
     @Test
-    void testFindByItemIdAndExistsBySizeAndColor() {
+    void findByItemIdAndExistsBySizeAndColor_whenVariantExists_returnsVariantAndExistenceFlags() {
         ItemVariant variant = new ItemVariant();
         variant.setItem(item);
         variant.setColor(color);
@@ -138,7 +143,7 @@ class ItemVariantRepositoryTest {
     }
 
     @Test
-    void testFindByIdAndIsActiveTrue() {
+    void findByIdAndIsActiveTrue_whenVariantIsActive_returnsVariant() {
         ItemVariant activeVariant = new ItemVariant();
         activeVariant.setItem(item);
         activeVariant.setColor(color);
@@ -154,7 +159,7 @@ class ItemVariantRepositoryTest {
     }
 
     @Test
-    void testFindByIdAndIsActiveTrueInactive() {
+    void findByIdAndIsActiveTrue_whenVariantIsInactive_returnsEmpty() {
         ItemVariant inactiveVariant = new ItemVariant();
         inactiveVariant.setItem(item);
         inactiveVariant.setColor(color);
@@ -169,7 +174,7 @@ class ItemVariantRepositoryTest {
     }
 
     @Test
-    void testDeleteItemVariant() {
+    void deleteById_whenItemVariantExists_removesItemVariant() {
         ItemVariant variant = new ItemVariant();
         variant.setItem(item);
         variant.setColor(color);
@@ -184,7 +189,7 @@ class ItemVariantRepositoryTest {
     }
 
     @Test
-    void testCountItemVariants() {
+    void count_whenItemVariantsExist_returnsItemVariantCount() {
         ItemVariant variant1 = new ItemVariant();
         variant1.setItem(item);
         variant1.setColor(color);

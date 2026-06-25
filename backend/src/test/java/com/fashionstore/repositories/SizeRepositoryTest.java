@@ -19,7 +19,7 @@ class SizeRepositoryTest {
     private SizeRepository sizeRepository;
 
     @Test
-    void testSaveSize() {
+    void save_whenSizeIsValid_persistsSize() {
         Size size = new Size();
         size.setLabel("M");
         size.setSizeSystem(SizeSystem.US);
@@ -32,7 +32,7 @@ class SizeRepositoryTest {
     }
 
     @Test
-    void testFindSizeById() {
+    void findById_whenSizeExists_returnsSize() {
         Size size = new Size();
         size.setLabel("L");
         size.setSizeSystem(SizeSystem.US);
@@ -45,7 +45,7 @@ class SizeRepositoryTest {
     }
 
     @Test
-    void testDeleteSize() {
+    void deleteById_whenSizeExists_removesSize() {
         Size size = new Size();
         size.setLabel("XL");
         size.setSizeSystem(SizeSystem.EU);
@@ -57,7 +57,7 @@ class SizeRepositoryTest {
     }
 
     @Test
-    void testCountSizes() {
+    void count_whenSizesExist_returnsSizeCount() {
         Size size1 = new Size();
         size1.setLabel("S");
         size1.setSizeSystem(SizeSystem.US);
@@ -74,7 +74,7 @@ class SizeRepositoryTest {
     }
 
     @Test
-    void testFindAllSizes() {
+    void findAll_whenSizesExist_returnsSizes() {
         Size size1 = new Size();
         size1.setLabel("XS");
         size1.setSizeSystem(SizeSystem.EU);
@@ -90,7 +90,7 @@ class SizeRepositoryTest {
     }
 
     @Test
-    void testExistsSizeById() {
+    void existsById_whenSizeExists_returnsTrue() {
         Size size = new Size();
         size.setLabel("2XL");
         size.setSizeSystem(SizeSystem.US);

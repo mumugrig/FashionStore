@@ -13,4 +13,5 @@ public class AuthResponse {
     private String tokenType;
     private Instant accessTokenExpiresAt;
     private UserResponse user;
+
 }

@@ -11,10 +11,12 @@ import com.fashionstore.vo.Audience;
 import com.fashionstore.vo.Comfort;
 import com.fashionstore.vo.Quality;
 import com.fashionstore.vo.SizeFit;
+import com.fashionstore.vo.SizeSystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,15 +70,19 @@ class ReviewRepositoryTest {
         Item item = new Item();
         item.setName("Review Item");
         item.setPrice(BigDecimal.valueOf(49.99f));
+        item.setDescription("Review item description");
         item.setAudience(Audience.UNISEX);
         item.setCategory(category);
         itemRepository.save(item);
 
         Color color = new Color();
         color.setName("Gray");
+        color.setValue("#808080");
         colorRepository.save(color);
 
         Size size = new Size();
+        size.setLabel("M");
+        size.setSizeSystem(SizeSystem.ALPHA);
         sizeRepository.save(size);
 
         itemVariant = new ItemVariant();
@@ -89,7 +95,7 @@ class ReviewRepositoryTest {
     }
 
     @Test
-    void testSaveReview() {
+    void save_whenReviewIsValid_persistsReview() {
         Review review = new Review();
         review.setBody("Great product!");
         review.setSizeFit(SizeFit.TRUE_TO_SIZE);
@@ -106,7 +112,7 @@ class ReviewRepositoryTest {
     }
 
     @Test
-    void testFindReviewById() {
+    void findById_whenReviewExists_returnsReview() {
         Review review = new Review();
         review.setBody("Good quality");
         review.setSizeFit(SizeFit.RUNS_SMALL);
@@ -123,7 +129,7 @@ class ReviewRepositoryTest {
     }
 
     @Test
-    void testFindByItemVariantId() {
+    void findByItemVariantId_whenReviewsExist_returnsVariantReviews() {
         ItemVariant itemVariant2 = new ItemVariant();
         itemVariant2.setItem(itemVariant.getItem());
         itemVariant2.setColor(itemVariant.getColor());
@@ -162,13 +168,14 @@ class ReviewRepositoryTest {
         List<Review> variantReviews = reviewRepository.findByItemVariantId(itemVariant.getId());
 
         assertEquals(2, variantReviews.size());
+        assertEquals(3, reviewRepository.findByItemVariantItemId(itemVariant.getItem().getId(), PageRequest.of(0, 20)).getTotalElements());
         assertTrue(variantReviews.stream().allMatch(r -> r.getItemVariant().getId().equals(itemVariant.getId())));
         assertTrue(reviewRepository.existsByItemVariantId(itemVariant.getId()));
         assertTrue(reviewRepository.existsByItemVariantItemId(itemVariant.getItem().getId()));
     }
 
     @Test
-    void testFindByItemVariantIdEmpty() {
+    void findByItemVariantId_whenReviewsAreMissing_returnsEmptyList() {
         ItemVariant emptyVariant = new ItemVariant();
         emptyVariant.setItem(itemVariant.getItem());
         emptyVariant.setColor(itemVariant.getColor());
@@ -183,7 +190,7 @@ class ReviewRepositoryTest {
     }
 
     @Test
-    void testDeleteReview() {
+    void deleteById_whenReviewExists_removesReview() {
         Review review = new Review();
         review.setBody("To Delete");
         review.setSizeFit(SizeFit.TRUE_TO_SIZE);
@@ -199,7 +206,7 @@ class ReviewRepositoryTest {
     }
 
     @Test
-    void testDeleteByUserId() {
+    void deleteByUserId_whenUserHasRecords_removesUserRecords() {
         Review review = new Review();
         review.setBody("To Delete By User");
         review.setSizeFit(SizeFit.TRUE_TO_SIZE);
@@ -215,7 +222,7 @@ class ReviewRepositoryTest {
     }
 
     @Test
-    void testCountReviews() {
+    void count_whenReviewsExist_returnsReviewCount() {
         Review review1 = new Review();
         review1.setBody("First");
         review1.setSizeFit(SizeFit.TRUE_TO_SIZE);

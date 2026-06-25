@@ -1,4 +1,4 @@
-package com.fashionstore.controllers;
+package com.fashionstore.controllers.user;
 
 import com.fashionstore.dto.request.LoginRequest;
 import com.fashionstore.dto.request.RefreshTokenRequest;

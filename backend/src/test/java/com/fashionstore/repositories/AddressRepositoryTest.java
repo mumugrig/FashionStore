@@ -37,7 +37,7 @@ class AddressRepositoryTest {
     }
 
     @Test
-    void testSaveAddress() {
+    void save_whenAddressIsValid_persistsAddress() {
         Address address = new Address();
         address.setCountry("USA");
         address.setRegion("California");
@@ -53,7 +53,7 @@ class AddressRepositoryTest {
     }
 
     @Test
-    void testFindAddressById() {
+    void findById_whenAddressExists_returnsAddress() {
         Address address = new Address();
         address.setCountry("USA");
         address.setRegion("NY");
@@ -70,7 +70,7 @@ class AddressRepositoryTest {
     }
 
     @Test
-    void testFindByUserId() {
+    void findByUserId_whenRecordsExist_returnsUserRecords() {
         User user2 = new User();
         user2.setFirstName("Jane");
         user2.setLastName("Smith");
@@ -112,7 +112,7 @@ class AddressRepositoryTest {
     }
 
     @Test
-    void testFindByUserIdEmpty() {
+    void findByUserId_whenRecordsAreMissing_returnsEmptyList() {
         User user3 = new User();
         user3.setFirstName("Bob");
         user3.setLastName("Brown");
@@ -126,7 +126,7 @@ class AddressRepositoryTest {
     }
 
     @Test
-    void testDeleteAddress() {
+    void deleteById_whenAddressExists_removesAddress() {
         Address address = new Address();
         address.setCountry("USA");
         address.setRegion("FL");
@@ -142,7 +142,7 @@ class AddressRepositoryTest {
     }
 
     @Test
-    void testDeleteByUserId() {
+    void deleteByUserId_whenUserHasRecords_removesUserRecords() {
         Address address = new Address();
         address.setCountry("USA");
         address.setRegion("FL");
@@ -158,7 +158,7 @@ class AddressRepositoryTest {
     }
 
     @Test
-    void testCountAddresses() {
+    void count_whenAddressesExist_returnsAddressCount() {
         Address address1 = new Address();
         address1.setCountry("USA");
         address1.setRegion("WA");

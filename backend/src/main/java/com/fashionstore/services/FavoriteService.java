@@ -2,36 +2,41 @@ package com.fashionstore.services;
 
 import com.fashionstore.dto.request.FavoriteRequest;
 import com.fashionstore.dto.response.FavoriteResponse;
+import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.models.Favorite;
 import com.fashionstore.repositories.FavoriteRepository;
 import com.fashionstore.repositories.ItemVariantRepository;
 import com.fashionstore.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
     private final UserRepository userRepository;
     private final ItemVariantRepository itemVariantRepository;
-
-    public FavoriteService(FavoriteRepository favoriteRepository, UserRepository userRepository, ItemVariantRepository itemVariantRepository) {
-        this.favoriteRepository = favoriteRepository;
-        this.userRepository = userRepository;
-        this.itemVariantRepository = itemVariantRepository;
-    }
+    private final CurrentUserService currentUserService;
 
     @Transactional
     public FavoriteResponse addFavorite(FavoriteRequest favoriteRequest) {
         Favorite favorite = new Favorite();
         favorite.setUser(userRepository.findById(favoriteRequest.getUserId())
                 .orElseThrow(() -> new NotFoundException("User", favoriteRequest.getUserId())));
-        favorite.setItemVariant(itemVariantRepository.findById(favoriteRequest.getItemVariantId())
-                .orElseThrow(() -> new NotFoundException("ItemVariant", favoriteRequest.getItemVariantId())));
+        applyFavoriteRequest(favorite, favoriteRequest);
+        Favorite savedFavorite = favoriteRepository.save(favorite);
+        return FavoriteResponse.from(savedFavorite);
+    }
+
+    @Transactional
+    public FavoriteResponse addFavorite(Authentication authentication, FavoriteRequest favoriteRequest) {
+        Favorite favorite = new Favorite();
+        favorite.setUser(currentUserService.findCurrentUser(authentication));
+        applyFavoriteRequest(favorite, favoriteRequest);
         Favorite savedFavorite = favoriteRepository.save(favorite);
         return FavoriteResponse.from(savedFavorite);
     }
@@ -41,8 +46,7 @@ public class FavoriteService {
         return favoriteRepository.findById(id).map(favorite -> {
             favorite.setUser(userRepository.findById(favoriteRequest.getUserId())
                     .orElseThrow(() -> new NotFoundException("User", favoriteRequest.getUserId())));
-            favorite.setItemVariant(itemVariantRepository.findById(favoriteRequest.getItemVariantId())
-                    .orElseThrow(() -> new NotFoundException("ItemVariant", favoriteRequest.getItemVariantId())));
+            applyFavoriteRequest(favorite, favoriteRequest);
             Favorite savedFavorite = favoriteRepository.save(favorite);
             return FavoriteResponse.from(savedFavorite);
         }).orElseThrow(() -> new NotFoundException("Favorite", id));
@@ -54,19 +58,22 @@ public class FavoriteService {
     }
 
     @Transactional(readOnly = true)
-    public List<FavoriteResponse> getFavoriteByUserId(Long userId){
-        return favoriteRepository.findByUserId(userId)
-                .stream()
-                .map(FavoriteResponse::from)
-                .collect(Collectors.toList());
+    public PageResponse<FavoriteResponse> getPagedFavoritesByUserId(Long userId, int page, int size){
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException("User", userId);
+        }
+        return PageResponse.from(favoriteRepository.findByUserId(userId, PageRequestFactory.create(page, size)), FavoriteResponse::from);
     }
 
     @Transactional(readOnly = true)
-    public List<FavoriteResponse> getAllFavorites() {
-        return favoriteRepository.findAll()
-                .stream()
-                .map(FavoriteResponse::from)
-                .collect(Collectors.toList());
+    public PageResponse<FavoriteResponse> getPagedFavorites(Authentication authentication, int page, int size) {
+        var currentUser = currentUserService.findCurrentUser(authentication);
+        return PageResponse.from(favoriteRepository.findByUserId(currentUser.getId(), PageRequestFactory.create(page, size)), FavoriteResponse::from);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<FavoriteResponse> getPagedFavorites(int page, int size) {
+        return PageResponse.from(favoriteRepository.findAll(PageRequestFactory.create(page, size)), FavoriteResponse::from);
     }
 
     @Transactional
@@ -75,5 +82,18 @@ public class FavoriteService {
             throw new NotFoundException("Favorite", id);
         }
         favoriteRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteFavorite(Authentication authentication, Long id){
+        var currentUser = currentUserService.findCurrentUser(authentication);
+        Favorite favorite = favoriteRepository.findByIdAndUserId(id, currentUser.getId())
+                .orElseThrow(() -> new NotFoundException("Favorite", id));
+        favoriteRepository.delete(favorite);
+    }
+
+    private void applyFavoriteRequest(Favorite favorite, FavoriteRequest favoriteRequest) {
+        favorite.setItemVariant(itemVariantRepository.findById(favoriteRequest.getItemVariantId())
+                .orElseThrow(() -> new NotFoundException("ItemVariant", favoriteRequest.getItemVariantId())));
     }
 }

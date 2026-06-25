@@ -18,7 +18,7 @@ class ColorRepositoryTest {
     private ColorRepository colorRepository;
 
     @Test
-    void testSaveColor() {
+    void save_whenColorIsValid_persistsColor() {
         Color color = new Color();
         color.setName("Blue");
         color.setValue("#0000FF");
@@ -32,7 +32,7 @@ class ColorRepositoryTest {
     }
 
     @Test
-    void testFindColorById() {
+    void findById_whenColorExists_returnsColor() {
         Color color = new Color();
         color.setName("Red");
         color.setValue("#FF0000");
@@ -45,7 +45,7 @@ class ColorRepositoryTest {
     }
 
     @Test
-    void testDeleteColor() {
+    void deleteById_whenColorExists_removesColor() {
         Color color = new Color();
         color.setName("Green");
         color.setValue("#00FF00");
@@ -57,7 +57,7 @@ class ColorRepositoryTest {
     }
 
     @Test
-    void testCountColors() {
+    void count_whenColorsExist_returnsColorCount() {
         Color color1 = new Color();
         color1.setName("Color1");
         color1.setValue("#111111");
@@ -74,13 +74,15 @@ class ColorRepositoryTest {
     }
 
     @Test
-    void testFindAllColors() {
+    void findAll_whenColorsExist_returnsColors() {
         Color color1 = new Color();
         color1.setName("Yellow");
+        color1.setValue("#FFFF00");
         colorRepository.save(color1);
 
         Color color2 = new Color();
         color2.setName("Purple");
+        color2.setValue("#800080");
         colorRepository.save(color2);
 
         long count = colorRepository.findAll().size();

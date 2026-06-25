@@ -12,6 +12,7 @@ import com.fashionstore.repositories.RefreshTokenRepository;
 import com.fashionstore.repositories.ReviewRepository;
 import com.fashionstore.repositories.UserRepository;
 import com.fashionstore.vo.UserRole;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final CurrentUserService currentUserService;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
     private final AddressRepository addressRepository;
@@ -30,21 +33,6 @@ public class UserService {
     private final FavoriteRepository favoriteRepository;
     private final ReviewRepository reviewRepository;
 
-    public UserService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder,
-                       RefreshTokenRepository refreshTokenRepository,
-                       AddressRepository addressRepository,
-                       CartItemRepository cartItemRepository,
-                       FavoriteRepository favoriteRepository,
-                       ReviewRepository reviewRepository) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.refreshTokenRepository = refreshTokenRepository;
-        this.addressRepository = addressRepository;
-        this.cartItemRepository = cartItemRepository;
-        this.favoriteRepository = favoriteRepository;
-        this.reviewRepository = reviewRepository;
-    }
 
     @Transactional
     public UserResponse createUser(UserRequest userRequest) {
@@ -83,12 +71,12 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserResponse getAuthenticatedUser(Authentication authentication) {
-        return UserResponse.from(findCurrentUser(authentication));
+        return UserResponse.from(currentUserService.findCurrentUser(authentication));
     }
 
     @Transactional
     public UserResponse updateAuthenticatedUser(Authentication authentication, UserRequest userRequest) {
-        User user = findCurrentUser(authentication);
+        User user = currentUserService.findCurrentUser(authentication);
         user.setFirstName(userRequest.getFirstName());
         user.setLastName(userRequest.getLastName());
         user.setEmail(userRequest.getEmail());
@@ -130,13 +118,5 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    private User findCurrentUser(Authentication authentication) {
-        if (authentication == null || authentication.getName() == null) {
-            throw new NotFoundException("User", 0L);
-        }
 
-        return userRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new NotFoundException("User", 0L));
-    }
 }
-

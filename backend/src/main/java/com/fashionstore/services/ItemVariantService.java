@@ -15,6 +15,7 @@ import com.fashionstore.repositories.ColorRepository;
 import com.fashionstore.repositories.CartItemRepository;
 import com.fashionstore.repositories.FavoriteRepository;
 import com.fashionstore.repositories.ReviewRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ItemVariantService {
     private final ItemVariantRepository itemVariantRepository;
     private final ItemRepository itemRepository;
@@ -30,22 +32,6 @@ public class ItemVariantService {
     private final CartItemRepository cartItemRepository;
     private final FavoriteRepository favoriteRepository;
     private final ReviewRepository reviewRepository;
-
-    public ItemVariantService(ItemVariantRepository itemVariantRepository,
-                            ItemRepository itemRepository,
-                            SizeRepository sizeRepository,
-                            ColorRepository colorRepository,
-                            CartItemRepository cartItemRepository,
-                            FavoriteRepository favoriteRepository,
-                            ReviewRepository reviewRepository) {
-        this.itemVariantRepository = itemVariantRepository;
-        this.itemRepository = itemRepository;
-        this.sizeRepository = sizeRepository;
-        this.colorRepository = colorRepository;
-        this.cartItemRepository = cartItemRepository;
-        this.favoriteRepository = favoriteRepository;
-        this.reviewRepository = reviewRepository;
-    }
 
     @Transactional
     public ItemVariantResponse createItemVariant(ItemVariantRequest itemVariantRequest) {

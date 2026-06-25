@@ -8,14 +8,17 @@ import com.fashionstore.dto.request.FavoriteRequest;
 import com.fashionstore.dto.request.ItemRequest;
 import com.fashionstore.dto.request.ReviewRequest;
 import com.fashionstore.dto.request.SizeRequest;
+import com.fashionstore.dto.request.UserRequest;
 import com.fashionstore.dto.response.AddressResponse;
 import com.fashionstore.dto.response.CartItemResponse;
 import com.fashionstore.dto.response.CategoryResponse;
 import com.fashionstore.dto.response.ColorResponse;
 import com.fashionstore.dto.response.FavoriteResponse;
 import com.fashionstore.dto.response.ItemResponse;
+import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.dto.response.ReviewResponse;
 import com.fashionstore.dto.response.SizeResponse;
+import com.fashionstore.dto.response.UserResponse;
 import com.fashionstore.vo.Audience;
 import com.fashionstore.vo.Comfort;
 import com.fashionstore.vo.Quality;
@@ -23,6 +26,7 @@ import com.fashionstore.vo.SizeFit;
 import com.fashionstore.vo.SizeSystem;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 abstract class ControllerTestSupport {
     protected CategoryRequest categoryRequest(String name, Long parentId) {
@@ -85,12 +89,21 @@ abstract class ControllerTestSupport {
 
     protected ReviewRequest reviewRequest(long userId, long variantId, String body) {
         ReviewRequest request = new ReviewRequest();
-        request.setUserId(userId);
         request.setItemVariantId(variantId);
         request.setBody(body);
         request.setSizeFit(SizeFit.TRUE_TO_SIZE);
         request.setQuality(Quality.EXCELLENT);
         request.setComfort(Comfort.VERY_COMFORTABLE);
+        return request;
+    }
+
+    protected UserRequest userRequest(String email, String firstName) {
+        UserRequest request = new UserRequest();
+        request.setFirstName(firstName);
+        request.setLastName("User");
+        request.setEmail(email);
+        request.setPhoneNumber("1234567890");
+        request.setPassword("password");
         return request;
     }
 
@@ -124,5 +137,13 @@ abstract class ControllerTestSupport {
 
     protected ReviewResponse reviewResponse(long id, long userId, long variantId, String body) {
         return new ReviewResponse(id, body, "TRUE_TO_SIZE", "EXCELLENT", "VERY_COMFORTABLE", userId, variantId);
+    }
+
+    protected UserResponse userResponse(long id, String email) {
+        return new UserResponse(id, "Test", "User", email, "1234567890");
+    }
+
+    protected <T> PageResponse<T> pageResponse(T item) {
+        return new PageResponse<>(List.of(item), 1, 20, 1, 1, true, true);
     }
 }

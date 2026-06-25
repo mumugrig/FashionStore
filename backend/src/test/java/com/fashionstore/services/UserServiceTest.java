@@ -10,9 +10,9 @@ import com.fashionstore.repositories.FavoriteRepository;
 import com.fashionstore.repositories.RefreshTokenRepository;
 import com.fashionstore.repositories.ReviewRepository;
 import com.fashionstore.repositories.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -31,78 +31,102 @@ import static org.mockito.Mockito.inOrder;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest extends ServiceTestSupport {
-    @Mock private UserRepository userRepository;
-    @Mock private PasswordEncoder passwordEncoder;
-    @Mock private RefreshTokenRepository refreshTokenRepository;
-    @Mock private AddressRepository addressRepository;
-    @Mock private CartItemRepository cartItemRepository;
-    @Mock private FavoriteRepository favoriteRepository;
-    @Mock private ReviewRepository reviewRepository;
-    @InjectMocks private UserService userService;
+    @Mock private UserRepository userRepositoryMock;
+    @Mock private CurrentUserService currentUserServiceMock;
+    @Mock private PasswordEncoder passwordEncoderMock;
+    @Mock private RefreshTokenRepository refreshTokenRepositoryMock;
+    @Mock private AddressRepository addressRepositoryMock;
+    @Mock private CartItemRepository cartItemRepositoryMock;
+    @Mock private FavoriteRepository favoriteRepositoryMock;
+    @Mock private ReviewRepository reviewRepositoryMock;
+    private UserService objectUnderTest;
+
+    @BeforeEach
+    void setUp() {
+        objectUnderTest = new UserService(userRepositoryMock, currentUserServiceMock, passwordEncoderMock, refreshTokenRepositoryMock,
+                addressRepositoryMock, cartItemRepositoryMock, favoriteRepositoryMock, reviewRepositoryMock);
+    }
 
     @Test
-    void createsUsersWithEncodedPassword() {
+    void createUser_whenEmailIsNew_returnsCreatedUser() {
         User savedUser = user(1L, "service-user@example.com");
         savedUser.setFirstName("Service");
         savedUser.setPasswordHash("encoded-password");
-        when(userRepository.findByEmail("service-user@example.com")).thenReturn(Optional.empty());
-        when(passwordEncoder.encode("password")).thenReturn("encoded-password");
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        when(userRepositoryMock.findByEmail("service-user@example.com")).thenReturn(Optional.empty());
+        when(passwordEncoderMock.encode("password")).thenReturn("encoded-password");
+        when(userRepositoryMock.save(any(User.class))).thenReturn(savedUser);
 
-        UserResponse created = userService.createUser(userRequest("service-user@example.com", "Service"));
+        UserResponse response = objectUnderTest.createUser(userRequest("service-user@example.com", "Service"));
 
-        assertEquals("Service", created.getFirstName());
-        assertEquals("service-user@example.com", created.getEmail());
-        assertTrue(created.getId() > 0);
+        assertEquals("Service", response.getFirstName(), "Created user first name should match saved entity");
+        assertEquals("service-user@example.com", response.getEmail(), "Created user email should match saved entity");
+        assertTrue(response.getId() > 0, "Created user should expose a positive id");
     }
 
     @Test
-    void updatesExistingUser() {
+    void updateUser_whenUserExists_returnsUpdatedUser() {
         User existing = user(1L, "service-user@example.com");
         User updatedUser = user(1L, "service-user-updated@example.com");
         updatedUser.setFirstName("Updated");
-        when(userRepository.findById(1L)).thenReturn(Optional.of(existing));
-        when(passwordEncoder.encode("password")).thenReturn("encoded-password");
-        when(userRepository.save(existing)).thenReturn(updatedUser);
+        when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(existing));
+        when(passwordEncoderMock.encode("password")).thenReturn("encoded-password");
+        when(userRepositoryMock.save(existing)).thenReturn(updatedUser);
 
         UserRequest updateRequest = userRequest("service-user-updated@example.com", "Updated");
-        UserResponse updated = userService.updateUser(1L, updateRequest);
+        UserResponse response = objectUnderTest.updateUser(1L, updateRequest);
 
-        assertEquals("Updated", updated.getFirstName());
-        assertEquals("service-user-updated@example.com", updated.getEmail());
+        assertEquals("Updated", response.getFirstName(), "Updated user first name should match saved entity");
+        assertEquals("service-user-updated@example.com", response.getEmail(), "Updated user email should match saved entity");
     }
 
     @Test
-    void throwsWhenUserIsMissing() {
-        when(userRepository.findById(99999L)).thenReturn(Optional.empty());
+    void getUserById_whenUserIsMissing_throwsNotFoundException() {
+        when(userRepositoryMock.findById(99999L)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> userService.getUserById(99999L));
+        assertThrows(NotFoundException.class, () -> objectUnderTest.getUserById(99999L));
     }
 
     @Test
-    void usesAuthenticatedPrincipalForMeOperations() {
+    void getAuthenticatedUser_whenPrincipalEmailExists_returnsCurrentUser() {
+        User currentUser = user(1L, "me-service@example.com");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("me-service@example.com", null);
+
+        when(currentUserServiceMock.findCurrentUser(authentication)).thenReturn(currentUser);
+
+        UserResponse response = objectUnderTest.getAuthenticatedUser(authentication);
+
+        assertEquals(currentUser.getId(), response.getId(), "Authenticated user id should match principal email lookup");
+    }
+
+    @Test
+    void updateAuthenticatedUser_whenPrincipalEmailExists_returnsUpdatedUser() {
         User currentUser = user(1L, "me-service@example.com");
         User updatedUser = user(1L, "me-service-updated@example.com");
         updatedUser.setFirstName("Mine");
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("me-service@example.com", null);
-        when(userRepository.findByEmail("me-service@example.com")).thenReturn(Optional.of(currentUser));
-        when(passwordEncoder.encode("password")).thenReturn("encoded-password");
-        when(userRepository.save(currentUser)).thenReturn(updatedUser);
 
-        assertEquals(currentUser.getId(), userService.getAuthenticatedUser(authentication).getId());
-        assertEquals("Mine", userService.updateAuthenticatedUser(authentication, userRequest("me-service-updated@example.com", "Mine")).getFirstName());
+        when(currentUserServiceMock.findCurrentUser(authentication)).thenReturn(currentUser);
+        when(passwordEncoderMock.encode("password")).thenReturn("encoded-password");
+        when(userRepositoryMock.save(currentUser)).thenReturn(updatedUser);
+
+        UserResponse response = objectUnderTest.updateAuthenticatedUser(authentication, userRequest("me-service-updated@example.com", "Mine"));
+
+        assertEquals("Mine", response.getFirstName(), "Authenticated user update should return saved first name");
     }
 
     @Test
-    void deletesUserOwnedDataBeforeDeletingUser() {
-        userService.deleteUser(1L);
+    void deleteUser_whenUserExists_deletesOwnedDataBeforeUser() {
+        when(userRepositoryMock.existsById(1L)).thenReturn(true);
 
-        InOrder inOrder = inOrder(refreshTokenRepository, addressRepository, cartItemRepository, favoriteRepository, reviewRepository, userRepository);
-        inOrder.verify(refreshTokenRepository).deleteByUserId(1L);
-        inOrder.verify(addressRepository).deleteByUserId(1L);
-        inOrder.verify(cartItemRepository).deleteByUserId(1L);
-        inOrder.verify(favoriteRepository).deleteByUserId(1L);
-        inOrder.verify(reviewRepository).deleteByUserId(1L);
-        inOrder.verify(userRepository).deleteById(1L);
+        objectUnderTest.deleteUser(1L);
+
+        InOrder inOrder = inOrder(refreshTokenRepositoryMock, addressRepositoryMock, cartItemRepositoryMock,
+                favoriteRepositoryMock, reviewRepositoryMock, userRepositoryMock);
+        inOrder.verify(refreshTokenRepositoryMock).deleteByUserId(1L);
+        inOrder.verify(addressRepositoryMock).deleteByUserId(1L);
+        inOrder.verify(cartItemRepositoryMock).deleteByUserId(1L);
+        inOrder.verify(favoriteRepositoryMock).deleteByUserId(1L);
+        inOrder.verify(reviewRepositoryMock).deleteByUserId(1L);
+        inOrder.verify(userRepositoryMock).deleteById(1L);
     }
 }

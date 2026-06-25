@@ -1,4 +1,5 @@
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\AddressControllerTest.java
+D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\AdminUserControllerTest.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\CartItemControllerTest.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\CategoryControllerTest.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\ColorControllerTest.java
@@ -8,6 +9,7 @@ D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\I
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\ReviewControllerTest.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\SizeControllerTest.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\UserControllerAuthTest.java
+D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\UserOwnedControllerTest.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\FashionStoreApplicationTests.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\repositories\AddressRepositoryTest.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\repositories\CartItemRepositoryTest.java
@@ -28,6 +30,7 @@ D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\services\Colo
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\services\FavoriteServiceTest.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\services\ItemServiceTest.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\services\ItemVariantServiceTest.java
+D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\services\PageRequestFactoryTest.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\services\ReviewServiceTest.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\services\ServiceTestSupport.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\services\SizeServiceTest.java

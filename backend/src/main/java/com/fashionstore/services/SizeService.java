@@ -5,23 +5,19 @@ import com.fashionstore.exceptions.ConflictException;
 import com.fashionstore.models.Size;
 import com.fashionstore.dto.request.SizeRequest;
 import com.fashionstore.dto.response.SizeResponse;
+import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.repositories.ItemVariantRepository;
 import com.fashionstore.repositories.SizeRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SizeService {
     private final SizeRepository sizeRepository;
     private final ItemVariantRepository itemVariantRepository;
-
-    public SizeService(SizeRepository sizeRepository, ItemVariantRepository itemVariantRepository) {
-        this.sizeRepository = sizeRepository;
-        this.itemVariantRepository = itemVariantRepository;
-    }
 
     @Transactional
     public SizeResponse createSize(SizeRequest sizeRequest) {
@@ -54,11 +50,8 @@ public class SizeService {
     }
 
     @Transactional(readOnly = true)
-    public List<SizeResponse> getAllSizes() {
-        return sizeRepository.findAll()
-                .stream()
-                .map(SizeResponse::from)
-                .collect(Collectors.toList());
+    public PageResponse<SizeResponse> getPagedSizes(int page, int size) {
+        return PageResponse.from(sizeRepository.findAll(PageRequestFactory.create(page, size)), SizeResponse::from);
     }
 
     @Transactional

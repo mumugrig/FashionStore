@@ -1,14 +1,13 @@
 package com.fashionstore.controllers;
 
 import com.fashionstore.services.CategoryService;
+import com.fashionstore.controllers.admin.AdminCategoryController;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -18,28 +17,58 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryControllerTest extends ControllerTestSupport {
-    @Mock private CategoryService categoryService;
-    @InjectMocks private CategoryController categoryController;
+    @Mock private CategoryService categoryServiceMock;
+    private AdminCategoryController objectUnderTest;
+
+    @BeforeEach
+    void setUp() {
+        objectUnderTest = new AdminCategoryController(categoryServiceMock);
+    }
 
     @Test
-    void createsUpdatesReadsListsAndDeletesCategories() {
-        when(categoryService.createCategory(any())).thenReturn(categoryResponse(1L, "Shoes", null));
-        when(categoryService.updateCategory(org.mockito.ArgumentMatchers.eq(1L), any())).thenReturn(categoryResponse(1L, "Sneakers", null));
-        when(categoryService.getCategoryById(1L)).thenReturn(categoryResponse(1L, "Sneakers", null));
-        when(categoryService.getAllCategories()).thenReturn(List.of(categoryResponse(1L, "Sneakers", null)));
+    void createCategory_whenRequestIsValid_returnsCreatedCategory() {
+        when(categoryServiceMock.createCategory(any())).thenReturn(categoryResponse(1L, "Shoes", null));
 
-        var created = categoryController.createCategory(categoryRequest("Shoes", null));
-        var updated = categoryController.updateCategory(1L, categoryRequest("Sneakers", null));
-        var fetched = categoryController.getCategoryById(1L);
-        var listed = categoryController.getAllCategories();
-        var deleted = categoryController.deleteCategory(1L);
+        var response = objectUnderTest.createCategory(categoryRequest("Shoes", null));
 
-        assertEquals(HttpStatus.CREATED, created.getStatusCode());
-        assertEquals("Sneakers", updated.getBody().getName());
-        assertEquals(1L, fetched.getBody().getId());
-        assertEquals(1, listed.getBody().size());
-        assertEquals(HttpStatus.NO_CONTENT, deleted.getStatusCode());
-        assertNull(deleted.getBody());
-        verify(categoryService).deleteCategory(1L);
+        assertEquals(HttpStatus.CREATED, response.getStatusCode(), "Category creation should return HTTP 201");
+        assertEquals("Shoes", response.getBody().getName(), "Created category name should match service response");
+    }
+
+    @Test
+    void updateCategory_whenCategoryExists_returnsUpdatedCategory() {
+        when(categoryServiceMock.updateCategory(org.mockito.ArgumentMatchers.eq(1L), any()))
+                .thenReturn(categoryResponse(1L, "Sneakers", null));
+
+        var response = objectUnderTest.updateCategory(1L, categoryRequest("Sneakers", null));
+
+        assertEquals("Sneakers", response.getBody().getName(), "Updated category name should match service response");
+    }
+
+    @Test
+    void getCategoryById_whenCategoryExists_returnsCategory() {
+        when(categoryServiceMock.getCategoryById(1L)).thenReturn(categoryResponse(1L, "Sneakers", null));
+
+        var response = objectUnderTest.getCategoryById(1L);
+
+        assertEquals(1L, response.getBody().getId(), "Fetched category id should match requested category");
+    }
+
+    @Test
+    void getPagedCategories_whenPageIsRequested_returnsPagedCategories() {
+        when(categoryServiceMock.getPagedCategories(1, 20)).thenReturn(pageResponse(categoryResponse(1L, "Sneakers", null)));
+
+        var response = objectUnderTest.getPagedCategories(1, 20);
+
+        assertEquals(1, response.getBody().getContent().size(), "Category page should contain service results");
+    }
+
+    @Test
+    void deleteCategory_whenCategoryExists_returnsNoContent() {
+        var response = objectUnderTest.deleteCategory(1L);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode(), "Category deletion should return HTTP 204");
+        assertNull(response.getBody(), "Delete response body should be empty");
+        verify(categoryServiceMock).deleteCategory(1L);
     }
 }
