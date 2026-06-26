@@ -67,6 +67,7 @@ abstract class ServiceTestSupport {
         request.setName(name);
         request.setPrice(BigDecimal.valueOf(19.99));
         request.setDescription("A valid test item description");
+        request.setImageUrl("https://example.com/item.png");
         request.setAudience(Audience.MEN);
         request.setCategoryId(categoryId);
         return request;
@@ -83,6 +84,7 @@ abstract class ServiceTestSupport {
         request.setColorId(colorId);
         request.setActive(active);
         request.setStockLeft(stockLeft);
+        request.setImageUrl("https://example.com/variant.png");
         return request;
     }
 
@@ -164,6 +166,7 @@ abstract class ServiceTestSupport {
         item.setName(name);
         item.setPrice(BigDecimal.valueOf(19.99));
         item.setDescription("A valid test item description");
+        item.setImageUrl("https://example.com/item.png");
         item.setAudience(Audience.MEN);
         item.setCategory(category);
         return item;
@@ -174,6 +177,7 @@ abstract class ServiceTestSupport {
         variant.setId(id);
         variant.setActive(true);
         variant.setStockLeft(10);
+        variant.setImageUrl("https://example.com/variant.png");
         variant.setItem(item);
         variant.setSize(size);
         variant.setColor(color);

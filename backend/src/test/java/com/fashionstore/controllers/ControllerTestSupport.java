@@ -9,16 +9,7 @@ import com.fashionstore.dto.request.ItemRequest;
 import com.fashionstore.dto.request.ReviewRequest;
 import com.fashionstore.dto.request.SizeRequest;
 import com.fashionstore.dto.request.UserRequest;
-import com.fashionstore.dto.response.AddressResponse;
-import com.fashionstore.dto.response.CartItemResponse;
-import com.fashionstore.dto.response.CategoryResponse;
-import com.fashionstore.dto.response.ColorResponse;
-import com.fashionstore.dto.response.FavoriteResponse;
-import com.fashionstore.dto.response.ItemResponse;
-import com.fashionstore.dto.response.PageResponse;
-import com.fashionstore.dto.response.ReviewResponse;
-import com.fashionstore.dto.response.SizeResponse;
-import com.fashionstore.dto.response.UserResponse;
+import com.fashionstore.dto.response.*;
 import com.fashionstore.vo.Audience;
 import com.fashionstore.vo.Comfort;
 import com.fashionstore.vo.Quality;
@@ -26,6 +17,7 @@ import com.fashionstore.vo.SizeFit;
 import com.fashionstore.vo.SizeSystem;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 abstract class ControllerTestSupport {
@@ -56,6 +48,7 @@ abstract class ControllerTestSupport {
         request.setName(name);
         request.setPrice(BigDecimal.valueOf(19.99));
         request.setDescription("Valid controller item description");
+        request.setImageUrl("https://example.com/item.png");
         request.setAudience(Audience.MEN);
         request.setCategoryId(categoryId);
         return request;
@@ -120,7 +113,8 @@ abstract class ControllerTestSupport {
     }
 
     protected ItemResponse itemResponse(long id, String name, long categoryId) {
-        return new ItemResponse(id, name, BigDecimal.valueOf(19.99), "Valid controller item description", "MEN", categoryId);
+        return new ItemResponse(id, name, BigDecimal.valueOf(19.99), "Valid controller item description",
+                "https://example.com/item.png", "MEN", categoryId, new ArrayList<ItemVariantResponse>());
     }
 
     protected AddressResponse addressResponse(long id, long userId, String city) {

@@ -25,6 +25,9 @@ public class Item {
     @Column(nullable = false)
     private String description;
 
+    @Column(name = "image_url", length = 2048)
+    private String imageUrl;
+
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
     private Audience audience;

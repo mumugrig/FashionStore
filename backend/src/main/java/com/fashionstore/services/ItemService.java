@@ -34,6 +34,7 @@ public class ItemService {
         item.setName(itemRequest.getName());
         item.setPrice(itemRequest.getPrice());
         item.setDescription(itemRequest.getDescription());
+        item.setImageUrl(itemRequest.getImageUrl());
         item.setAudience(itemRequest.getAudience());
         item.setCategory(findCategory(itemRequest.getCategoryId()));
 
@@ -49,6 +50,7 @@ public class ItemService {
             item.setName(itemRequest.getName());
             item.setPrice(itemRequest.getPrice());
             item.setDescription(itemRequest.getDescription());
+            item.setImageUrl(itemRequest.getImageUrl());
             item.setAudience(itemRequest.getAudience());
             item.setCategory(findCategory(itemRequest.getCategoryId()));
 

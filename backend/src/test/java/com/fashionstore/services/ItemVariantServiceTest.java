@@ -60,6 +60,7 @@ class ItemVariantServiceTest extends ServiceTestSupport {
         ItemVariantResponse response = objectUnderTest.createItemVariant(itemVariantRequest(1L, 1L, 1L));
 
         assertEquals(item.getId(), response.getItemId(), "Created variant should reference the requested item");
+        assertEquals("https://example.com/variant.png", response.getImageUrl(), "Created variant image should match saved entity");
     }
 
     @Test
@@ -81,6 +82,7 @@ class ItemVariantServiceTest extends ServiceTestSupport {
         ItemVariantResponse response = objectUnderTest.updateItemVariant(1L, itemVariantRequest(1L, 1L, 1L, false, 3));
 
         assertFalse(response.isActive(), "Updated variant should reflect saved active flag");
+        assertEquals("https://example.com/variant.png", response.getImageUrl(), "Updated variant image should match saved entity");
     }
 
     @Test

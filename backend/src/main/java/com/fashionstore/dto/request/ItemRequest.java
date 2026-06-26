@@ -30,6 +30,9 @@ public class ItemRequest {
     @Size(min = 10, max = 5000, message = "Item description must be between 10 and 5000 characters")
     private String description;
 
+    @Size(max = 2048, message = "Image URL cannot exceed 2048 characters")
+    private String imageUrl;
+
     @NotNull(message = "Audience is required")
     private Audience audience;
 

@@ -5,11 +5,6 @@ import com.fashionstore.exceptions.ConflictException;
 import com.fashionstore.models.User;
 import com.fashionstore.dto.request.UserRequest;
 import com.fashionstore.dto.response.UserResponse;
-import com.fashionstore.repositories.AddressRepository;
-import com.fashionstore.repositories.CartItemRepository;
-import com.fashionstore.repositories.FavoriteRepository;
-import com.fashionstore.repositories.RefreshTokenRepository;
-import com.fashionstore.repositories.ReviewRepository;
 import com.fashionstore.repositories.UserRepository;
 import com.fashionstore.vo.UserRole;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +22,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final CurrentUserService currentUserService;
     private final PasswordEncoder passwordEncoder;
-    private final RefreshTokenRepository refreshTokenRepository;
-    private final AddressRepository addressRepository;
-    private final CartItemRepository cartItemRepository;
-    private final FavoriteRepository favoriteRepository;
-    private final ReviewRepository reviewRepository;
 
 
     @Transactional
@@ -57,6 +47,7 @@ public class UserService {
         Optional<User> userOptional = userRepository.findById(id);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
+            ensureEmailAvailableForUser(userRequest.getEmail(), user.getId());
             user.setFirstName(userRequest.getFirstName());
             user.setLastName(userRequest.getLastName());
             user.setEmail(userRequest.getEmail());
@@ -77,6 +68,7 @@ public class UserService {
     @Transactional
     public UserResponse updateAuthenticatedUser(Authentication authentication, UserRequest userRequest) {
         User user = currentUserService.findCurrentUser(authentication);
+        ensureEmailAvailableForUser(userRequest.getEmail(), user.getId());
         user.setFirstName(userRequest.getFirstName());
         user.setLastName(userRequest.getLastName());
         user.setEmail(userRequest.getEmail());
@@ -107,16 +99,16 @@ public class UserService {
 
     @Transactional
     public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new NotFoundException("User", id);
-        }
-        refreshTokenRepository.deleteByUserId(id);
-        addressRepository.deleteByUserId(id);
-        cartItemRepository.deleteByUserId(id);
-        favoriteRepository.deleteByUserId(id);
-        reviewRepository.deleteByUserId(id);
-        userRepository.deleteById(id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User", id));
+        userRepository.delete(user);
     }
 
-
+    private void ensureEmailAvailableForUser(String email, Long userId) {
+        userRepository.findByEmail(email)
+                .filter(existingUser -> !existingUser.getId().equals(userId))
+                .ifPresent(existingUser -> {
+                    throw new ConflictException("Email is already registered");
+                });
+    }
 }

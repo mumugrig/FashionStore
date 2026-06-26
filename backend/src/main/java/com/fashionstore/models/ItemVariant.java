@@ -27,6 +27,9 @@ public class ItemVariant {
     @Column(name = "stock_left", nullable = false)
     private int stockLeft;
 
+    @Column(name = "image_url", length = 2048)
+    private String imageUrl;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;

@@ -14,6 +14,7 @@ public class ItemVariantResponse {
     private Long id;
     private boolean isActive;
     private int stockLeft;
+    private String imageUrl;
     private Long itemId;
     private Long sizeId;
     private Long colorId;
@@ -23,6 +24,7 @@ public class ItemVariantResponse {
         result.id = itemVariant.getId();
         result.isActive = itemVariant.isActive();
         result.stockLeft = itemVariant.getStockLeft();
+        result.imageUrl = itemVariant.getImageUrl();
         result.itemId = itemVariant.getItem().getId();
         result.sizeId = itemVariant.getSize().getId();
         result.colorId = itemVariant.getColor().getId();

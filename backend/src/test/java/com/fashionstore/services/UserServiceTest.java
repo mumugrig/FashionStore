@@ -2,13 +2,9 @@ package com.fashionstore.services;
 
 import com.fashionstore.dto.request.UserRequest;
 import com.fashionstore.dto.response.UserResponse;
+import com.fashionstore.exceptions.ConflictException;
 import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.models.User;
-import com.fashionstore.repositories.AddressRepository;
-import com.fashionstore.repositories.CartItemRepository;
-import com.fashionstore.repositories.FavoriteRepository;
-import com.fashionstore.repositories.RefreshTokenRepository;
-import com.fashionstore.repositories.ReviewRepository;
 import com.fashionstore.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,25 +22,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-import org.mockito.InOrder;
-import static org.mockito.Mockito.inOrder;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest extends ServiceTestSupport {
     @Mock private UserRepository userRepositoryMock;
     @Mock private CurrentUserService currentUserServiceMock;
     @Mock private PasswordEncoder passwordEncoderMock;
-    @Mock private RefreshTokenRepository refreshTokenRepositoryMock;
-    @Mock private AddressRepository addressRepositoryMock;
-    @Mock private CartItemRepository cartItemRepositoryMock;
-    @Mock private FavoriteRepository favoriteRepositoryMock;
-    @Mock private ReviewRepository reviewRepositoryMock;
     private UserService objectUnderTest;
 
     @BeforeEach
     void setUp() {
-        objectUnderTest = new UserService(userRepositoryMock, currentUserServiceMock, passwordEncoderMock, refreshTokenRepositoryMock,
-                addressRepositoryMock, cartItemRepositoryMock, favoriteRepositoryMock, reviewRepositoryMock);
+        objectUnderTest = new UserService(userRepositoryMock, currentUserServiceMock, passwordEncoderMock);
     }
 
     @Test
@@ -69,6 +57,7 @@ class UserServiceTest extends ServiceTestSupport {
         User updatedUser = user(1L, "service-user-updated@example.com");
         updatedUser.setFirstName("Updated");
         when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(existing));
+        when(userRepositoryMock.findByEmail("service-user-updated@example.com")).thenReturn(Optional.empty());
         when(passwordEncoderMock.encode("password")).thenReturn("encoded-password");
         when(userRepositoryMock.save(existing)).thenReturn(updatedUser);
 
@@ -77,6 +66,33 @@ class UserServiceTest extends ServiceTestSupport {
 
         assertEquals("Updated", response.getFirstName(), "Updated user first name should match saved entity");
         assertEquals("service-user-updated@example.com", response.getEmail(), "Updated user email should match saved entity");
+    }
+
+    @Test
+    void updateUser_whenEmailBelongsToAnotherUser_throwsConflictException() {
+        User existing = user(1L, "service-user@example.com");
+        User otherUser = user(2L, "taken@example.com");
+
+        when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(existing));
+        when(userRepositoryMock.findByEmail("taken@example.com")).thenReturn(Optional.of(otherUser));
+
+        assertThrows(ConflictException.class, () -> objectUnderTest.updateUser(1L, userRequest("taken@example.com", "Updated")));
+    }
+
+    @Test
+    void updateUser_whenEmailBelongsToSameUser_returnsUpdatedUser() {
+        User existing = user(1L, "service-user@example.com");
+        User updatedUser = user(1L, "service-user@example.com");
+        updatedUser.setFirstName("Updated");
+
+        when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(existing));
+        when(userRepositoryMock.findByEmail("service-user@example.com")).thenReturn(Optional.of(existing));
+        when(passwordEncoderMock.encode("password")).thenReturn("encoded-password");
+        when(userRepositoryMock.save(existing)).thenReturn(updatedUser);
+
+        UserResponse response = objectUnderTest.updateUser(1L, userRequest("service-user@example.com", "Updated"));
+
+        assertEquals("Updated", response.getFirstName(), "Same-user email update should be allowed");
     }
 
     @Test
@@ -106,6 +122,7 @@ class UserServiceTest extends ServiceTestSupport {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("me-service@example.com", null);
 
         when(currentUserServiceMock.findCurrentUser(authentication)).thenReturn(currentUser);
+        when(userRepositoryMock.findByEmail("me-service-updated@example.com")).thenReturn(Optional.empty());
         when(passwordEncoderMock.encode("password")).thenReturn("encoded-password");
         when(userRepositoryMock.save(currentUser)).thenReturn(updatedUser);
 
@@ -115,18 +132,25 @@ class UserServiceTest extends ServiceTestSupport {
     }
 
     @Test
-    void deleteUser_whenUserExists_deletesOwnedDataBeforeUser() {
-        when(userRepositoryMock.existsById(1L)).thenReturn(true);
+    void updateAuthenticatedUser_whenEmailBelongsToAnotherUser_throwsConflictException() {
+        User currentUser = user(1L, "me-service@example.com");
+        User otherUser = user(2L, "taken@example.com");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("me-service@example.com", null);
+
+        when(currentUserServiceMock.findCurrentUser(authentication)).thenReturn(currentUser);
+        when(userRepositoryMock.findByEmail("taken@example.com")).thenReturn(Optional.of(otherUser));
+
+        assertThrows(ConflictException.class,
+                () -> objectUnderTest.updateAuthenticatedUser(authentication, userRequest("taken@example.com", "Mine")));
+    }
+
+    @Test
+    void deleteUser_whenUserExists_deletesUserEntityAndLetsCascadeRemoveOwnedData() {
+        User user = user(1L, "delete-me@example.com");
+        when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(user));
 
         objectUnderTest.deleteUser(1L);
 
-        InOrder inOrder = inOrder(refreshTokenRepositoryMock, addressRepositoryMock, cartItemRepositoryMock,
-                favoriteRepositoryMock, reviewRepositoryMock, userRepositoryMock);
-        inOrder.verify(refreshTokenRepositoryMock).deleteByUserId(1L);
-        inOrder.verify(addressRepositoryMock).deleteByUserId(1L);
-        inOrder.verify(cartItemRepositoryMock).deleteByUserId(1L);
-        inOrder.verify(favoriteRepositoryMock).deleteByUserId(1L);
-        inOrder.verify(reviewRepositoryMock).deleteByUserId(1L);
-        inOrder.verify(userRepositoryMock).deleteById(1L);
+        verify(userRepositoryMock).delete(user);
     }
 }

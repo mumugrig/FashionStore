@@ -38,6 +38,7 @@ public class ItemVariantService {
         ItemVariant itemVariant = new ItemVariant();
         itemVariant.setActive(itemVariantRequest.isActive());
         itemVariant.setStockLeft(itemVariantRequest.getStockLeft());
+        itemVariant.setImageUrl(itemVariantRequest.getImageUrl());
 
         Item item = itemRepository.findById(itemVariantRequest.getItemId())
                 .orElseThrow(() -> new NotFoundException("Item", itemVariantRequest.getItemId()));
@@ -62,6 +63,7 @@ public class ItemVariantService {
             ItemVariant itemVariant = itemVariantOptional.get();
             itemVariant.setActive(itemVariantRequest.isActive());
             itemVariant.setStockLeft(itemVariantRequest.getStockLeft());
+            itemVariant.setImageUrl(itemVariantRequest.getImageUrl());
 
             Item item = itemRepository.findById(itemVariantRequest.getItemId())
                     .orElseThrow(() -> new NotFoundException("Item", itemVariantRequest.getItemId()));

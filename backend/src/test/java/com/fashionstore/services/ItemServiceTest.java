@@ -50,6 +50,7 @@ class ItemServiceTest extends ServiceTestSupport {
         ItemResponse response = objectUnderTest.createItem(itemRequest("Service Shirt", 1L));
 
         assertEquals("Service Shirt", response.getName(), "Created item name should match saved entity");
+        assertEquals("https://example.com/item.png", response.getImageUrl(), "Created item image should match saved entity");
     }
 
     @Test
@@ -65,6 +66,7 @@ class ItemServiceTest extends ServiceTestSupport {
         ItemResponse response = objectUnderTest.updateItem(1L, itemRequest("Updated Shirt", 1L));
 
         assertEquals("Updated Shirt", response.getName(), "Updated item name should match saved entity");
+        assertEquals("https://example.com/item.png", response.getImageUrl(), "Updated item image should match saved entity");
     }
 
     @Test
