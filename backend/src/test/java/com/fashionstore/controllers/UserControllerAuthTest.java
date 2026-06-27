@@ -4,9 +4,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fashionstore.dto.request.RegisterRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fashionstore.dto.response.AuthResponse;
+import com.fashionstore.models.CartItem;
+import com.fashionstore.models.Category;
+import com.fashionstore.models.Color;
+import com.fashionstore.models.Favorite;
+import com.fashionstore.models.Item;
+import com.fashionstore.models.ItemVariant;
+import com.fashionstore.models.Size;
 import com.fashionstore.models.User;
+import com.fashionstore.repositories.CartItemRepository;
+import com.fashionstore.repositories.CategoryRepository;
+import com.fashionstore.repositories.ColorRepository;
+import com.fashionstore.repositories.FavoriteRepository;
+import com.fashionstore.repositories.ItemRepository;
+import com.fashionstore.repositories.ItemVariantRepository;
+import com.fashionstore.repositories.SizeRepository;
 import com.fashionstore.repositories.UserRepository;
 import com.fashionstore.services.AuthService;
+import com.fashionstore.vo.Audience;
+import com.fashionstore.vo.SizeSystem;
 import com.fashionstore.vo.UserRole;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +35,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +57,27 @@ class UserControllerAuthTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private ColorRepository colorRepository;
+
+    @Autowired
+    private SizeRepository sizeRepository;
+
+    @Autowired
+    private ItemRepository itemRepository;
+
+    @Autowired
+    private ItemVariantRepository itemVariantRepository;
+
+    @Autowired
+    private CartItemRepository cartItemRepository;
+
+    @Autowired
+    private FavoriteRepository favoriteRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -202,6 +240,97 @@ class UserControllerAuthTest {
         }
     }
 
+    @Test
+    void itemsEndpointAppliesDocumentedFiltersExceptReviewStars() throws Exception {
+        AuthResponse userAuth = authService.register(registerRequest("query-items@example.com"));
+        createFilterableVariant();
+        HttpRequest request = HttpRequest.newBuilder(URI.create(url(
+                "/api/items?category=Shirts&search=Oxford&itemSize=M&color=Navy&audience=men&pricemin=40&pricemax=60")))
+                .header("Authorization", "Bearer " + userAuth.getAccessToken())
+                .GET()
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(200, response.statusCode());
+        assertTrue(response.body().contains("\"name\":\"Oxford Shirt\""));
+        assertTrue(response.body().contains("\"totalElements\":1"));
+    }
+
+    @Test
+    void userCollectionEndpointsApplySearchFilters() throws Exception {
+        AuthResponse userAuth = authService.register(registerRequest("query-owned@example.com"));
+        User user = userRepository.findByEmail("query-owned@example.com").orElseThrow();
+        ItemVariant variant = createFilterableVariant();
+
+        CartItem cartItem = new CartItem();
+        cartItem.setUser(user);
+        cartItem.setItemVariant(variant);
+        cartItem.setQuantity(1);
+        cartItemRepository.save(cartItem);
+
+        Favorite favorite = new Favorite();
+        favorite.setUser(user);
+        favorite.setItemVariant(variant);
+        favoriteRepository.save(favorite);
+
+        for (String endpoint : List.of("/api/cart?search=shirt", "/api/favorites?search=shirt")) {
+            HttpRequest request = HttpRequest.newBuilder(URI.create(url(endpoint)))
+                    .header("Authorization", "Bearer " + userAuth.getAccessToken())
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            assertEquals(200, response.statusCode(), endpoint);
+            assertTrue(response.body().contains("\"totalElements\":"), endpoint);
+        }
+    }
+
+    @Test
+    void adminUsersEndpointAppliesSearchAndRejectsInvalidFilterColumn() throws Exception {
+        authService.register(registerRequest("admin-search-target@example.com"));
+        AuthResponse adminAuth = createAdminAndLogin("admin-search@example.com");
+
+        HttpResponse<String> searchResponse = httpClient.send(
+                HttpRequest.newBuilder(URI.create(url("/api/admin/users?search=search-target")))
+                        .header("Authorization", "Bearer " + adminAuth.getAccessToken())
+                        .GET()
+                        .build(),
+                HttpResponse.BodyHandlers.ofString()
+        );
+        HttpResponse<String> invalidFilterResponse = httpClient.send(
+                HttpRequest.newBuilder(URI.create(url("/api/admin/users?filterColumn=unknown&filterValue=target")))
+                        .header("Authorization", "Bearer " + adminAuth.getAccessToken())
+                        .GET()
+                        .build(),
+                HttpResponse.BodyHandlers.ofString()
+        );
+
+        assertEquals(200, searchResponse.statusCode());
+        assertTrue(searchResponse.body().contains("admin-search-target@example.com"));
+        assertEquals(400, invalidFilterResponse.statusCode());
+    }
+
+    @Test
+    void adminBulkDeleteEndpointDeletesSelectedRecords() throws Exception {
+        AuthResponse adminAuth = createAdminAndLogin("admin-bulk-delete@example.com");
+        Category category = new Category();
+        category.setName("Bulk Delete Category");
+        Category savedCategory = categoryRepository.save(category);
+
+        HttpRequest request = HttpRequest.newBuilder(URI.create(url("/api/admin/categories/bulk-delete")))
+                .header("Authorization", "Bearer " + adminAuth.getAccessToken())
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(Map.of("ids", List.of(savedCategory.getId())))))
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(204, response.statusCode());
+        assertTrue(categoryRepository.findById(savedCategory.getId()).isEmpty());
+    }
+
     private String url(String path) {
         return "http://localhost:" + port + path;
     }
@@ -278,5 +407,37 @@ class UserControllerAuthTest {
         request.setPhoneNumber("1234567890");
         request.setPassword("password");
         return request;
+    }
+
+    private ItemVariant createFilterableVariant() {
+        Category category = new Category();
+        category.setName("Shirts");
+        categoryRepository.save(category);
+
+        Color color = new Color();
+        color.setName("Navy");
+        color.setValue("#000080");
+        colorRepository.save(color);
+
+        Size size = new Size();
+        size.setLabel("M");
+        size.setSizeSystem(SizeSystem.ALPHA);
+        sizeRepository.save(size);
+
+        Item item = new Item();
+        item.setName("Oxford Shirt");
+        item.setPrice(BigDecimal.valueOf(49.90));
+        item.setDescription("A filterable shirt for query parameter tests");
+        item.setAudience(Audience.MEN);
+        item.setCategory(category);
+        itemRepository.save(item);
+
+        ItemVariant variant = new ItemVariant();
+        variant.setItem(item);
+        variant.setColor(color);
+        variant.setSize(size);
+        variant.setActive(true);
+        variant.setStockLeft(10);
+        return itemVariantRepository.save(variant);
     }
 }

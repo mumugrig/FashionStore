@@ -6,13 +6,19 @@ import { AdminResourceConfig } from './admin-resource.config';
 
 export type AdminRow = Record<string, unknown> & { id: number };
 
+export interface AdminListFilters {
+  search?: string;
+  filterColumn?: string;
+  filterValue?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private readonly api = inject(ApiService);
 
-  list(config: AdminResourceConfig, page = 1, size = 20): Observable<PageResponse<AdminRow> | AdminRow[]> {
+  list(config: AdminResourceConfig, page = 1, size = 20, filters: AdminListFilters = {}): Observable<PageResponse<AdminRow> | AdminRow[]> {
     if (config.paged) {
-      return this.api.getPage<AdminRow>(config.endpoint, page, size);
+      return this.api.get<PageResponse<AdminRow>>(config.endpoint, { ...filters, page, size });
     }
     return this.api.get<AdminRow[]>(config.endpoint);
   }
@@ -30,5 +36,9 @@ export class AdminService {
   remove(config: AdminResourceConfig, id: number): Observable<void> {
     const path = config.deletePath?.(id) ?? `${config.endpoint}/${id}`;
     return this.api.delete(path);
+  }
+
+  removeMany(config: AdminResourceConfig, ids: number[]): Observable<void> {
+    return this.api.post<void>(config.bulkDeletePath ?? `${config.endpoint}/bulk-delete`, { ids });
   }
 }

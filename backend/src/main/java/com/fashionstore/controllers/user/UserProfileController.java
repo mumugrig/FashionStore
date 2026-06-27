@@ -1,11 +1,12 @@
 package com.fashionstore.controllers.user;
 
-import com.fashionstore.dto.request.UserRequest;
+import com.fashionstore.dto.request.ProfileUpdateRequest;
 import com.fashionstore.dto.response.UserResponse;
 import com.fashionstore.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,13 @@ public class UserProfileController {
     }
 
     @PatchMapping("/me")
-    public ResponseEntity<UserResponse> updateAuthenticatedUser(Authentication authentication, @Valid @RequestBody UserRequest userRequest) {
-        return ResponseEntity.ok(userService.updateAuthenticatedUser(authentication, userRequest));
+    public ResponseEntity<UserResponse> updateAuthenticatedUser(Authentication authentication, @Valid @RequestBody ProfileUpdateRequest profileUpdateRequest) {
+        return ResponseEntity.ok(userService.updateAuthenticatedUser(authentication, profileUpdateRequest));
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteAuthenticatedUser(Authentication authentication) {
+        userService.deleteAuthenticatedUser(authentication);
+        return ResponseEntity.noContent().build();
     }
 }

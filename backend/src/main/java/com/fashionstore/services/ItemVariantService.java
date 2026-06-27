@@ -7,7 +7,9 @@ import com.fashionstore.models.Item;
 import com.fashionstore.models.Size;
 import com.fashionstore.models.Color;
 import com.fashionstore.dto.request.ItemVariantRequest;
+import com.fashionstore.dto.response.AdminItemVariantResponse;
 import com.fashionstore.dto.response.ItemVariantResponse;
+import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.repositories.ItemVariantRepository;
 import com.fashionstore.repositories.ItemRepository;
 import com.fashionstore.repositories.SizeRepository;
@@ -15,11 +17,15 @@ import com.fashionstore.repositories.ColorRepository;
 import com.fashionstore.repositories.CartItemRepository;
 import com.fashionstore.repositories.FavoriteRepository;
 import com.fashionstore.repositories.ReviewRepository;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -98,6 +104,22 @@ public class ItemVariantService {
     }
 
     @Transactional(readOnly = true)
+    public PageResponse<AdminItemVariantResponse> getPagedAdminItemVariants(
+            int page,
+            int size,
+            String search,
+            String filterColumn,
+            String filterValue) {
+        if (!AdminFilterSpecification.hasFilters(search, filterColumn, filterValue)) {
+            return PageResponse.from(itemVariantRepository.findAll(PageRequestFactory.create(page, size)), AdminItemVariantResponse::from);
+        }
+        return PageResponse.from(itemVariantRepository.findAll(
+                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                PageRequestFactory.create(page, size)
+        ), AdminItemVariantResponse::from);
+    }
+
+    @Transactional(readOnly = true)
     public List<ItemVariantResponse> getActiveVariantsByItem(Long itemId) {
         return itemVariantRepository.findByItemIdAndIsActiveTrue(itemId)
                 .stream()
@@ -120,6 +142,31 @@ public class ItemVariantService {
             throw new ConflictException("Cannot delete item variant because it has reviews. Delete those reviews first.");
         }
         itemVariantRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteItemVariants(List<Long> ids) {
+        ids.forEach(this::deleteItemVariant);
+    }
+
+    private Map<String, Function<Root<ItemVariant>, Expression<?>>> adminFields() {
+        return Map.ofEntries(
+                Map.entry("id", root -> root.get("id")),
+                Map.entry("active", root -> root.get("isActive")),
+                Map.entry("isActive", root -> root.get("isActive")),
+                Map.entry("stockLeft", root -> root.get("stockLeft")),
+                Map.entry("imageUrl", root -> root.get("imageUrl")),
+                Map.entry("itemId", root -> root.get("item").get("id")),
+                Map.entry("itemName", root -> root.get("item").get("name")),
+                Map.entry("itemPrice", root -> root.get("item").get("price")),
+                Map.entry("itemAudience", root -> root.get("item").get("audience")),
+                Map.entry("sizeId", root -> root.get("size").get("id")),
+                Map.entry("sizeLabel", root -> root.get("size").get("label")),
+                Map.entry("sizeSystem", root -> root.get("size").get("sizeSystem")),
+                Map.entry("colorId", root -> root.get("color").get("id")),
+                Map.entry("colorName", root -> root.get("color").get("name")),
+                Map.entry("colorValue", root -> root.get("color").get("value"))
+        );
     }
 }
 

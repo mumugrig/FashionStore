@@ -107,7 +107,7 @@ Pagination uses one-based page numbers. If omitted, `page` defaults to `1` and `
 |------------------|--------|---------------------------|----------|
 | category=`cat`   | String | Filter items by category  | No       |
 | search=`query`   | String | Filter items by name      | No       |
-| size=`size`      | String | Filter items by size      | No       |
+| itemSize=`size`  | String | Filter items by size      | No       |
 | color=`col`      | String | Filter items by color     | No       |
 | audience=`aud`   | String | Filter items by audience  | No       |
 | pricemin=`price` | Number | Set lower bound for price | No       |

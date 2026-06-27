@@ -8,10 +8,15 @@ import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.exceptions.ConflictException;
 import com.fashionstore.repositories.ColorRepository;
 import com.fashionstore.repositories.ItemVariantRepository;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -56,6 +61,17 @@ public class ColorService {
         return PageResponse.from(colorRepository.findAll(PageRequestFactory.create(page, size)), ColorResponse::from);
     }
 
+    @Transactional(readOnly = true)
+    public PageResponse<ColorResponse> getPagedColors(int page, int size, String search, String filterColumn, String filterValue) {
+        if (!AdminFilterSpecification.hasFilters(search, filterColumn, filterValue)) {
+            return getPagedColors(page, size);
+        }
+        return PageResponse.from(colorRepository.findAll(
+                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                PageRequestFactory.create(page, size)
+        ), ColorResponse::from);
+    }
+
     @Transactional
     public void deleteColor(Long id) {
         if (!colorRepository.existsById(id)) {
@@ -65,6 +81,20 @@ public class ColorService {
             throw new ConflictException("Cannot delete color because item variants use it. Reassign or delete them first.");
         }
         colorRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteColors(List<Long> ids) {
+        ids.forEach(this::deleteColor);
+    }
+
+    private Map<String, Function<Root<Color>, Expression<?>>> adminFields() {
+        return Map.of(
+                "id", root -> root.get("id"),
+                "name", root -> root.get("name"),
+                "value", root -> root.get("value"),
+                "imageUrl", root -> root.get("imageUrl")
+        );
     }
 }
 

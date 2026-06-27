@@ -3,8 +3,10 @@ package com.fashionstore.services;
 import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.exceptions.ConflictException;
 import com.fashionstore.models.Item;
+import com.fashionstore.models.ItemVariant;
 import com.fashionstore.models.Category;
 import com.fashionstore.dto.request.ItemRequest;
+import com.fashionstore.dto.response.AdminItemResponse;
 import com.fashionstore.dto.response.ItemResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.repositories.ItemRepository;
@@ -12,11 +14,19 @@ import com.fashionstore.repositories.CategoryRepository;
 import com.fashionstore.repositories.CartItemRepository;
 import com.fashionstore.repositories.FavoriteRepository;
 import com.fashionstore.repositories.ReviewRepository;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,6 +82,49 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
+    public PageResponse<ItemResponse> getPagedItems(int page, int size, String search, String filterColumn, String filterValue) {
+        if (!AdminFilterSpecification.hasFilters(search, filterColumn, filterValue)) {
+            return getPagedItems(page, size);
+        }
+        return PageResponse.from(itemRepository.findAll(
+                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                PageRequestFactory.create(page, size)
+        ), ItemResponse::from);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<AdminItemResponse> getPagedAdminItems(int page, int size, String search, String filterColumn, String filterValue) {
+        if (!AdminFilterSpecification.hasFilters(search, filterColumn, filterValue)) {
+            return PageResponse.from(itemRepository.findAll(PageRequestFactory.create(page, size)), AdminItemResponse::from);
+        }
+        return PageResponse.from(itemRepository.findAll(
+                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                PageRequestFactory.create(page, size)
+        ), AdminItemResponse::from);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<ItemResponse> getPagedItems(
+            int page,
+            int size,
+            String category,
+            String search,
+            String itemSize,
+            String color,
+            String audience,
+            BigDecimal priceMin,
+            BigDecimal priceMax) {
+        if (!hasText(category) && !hasText(search) && !hasText(itemSize) && !hasText(color)
+                && !hasText(audience) && priceMin == null && priceMax == null) {
+            return getPagedItems(page, size);
+        }
+        return PageResponse.from(itemRepository.findAll(
+                itemFilters(category, search, itemSize, color, audience, priceMin, priceMax),
+                PageRequestFactory.create(page, size)
+        ), ItemResponse::from);
+    }
+
+    @Transactional(readOnly = true)
     public List<ItemResponse> getItemsByCategory(Long categoryId) {
         return itemRepository.findByCategoryId(categoryId)
                 .stream()
@@ -96,9 +149,82 @@ public class ItemService {
         itemRepository.deleteById(id);
     }
 
+    @Transactional
+    public void deleteItems(List<Long> ids) {
+        ids.forEach(this::deleteItem);
+    }
+
     private Category findCategory(Long id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Category", id));
+    }
+
+    private Specification<Item> itemFilters(
+            String category,
+            String search,
+            String itemSize,
+            String color,
+            String audience,
+            BigDecimal priceMin,
+            BigDecimal priceMax) {
+        return (root, query, criteriaBuilder) -> {
+            query.distinct(true);
+            var predicate = criteriaBuilder.conjunction();
+
+            if (hasText(category)) {
+                predicate = criteriaBuilder.and(predicate,
+                        criteriaBuilder.equal(criteriaBuilder.lower(root.join("category").get("name")), normalized(category)));
+            }
+            if (hasText(search)) {
+                predicate = criteriaBuilder.and(predicate,
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + normalized(search) + "%"));
+            }
+            Join<Item, ItemVariant> variant = null;
+            if (hasText(itemSize) || hasText(color)) {
+                variant = root.join("variants", JoinType.INNER);
+            }
+            if (hasText(itemSize)) {
+                predicate = criteriaBuilder.and(predicate,
+                        criteriaBuilder.equal(criteriaBuilder.lower(variant.join("size").get("label")), normalized(itemSize)));
+            }
+            if (hasText(color)) {
+                predicate = criteriaBuilder.and(predicate,
+                        criteriaBuilder.equal(criteriaBuilder.lower(variant.join("color").get("name")), normalized(color)));
+            }
+            if (hasText(audience)) {
+                predicate = criteriaBuilder.and(predicate,
+                        criteriaBuilder.equal(criteriaBuilder.lower(root.get("audience").as(String.class)), normalized(audience)));
+            }
+            if (priceMin != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.greaterThanOrEqualTo(root.get("price"), priceMin));
+            }
+            if (priceMax != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.lessThanOrEqualTo(root.get("price"), priceMax));
+            }
+
+            return predicate;
+        };
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
+    private String normalized(String value) {
+        return value.trim().toLowerCase();
+    }
+
+    private Map<String, Function<Root<Item>, Expression<?>>> adminFields() {
+        return Map.ofEntries(
+                Map.entry("id", root -> root.get("id")),
+                Map.entry("name", root -> root.get("name")),
+                Map.entry("price", root -> root.get("price")),
+                Map.entry("description", root -> root.get("description")),
+                Map.entry("imageUrl", root -> root.get("imageUrl")),
+                Map.entry("audience", root -> root.get("audience")),
+                Map.entry("categoryId", root -> root.get("category").get("id")),
+                Map.entry("categoryName", root -> root.get("category").get("name"))
+        );
     }
 }
 

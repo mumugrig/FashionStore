@@ -46,9 +46,9 @@ class ColorControllerTest extends ControllerTestSupport {
 
     @Test
     void getColors_whenPageIsRequested_returnsPagedColors() {
-        when(colorServiceMock.getPagedColors(1, 20)).thenReturn(pageResponse(colorResponse(1L, "White", "#ffffff")));
+        when(colorServiceMock.getPagedColors(1, 20, null, null, null)).thenReturn(pageResponse(colorResponse(1L, "White", "#ffffff")));
 
-        var response = objectUnderTest.getPagedColors(1, 20);
+        var response = objectUnderTest.getPagedColors(1, 20, null, null, null);
 
         assertEquals(1, response.getBody().getContent().size(), "Color page should contain service results");
     }

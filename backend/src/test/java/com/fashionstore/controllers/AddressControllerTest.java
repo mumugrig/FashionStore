@@ -56,11 +56,12 @@ class AddressControllerTest extends ControllerTestSupport {
 
     @Test
     void getAddresses_whenPageIsRequested_returnsPagedAddresses() {
-        when(addressServiceMock.getPagedAddresses(1, 20)).thenReturn(pageResponse(addressResponse(1L, 1L, "Lviv")));
+        when(addressServiceMock.getPagedAdminAddresses(1, 20, null, null, null)).thenReturn(pageResponse(adminAddressResponse(1L, 1L, "Lviv")));
 
-        var response = objectUnderTest.getPagedAddresses(1, 20);
+        var response = objectUnderTest.getPagedAddresses(1, 20, null, null, null);
 
         assertEquals(1, response.getBody().getContent().size(), "Address page should contain service results");
+        assertEquals("test@example.com", response.getBody().getContent().get(0).getUserEmail(), "Admin address response should include identifying user email");
     }
 
     @Test

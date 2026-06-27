@@ -1,9 +1,11 @@
 package com.fashionstore.services;
 
 import com.fashionstore.dto.request.UserRequest;
+import com.fashionstore.dto.request.ProfileUpdateRequest;
 import com.fashionstore.dto.response.UserResponse;
 import com.fashionstore.exceptions.ConflictException;
 import com.fashionstore.exceptions.NotFoundException;
+import com.fashionstore.exceptions.ValidationException;
 import com.fashionstore.models.User;
 import com.fashionstore.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -123,12 +125,61 @@ class UserServiceTest extends ServiceTestSupport {
 
         when(currentUserServiceMock.findCurrentUser(authentication)).thenReturn(currentUser);
         when(userRepositoryMock.findByEmail("me-service-updated@example.com")).thenReturn(Optional.empty());
-        when(passwordEncoderMock.encode("password")).thenReturn("encoded-password");
         when(userRepositoryMock.save(currentUser)).thenReturn(updatedUser);
 
-        UserResponse response = objectUnderTest.updateAuthenticatedUser(authentication, userRequest("me-service-updated@example.com", "Mine"));
+        UserResponse response = objectUnderTest.updateAuthenticatedUser(authentication, profileUpdateRequest("me-service-updated@example.com", "Mine"));
 
         assertEquals("Mine", response.getFirstName(), "Authenticated user update should return saved first name");
+    }
+
+    @Test
+    void updateAuthenticatedUser_whenNewPasswordHasMatchingCurrentPassword_updatesPassword() {
+        User currentUser = user(1L, "me-service@example.com");
+        currentUser.setPasswordHash("old-encoded-password");
+        User updatedUser = user(1L, "me-service@example.com");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("me-service@example.com", null);
+        ProfileUpdateRequest request = profileUpdateRequest("me-service@example.com", "Mine");
+        request.setCurrentPassword("old-password");
+        request.setNewPassword("new-password");
+
+        when(currentUserServiceMock.findCurrentUser(authentication)).thenReturn(currentUser);
+        when(userRepositoryMock.findByEmail("me-service@example.com")).thenReturn(Optional.of(currentUser));
+        when(passwordEncoderMock.matches("old-password", "old-encoded-password")).thenReturn(true);
+        when(passwordEncoderMock.encode("new-password")).thenReturn("new-encoded-password");
+        when(userRepositoryMock.save(currentUser)).thenReturn(updatedUser);
+
+        objectUnderTest.updateAuthenticatedUser(authentication, request);
+
+        assertEquals("new-encoded-password", currentUser.getPasswordHash(), "Password should be updated only after current password matches");
+    }
+
+    @Test
+    void updateAuthenticatedUser_whenNewPasswordHasNoCurrentPassword_throwsValidationException() {
+        User currentUser = user(1L, "me-service@example.com");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("me-service@example.com", null);
+        ProfileUpdateRequest request = profileUpdateRequest("me-service@example.com", "Mine");
+        request.setNewPassword("new-password");
+
+        when(currentUserServiceMock.findCurrentUser(authentication)).thenReturn(currentUser);
+        when(userRepositoryMock.findByEmail("me-service@example.com")).thenReturn(Optional.of(currentUser));
+
+        assertThrows(ValidationException.class, () -> objectUnderTest.updateAuthenticatedUser(authentication, request));
+    }
+
+    @Test
+    void updateAuthenticatedUser_whenCurrentPasswordDoesNotMatch_throwsValidationException() {
+        User currentUser = user(1L, "me-service@example.com");
+        currentUser.setPasswordHash("old-encoded-password");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("me-service@example.com", null);
+        ProfileUpdateRequest request = profileUpdateRequest("me-service@example.com", "Mine");
+        request.setCurrentPassword("wrong-password");
+        request.setNewPassword("new-password");
+
+        when(currentUserServiceMock.findCurrentUser(authentication)).thenReturn(currentUser);
+        when(userRepositoryMock.findByEmail("me-service@example.com")).thenReturn(Optional.of(currentUser));
+        when(passwordEncoderMock.matches("wrong-password", "old-encoded-password")).thenReturn(false);
+
+        assertThrows(ValidationException.class, () -> objectUnderTest.updateAuthenticatedUser(authentication, request));
     }
 
     @Test
@@ -141,7 +192,7 @@ class UserServiceTest extends ServiceTestSupport {
         when(userRepositoryMock.findByEmail("taken@example.com")).thenReturn(Optional.of(otherUser));
 
         assertThrows(ConflictException.class,
-                () -> objectUnderTest.updateAuthenticatedUser(authentication, userRequest("taken@example.com", "Mine")));
+                () -> objectUnderTest.updateAuthenticatedUser(authentication, profileUpdateRequest("taken@example.com", "Mine")));
     }
 
     @Test
@@ -152,5 +203,26 @@ class UserServiceTest extends ServiceTestSupport {
         objectUnderTest.deleteUser(1L);
 
         verify(userRepositoryMock).delete(user);
+    }
+
+    @Test
+    void deleteAuthenticatedUser_whenPrincipalEmailExists_deletesCurrentUser() {
+        User currentUser = user(1L, "delete-me-service@example.com");
+        TestingAuthenticationToken authentication = new TestingAuthenticationToken("delete-me-service@example.com", null);
+
+        when(currentUserServiceMock.findCurrentUser(authentication)).thenReturn(currentUser);
+
+        objectUnderTest.deleteAuthenticatedUser(authentication);
+
+        verify(userRepositoryMock).delete(currentUser);
+    }
+
+    private ProfileUpdateRequest profileUpdateRequest(String email, String firstName) {
+        ProfileUpdateRequest request = new ProfileUpdateRequest();
+        request.setFirstName(firstName);
+        request.setLastName("User");
+        request.setEmail(email);
+        request.setPhoneNumber("1234567890");
+        return request;
     }
 }

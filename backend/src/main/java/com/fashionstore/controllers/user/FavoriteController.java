@@ -30,8 +30,9 @@ public class FavoriteController {
     public ResponseEntity<PageResponse<FavoriteResponse>> getPagedFavorites(
             Authentication authentication,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(favoriteService.getPagedFavorites(authentication, page, size));
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search) {
+        return ResponseEntity.ok(favoriteService.getPagedFavorites(authentication, page, size, search));
     }
 
     @PostMapping("/items")

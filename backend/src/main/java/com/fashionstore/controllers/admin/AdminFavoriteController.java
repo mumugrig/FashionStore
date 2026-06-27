@@ -1,6 +1,8 @@
 package com.fashionstore.controllers.admin;
 
+import com.fashionstore.dto.request.BulkDeleteRequest;
 import com.fashionstore.dto.request.FavoriteRequest;
+import com.fashionstore.dto.response.AdminFavoriteResponse;
 import com.fashionstore.dto.response.FavoriteResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.services.FavoriteService;
@@ -26,10 +28,13 @@ public class AdminFavoriteController {
     private final FavoriteService favoriteService;
 
     @GetMapping("/favorites")
-    public ResponseEntity<PageResponse<FavoriteResponse>> getPagedFavorites(
+    public ResponseEntity<PageResponse<AdminFavoriteResponse>> getPagedFavorites(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(favoriteService.getPagedFavorites(page, size));
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String filterColumn,
+            @RequestParam(required = false) String filterValue) {
+        return ResponseEntity.ok(favoriteService.getPagedAdminFavorites(page, size, search, filterColumn, filterValue));
     }
 
     @GetMapping("/users/{userId}/favorites")
@@ -48,6 +53,12 @@ public class AdminFavoriteController {
     @DeleteMapping("/favorites/{id}")
     public ResponseEntity<Void> removeFavorite(@PathVariable Long id) {
         favoriteService.deleteFavorite(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/favorites/bulk-delete")
+    public ResponseEntity<Void> removeFavorites(@Valid @RequestBody BulkDeleteRequest request) {
+        favoriteService.deleteFavorites(request.getIds());
         return ResponseEntity.noContent().build();
     }
 }

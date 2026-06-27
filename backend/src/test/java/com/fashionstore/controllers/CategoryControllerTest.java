@@ -56,9 +56,9 @@ class CategoryControllerTest extends ControllerTestSupport {
 
     @Test
     void getPagedCategories_whenPageIsRequested_returnsPagedCategories() {
-        when(categoryServiceMock.getPagedCategories(1, 20)).thenReturn(pageResponse(categoryResponse(1L, "Sneakers", null)));
+        when(categoryServiceMock.getPagedAdminCategories(1, 20, null, null, null)).thenReturn(pageResponse(adminCategoryResponse(1L, "Sneakers", null, null)));
 
-        var response = objectUnderTest.getPagedCategories(1, 20);
+        var response = objectUnderTest.getPagedCategories(1, 20, null, null, null);
 
         assertEquals(1, response.getBody().getContent().size(), "Category page should contain service results");
     }

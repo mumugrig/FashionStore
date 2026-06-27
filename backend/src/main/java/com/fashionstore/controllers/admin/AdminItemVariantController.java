@@ -1,10 +1,11 @@
 package com.fashionstore.controllers.admin;
 
 import com.fashionstore.dto.request.BulkDeleteRequest;
-import com.fashionstore.dto.request.SizeRequest;
+import com.fashionstore.dto.request.ItemVariantRequest;
+import com.fashionstore.dto.response.AdminItemVariantResponse;
+import com.fashionstore.dto.response.ItemVariantResponse;
 import com.fashionstore.dto.response.PageResponse;
-import com.fashionstore.dto.response.SizeResponse;
-import com.fashionstore.services.SizeService;
+import com.fashionstore.services.ItemVariantService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,46 +22,46 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/admin/sizes")
+@RequestMapping("/api/admin/item-variants")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
-public class AdminSizeController {
-    private final SizeService sizeService;
+public class AdminItemVariantController {
+    private final ItemVariantService itemVariantService;
 
     @GetMapping
-    public ResponseEntity<PageResponse<SizeResponse>> getPagedSizes(
+    public ResponseEntity<PageResponse<AdminItemVariantResponse>> getPagedItemVariants(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) String filterColumn,
             @RequestParam(required = false) String filterValue) {
-        return ResponseEntity.ok(sizeService.getPagedSizes(page, size, search, filterColumn, filterValue));
+        return ResponseEntity.ok(itemVariantService.getPagedAdminItemVariants(page, size, search, filterColumn, filterValue));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SizeResponse> getSizeById(@PathVariable Long id) {
-        return ResponseEntity.ok(sizeService.getSizeById(id));
+    public ResponseEntity<ItemVariantResponse> getItemVariantById(@PathVariable Long id) {
+        return ResponseEntity.ok(itemVariantService.getItemVariantById(id));
     }
 
     @PostMapping
-    public ResponseEntity<SizeResponse> createSize(@Valid @RequestBody SizeRequest sizeRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(sizeService.createSize(sizeRequest));
+    public ResponseEntity<ItemVariantResponse> createItemVariant(@Valid @RequestBody ItemVariantRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(itemVariantService.createItemVariant(request));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<SizeResponse> updateSize(@PathVariable Long id, @Valid @RequestBody SizeRequest sizeRequest) {
-        return ResponseEntity.ok(sizeService.updateSize(id, sizeRequest));
+    public ResponseEntity<ItemVariantResponse> updateItemVariant(@PathVariable Long id, @Valid @RequestBody ItemVariantRequest request) {
+        return ResponseEntity.ok(itemVariantService.updateItemVariant(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSize(@PathVariable Long id) {
-        sizeService.deleteSize(id);
+    public ResponseEntity<Void> deleteItemVariant(@PathVariable Long id) {
+        itemVariantService.deleteItemVariant(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/bulk-delete")
-    public ResponseEntity<Void> deleteSizes(@Valid @RequestBody BulkDeleteRequest request) {
-        sizeService.deleteSizes(request.getIds());
+    public ResponseEntity<Void> deleteItemVariants(@Valid @RequestBody BulkDeleteRequest request) {
+        itemVariantService.deleteItemVariants(request.getIds());
         return ResponseEntity.noContent().build();
     }
 }

@@ -27,11 +27,12 @@ class CartItemControllerTest extends ControllerTestSupport {
 
     @Test
     void getCartItems_whenPageIsRequested_returnsPagedCartItems() {
-        when(cartItemServiceMock.getPagedCartItems(1, 20)).thenReturn(pageResponse(cartItemResponse(1L, 1L, 2L, 3)));
+        when(cartItemServiceMock.getPagedAdminCartItems(1, 20, null, null, null)).thenReturn(pageResponse(adminCartItemResponse(1L, 1L, 2L, 3)));
 
-        var response = objectUnderTest.getPagedCartItems(1, 20);
+        var response = objectUnderTest.getPagedCartItems(1, 20, null, null, null);
 
         assertEquals(1, response.getBody().getContent().size(), "Cart page should contain service results");
+        assertEquals("Jacket", response.getBody().getContent().get(0).getItemName(), "Admin cart response should include item name");
     }
 
     @Test

@@ -51,8 +51,8 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     const reason = this.route.snapshot.queryParamMap.get('reason');
     const storedNotice = sessionStorage.getItem('fashion-store-auth-message');
-    if (reason === 'session-expired') {
-      this.notice = storedNotice ?? 'Your session expired. Please log in again.';
+    if (reason) {
+      this.notice = storedNotice ?? (reason === 'account-deleted' ? 'Your account has been deleted.' : 'Your session expired. Please log in again.');
       sessionStorage.removeItem('fashion-store-auth-message');
     }
   }

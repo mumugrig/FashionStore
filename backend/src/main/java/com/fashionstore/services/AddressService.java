@@ -1,6 +1,7 @@
 package com.fashionstore.services;
 
 import com.fashionstore.dto.request.AddressRequest;
+import com.fashionstore.dto.response.AdminAddressResponse;
 import com.fashionstore.dto.response.AddressResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.exceptions.NotFoundException;
@@ -8,11 +9,16 @@ import org.springframework.stereotype.Service;
 import com.fashionstore.models.Address;
 import com.fashionstore.repositories.AddressRepository;
 import com.fashionstore.repositories.UserRepository;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +63,28 @@ public class AddressService {
     @Transactional(readOnly = true)
     public PageResponse<AddressResponse> getPagedAddresses(int page, int size) {
         return PageResponse.from(addressRepository.findAll(PageRequestFactory.create(page, size)), AddressResponse::from);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<AddressResponse> getPagedAddresses(int page, int size, String search, String filterColumn, String filterValue) {
+        if (!AdminFilterSpecification.hasFilters(search, filterColumn, filterValue)) {
+            return getPagedAddresses(page, size);
+        }
+        return PageResponse.from(addressRepository.findAll(
+                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                PageRequestFactory.create(page, size)
+        ), AddressResponse::from);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<AdminAddressResponse> getPagedAdminAddresses(int page, int size, String search, String filterColumn, String filterValue) {
+        if (!AdminFilterSpecification.hasFilters(search, filterColumn, filterValue)) {
+            return PageResponse.from(addressRepository.findAll(PageRequestFactory.create(page, size)), AdminAddressResponse::from);
+        }
+        return PageResponse.from(addressRepository.findAll(
+                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                PageRequestFactory.create(page, size)
+        ), AdminAddressResponse::from);
     }
 
     @Transactional(readOnly = true)
@@ -106,6 +134,11 @@ public class AddressService {
     }
 
     @Transactional
+    public void deleteAddresses(List<Long> ids) {
+        ids.forEach(this::deleteAddress);
+    }
+
+    @Transactional
     public void deleteAddress(Authentication authentication, Long id){
         var currentUser = currentUserService.findCurrentUser(authentication);
         Address address = addressRepository.findByIdAndUserId(id, currentUser.getId())
@@ -119,5 +152,22 @@ public class AddressService {
         address.setCountry(addressRequest.getCountry());
         address.setRegion(addressRequest.getRegion());
         address.setPostalCode(addressRequest.getPostalCode());
+    }
+
+    private Map<String, Function<Root<Address>, Expression<?>>> adminFields() {
+        return Map.ofEntries(
+                Map.entry("id", root -> root.get("id")),
+                Map.entry("country", root -> root.get("country")),
+                Map.entry("region", root -> root.get("region")),
+                Map.entry("city", root -> root.get("city")),
+                Map.entry("postalCode", root -> root.get("postalCode")),
+                Map.entry("addressLine", root -> root.get("addressLine")),
+                Map.entry("userId", root -> root.get("user").get("id")),
+                Map.entry("userFirstName", root -> root.get("user").get("firstName")),
+                Map.entry("userLastName", root -> root.get("user").get("lastName")),
+                Map.entry("userName", root -> root.get("user").get("firstName")),
+                Map.entry("userEmail", root -> root.get("user").get("email")),
+                Map.entry("userPhoneNumber", root -> root.get("user").get("phoneNumber"))
+        );
     }
 }

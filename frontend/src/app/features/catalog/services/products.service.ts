@@ -6,7 +6,7 @@ import { Item, PageResponse, Review } from '@shared/models/models';
 export interface ProductFilters {
   category?: string;
   search?: string;
-  size?: string;
+  itemSize?: string;
   color?: string;
   audience?: string;
   pricemin?: number;

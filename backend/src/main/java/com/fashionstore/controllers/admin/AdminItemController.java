@@ -1,6 +1,8 @@
 package com.fashionstore.controllers.admin;
 
+import com.fashionstore.dto.request.BulkDeleteRequest;
 import com.fashionstore.dto.request.ItemRequest;
+import com.fashionstore.dto.response.AdminItemResponse;
 import com.fashionstore.dto.response.ItemResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.services.ItemService;
@@ -27,10 +29,13 @@ public class AdminItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public ResponseEntity<PageResponse<ItemResponse>> getPagedItems(
+    public ResponseEntity<PageResponse<AdminItemResponse>> getPagedItems(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(itemService.getPagedItems(page, size));
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String filterColumn,
+            @RequestParam(required = false) String filterValue) {
+        return ResponseEntity.ok(itemService.getPagedAdminItems(page, size, search, filterColumn, filterValue));
     }
 
     @GetMapping("/{id}")
@@ -51,6 +56,12 @@ public class AdminItemController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
         itemService.deleteItem(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/bulk-delete")
+    public ResponseEntity<Void> deleteItems(@Valid @RequestBody BulkDeleteRequest request) {
+        itemService.deleteItems(request.getIds());
         return ResponseEntity.noContent().build();
     }
 }

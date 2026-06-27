@@ -8,18 +8,25 @@ export interface AdminField {
   options?: string[];
 }
 
+export interface AdminColumn {
+  key: string;
+  label: string;
+  defaultVisible?: boolean;
+}
+
 export interface AdminResourceConfig {
   key: string;
   label: string;
   endpoint: string;
   paged: boolean;
-  columns: string[];
+  columns: AdminColumn[];
   fields: AdminField[];
   create?: boolean;
   update?: boolean;
   delete?: boolean;
   updateMethod?: 'put' | 'patch';
   deletePath?: (id: number) => string;
+  bulkDeletePath?: string;
 }
 
 const audience = ['MEN', 'WOMEN', 'KIDS', 'UNISEX'];
@@ -34,7 +41,17 @@ export const adminResources: AdminResourceConfig[] = [
     label: 'Items',
     endpoint: '/admin/items',
     paged: true,
-    columns: ['name', 'price', 'audience', 'imageUrl'],
+    columns: [
+      { key: 'id', label: 'ID' },
+      { key: 'name', label: 'Name', defaultVisible: true },
+      { key: 'price', label: 'Price', defaultVisible: true },
+      { key: 'audience', label: 'Audience', defaultVisible: true },
+      { key: 'categoryId', label: 'Category ID' },
+      { key: 'categoryName', label: 'Category', defaultVisible: true },
+      { key: 'variantCount', label: 'Variants' },
+      { key: 'description', label: 'Description' },
+      { key: 'imageUrl', label: 'Image URL' }
+    ],
     fields: [
       { key: 'name', label: 'Name', type: 'text', required: true },
       { key: 'price', label: 'Price', type: 'number', required: true },
@@ -52,7 +69,12 @@ export const adminResources: AdminResourceConfig[] = [
     label: 'Categories',
     endpoint: '/admin/categories',
     paged: true,
-    columns: ['name'],
+    columns: [
+      { key: 'id', label: 'ID' },
+      { key: 'name', label: 'Name', defaultVisible: true },
+      { key: 'parentId', label: 'Parent ID' },
+      { key: 'parentName', label: 'Parent', defaultVisible: true }
+    ],
     fields: [
       { key: 'name', label: 'Name', type: 'text', required: true },
       { key: 'parentId', label: 'Parent category reference', type: 'number' }
@@ -66,7 +88,12 @@ export const adminResources: AdminResourceConfig[] = [
     label: 'Colors',
     endpoint: '/admin/colors',
     paged: true,
-    columns: ['name', 'value', 'imageUrl'],
+    columns: [
+      { key: 'id', label: 'ID' },
+      { key: 'name', label: 'Name', defaultVisible: true },
+      { key: 'value', label: 'Hex value', defaultVisible: true },
+      { key: 'imageUrl', label: 'Image URL', defaultVisible: true }
+    ],
     fields: [
       { key: 'name', label: 'Name', type: 'text', required: true },
       { key: 'value', label: 'Hex value', type: 'color', required: true },
@@ -81,7 +108,11 @@ export const adminResources: AdminResourceConfig[] = [
     label: 'Sizes',
     endpoint: '/admin/sizes',
     paged: true,
-    columns: ['label', 'sizeSystem'],
+    columns: [
+      { key: 'id', label: 'ID' },
+      { key: 'label', label: 'Label', defaultVisible: true },
+      { key: 'sizeSystem', label: 'System', defaultVisible: true }
+    ],
     fields: [
       { key: 'label', label: 'Label', type: 'text', required: true },
       { key: 'sizeSystem', label: 'System', type: 'select', required: true, options: sizeSystems }
@@ -94,8 +125,15 @@ export const adminResources: AdminResourceConfig[] = [
     key: 'users',
     label: 'Users',
     endpoint: '/admin/users',
-    paged: false,
-    columns: ['firstName', 'lastName', 'email', 'phoneNumber'],
+    paged: true,
+    columns: [
+      { key: 'id', label: 'ID' },
+      { key: 'firstName', label: 'First name', defaultVisible: true },
+      { key: 'lastName', label: 'Last name', defaultVisible: true },
+      { key: 'email', label: 'Email', defaultVisible: true },
+      { key: 'phoneNumber', label: 'Phone', defaultVisible: true },
+      { key: 'role', label: 'Role', defaultVisible: true }
+    ],
     fields: [
       { key: 'firstName', label: 'First name', type: 'text', required: true },
       { key: 'lastName', label: 'Last name', type: 'text', required: true },
@@ -112,7 +150,26 @@ export const adminResources: AdminResourceConfig[] = [
     label: 'Reviews',
     endpoint: '/admin/reviews',
     paged: true,
-    columns: ['body', 'sizeFit', 'quality', 'comfort'],
+    columns: [
+      { key: 'id', label: 'ID' },
+      { key: 'body', label: 'Body', defaultVisible: true },
+      { key: 'userId', label: 'User ID' },
+      { key: 'userName', label: 'User', defaultVisible: true },
+      { key: 'userEmail', label: 'User email', defaultVisible: true },
+      { key: 'itemVariantId', label: 'Variant ID' },
+      { key: 'itemId', label: 'Item ID' },
+      { key: 'itemName', label: 'Item', defaultVisible: true },
+      { key: 'sizeFit', label: 'Size fit' },
+      { key: 'quality', label: 'Quality' },
+      { key: 'comfort', label: 'Comfort' },
+      { key: 'sizeLabel', label: 'Size' },
+      { key: 'sizeSystem', label: 'Size system' },
+      { key: 'colorName', label: 'Color' },
+      { key: 'colorValue', label: 'Color value' },
+      { key: 'variantActive', label: 'Variant active' },
+      { key: 'variantStockLeft', label: 'Variant stock' },
+      { key: 'variantImageUrl', label: 'Variant image' }
+    ],
     fields: [
       { key: 'body', label: 'Body', type: 'textarea', required: true },
       { key: 'sizeFit', label: 'Size fit', type: 'select', required: true, options: sizeFit },
@@ -128,7 +185,18 @@ export const adminResources: AdminResourceConfig[] = [
     label: 'Addresses',
     endpoint: '/admin/addresses',
     paged: true,
-    columns: ['country', 'region', 'city', 'postalCode', 'addressLine'],
+    columns: [
+      { key: 'id', label: 'ID' },
+      { key: 'country', label: 'Country', defaultVisible: true },
+      { key: 'region', label: 'Region', defaultVisible: true },
+      { key: 'city', label: 'City', defaultVisible: true },
+      { key: 'postalCode', label: 'Postal code', defaultVisible: true },
+      { key: 'addressLine', label: 'Address line', defaultVisible: true },
+      { key: 'userId', label: 'User ID' },
+      { key: 'userName', label: 'User', defaultVisible: true },
+      { key: 'userEmail', label: 'User email' },
+      { key: 'userPhoneNumber', label: 'User phone' }
+    ],
     fields: [
       { key: 'country', label: 'Country', type: 'text', required: true },
       { key: 'region', label: 'Region', type: 'text', required: true },
@@ -146,7 +214,23 @@ export const adminResources: AdminResourceConfig[] = [
     label: 'Cart',
     endpoint: '/admin/cart',
     paged: true,
-    columns: ['quantity'],
+    columns: [
+      { key: 'id', label: 'ID' },
+      { key: 'quantity', label: 'Quantity', defaultVisible: true },
+      { key: 'userId', label: 'User ID' },
+      { key: 'userName', label: 'User', defaultVisible: true },
+      { key: 'userEmail', label: 'User email', defaultVisible: true },
+      { key: 'itemVariantId', label: 'Variant ID' },
+      { key: 'itemId', label: 'Item ID' },
+      { key: 'itemName', label: 'Item', defaultVisible: true },
+      { key: 'sizeLabel', label: 'Size' },
+      { key: 'sizeSystem', label: 'Size system' },
+      { key: 'colorName', label: 'Color' },
+      { key: 'colorValue', label: 'Color value' },
+      { key: 'variantActive', label: 'Variant active' },
+      { key: 'variantStockLeft', label: 'Variant stock' },
+      { key: 'variantImageUrl', label: 'Variant image' }
+    ],
     fields: [
       { key: 'quantity', label: 'Quantity', type: 'number', required: true },
       { key: 'itemVariantId', label: 'Product option reference', type: 'number', required: true },
@@ -161,12 +245,61 @@ export const adminResources: AdminResourceConfig[] = [
     label: 'Favorites',
     endpoint: '/admin/favorites',
     paged: true,
-    columns: [],
+    columns: [
+      { key: 'id', label: 'ID' },
+      { key: 'userId', label: 'User ID' },
+      { key: 'userName', label: 'User', defaultVisible: true },
+      { key: 'userEmail', label: 'User email', defaultVisible: true },
+      { key: 'itemVariantId', label: 'Variant ID' },
+      { key: 'itemId', label: 'Item ID' },
+      { key: 'itemName', label: 'Item', defaultVisible: true },
+      { key: 'sizeLabel', label: 'Size', defaultVisible: true },
+      { key: 'sizeSystem', label: 'Size system' },
+      { key: 'colorName', label: 'Color', defaultVisible: true },
+      { key: 'colorValue', label: 'Color value' },
+      { key: 'variantActive', label: 'Variant active' },
+      { key: 'variantStockLeft', label: 'Variant stock' },
+      { key: 'variantImageUrl', label: 'Variant image' }
+    ],
     fields: [
       { key: 'itemVariantId', label: 'Product option reference', type: 'number', required: true },
       { key: 'userId', label: 'User reference', type: 'number' }
     ],
     create: true,
+    delete: true
+  },
+  {
+    key: 'item-variants',
+    label: 'Item Variants',
+    endpoint: '/admin/item-variants',
+    paged: true,
+    columns: [
+      { key: 'id', label: 'ID' },
+      { key: 'active', label: 'Active', defaultVisible: true },
+      { key: 'stockLeft', label: 'Stock', defaultVisible: true },
+      { key: 'itemId', label: 'Item ID' },
+      { key: 'itemName', label: 'Item', defaultVisible: true },
+      { key: 'itemPrice', label: 'Item price' },
+      { key: 'itemAudience', label: 'Audience' },
+      { key: 'sizeId', label: 'Size ID' },
+      { key: 'sizeLabel', label: 'Size', defaultVisible: true },
+      { key: 'sizeSystem', label: 'Size system' },
+      { key: 'colorId', label: 'Color ID' },
+      { key: 'colorName', label: 'Color', defaultVisible: true },
+      { key: 'colorValue', label: 'Color value' },
+      { key: 'colorImageUrl', label: 'Color image' },
+      { key: 'imageUrl', label: 'Variant image' }
+    ],
+    fields: [
+      { key: 'active', label: 'Active', type: 'checkbox' },
+      { key: 'stockLeft', label: 'Stock left', type: 'number', required: true },
+      { key: 'imageUrl', label: 'Image URL', type: 'text' },
+      { key: 'itemId', label: 'Item reference', type: 'number', required: true },
+      { key: 'sizeId', label: 'Size reference', type: 'number', required: true },
+      { key: 'colorId', label: 'Color reference', type: 'number', required: true }
+    ],
+    create: true,
+    update: true,
     delete: true
   }
 ];

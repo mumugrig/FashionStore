@@ -13,7 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,6 +83,22 @@ class ItemServiceTest extends ServiceTestSupport {
         var response = objectUnderTest.getItemsByCategory(1L);
 
         assertEquals(1, response.size(), "Category query should return repository items");
+    }
+
+    @Test
+    void getPagedItems_whenFiltersAreProvided_usesFilteredRepositoryQuery() {
+        var category = category(1L, "Shirts");
+        var item = item(1L, "Filtered Shirt", category);
+
+        when(itemRepositoryMock.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(item)));
+
+        var response = objectUnderTest.getPagedItems(
+                1, 20, "Shirts", "shirt", "M", "Blue", "men",
+                BigDecimal.valueOf(10), BigDecimal.valueOf(30));
+
+        assertEquals(1, response.getContent().size(), "Filtered item query should return repository results");
+        verify(itemRepositoryMock).findAll(any(Specification.class), any(Pageable.class));
     }
 
     @Test

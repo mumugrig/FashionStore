@@ -31,8 +31,9 @@ public class CartController {
     public ResponseEntity<PageResponse<CartItemResponse>> getPagedCartItems(
             Authentication authentication,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(cartItemService.getPagedCartItems(authentication, page, size));
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search) {
+        return ResponseEntity.ok(cartItemService.getPagedCartItems(authentication, page, size, search));
     }
 
     @PostMapping("/items")

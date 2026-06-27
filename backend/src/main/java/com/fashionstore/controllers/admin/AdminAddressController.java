@@ -1,6 +1,8 @@
 package com.fashionstore.controllers.admin;
 
 import com.fashionstore.dto.request.AddressRequest;
+import com.fashionstore.dto.request.BulkDeleteRequest;
+import com.fashionstore.dto.response.AdminAddressResponse;
 import com.fashionstore.dto.response.AddressResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.services.AddressService;
@@ -27,10 +29,13 @@ public class AdminAddressController {
     private final AddressService addressService;
 
     @GetMapping("/addresses")
-    public ResponseEntity<PageResponse<AddressResponse>> getPagedAddresses(
+    public ResponseEntity<PageResponse<AdminAddressResponse>> getPagedAddresses(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(addressService.getPagedAddresses(page, size));
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String filterColumn,
+            @RequestParam(required = false) String filterValue) {
+        return ResponseEntity.ok(addressService.getPagedAdminAddresses(page, size, search, filterColumn, filterValue));
     }
 
     @GetMapping("/users/{userId}/addresses")
@@ -59,6 +64,12 @@ public class AdminAddressController {
     @DeleteMapping("/addresses/{id}")
     public ResponseEntity<Void> deleteAddress(@PathVariable Long id) {
         addressService.deleteAddress(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/addresses/bulk-delete")
+    public ResponseEntity<Void> deleteAddresses(@Valid @RequestBody BulkDeleteRequest request) {
+        addressService.deleteAddresses(request.getIds());
         return ResponseEntity.noContent().build();
     }
 }

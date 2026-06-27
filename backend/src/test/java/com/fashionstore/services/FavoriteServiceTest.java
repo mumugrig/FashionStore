@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -93,6 +94,27 @@ class FavoriteServiceTest extends ServiceTestSupport {
         var response = objectUnderTest.getPagedFavorites(authentication, 1, 20);
 
         assertEquals(user.getId(), response.getContent().get(0).getUserId(), "Favorites should be scoped to the current user");
+    }
+
+    @Test
+    void getPagedFavorites_whenSearchIsProvided_filtersCurrentUserFavoritesByItemName() {
+        var user = user(1L, "favorite-search@example.com");
+        var category = category(1L, "Shirts");
+        var item = item(1L, "Search Shirt", category);
+        var size = size(1L, "M");
+        var color = color(1L, "Blue", "#0000ff");
+        var variant = itemVariant(1L, item, size, color);
+        var favorite = favorite(1L, user, variant);
+        Authentication authentication = authentication(user.getId());
+
+        when(currentUserServiceMock.findCurrentUser(authentication)).thenReturn(user);
+        when(favoriteRepositoryMock.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(favorite)));
+
+        var response = objectUnderTest.getPagedFavorites(authentication, 1, 20, "shirt");
+
+        assertEquals(1, response.getContent().size(), "Favorite search should return repository results");
+        verify(favoriteRepositoryMock).findAll(any(Specification.class), any(Pageable.class));
     }
 
     @Test

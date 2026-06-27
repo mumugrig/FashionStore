@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+
 @RestController
 @RequestMapping("/api/items")
 @RequiredArgsConstructor
@@ -22,8 +24,16 @@ public class ItemController {
     @GetMapping
     public ResponseEntity<PageResponse<ItemResponse>> getPagedItems(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(itemService.getPagedItems(page, size));
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String itemSize,
+            @RequestParam(required = false) String color,
+            @RequestParam(required = false) String audience,
+            @RequestParam(required = false) BigDecimal pricemin,
+            @RequestParam(required = false) BigDecimal pricemax) {
+        return ResponseEntity.ok(itemService.getPagedItems(
+                page, size, category, search, itemSize, color, audience, pricemin, pricemax));
     }
 
     @GetMapping("/{id}")

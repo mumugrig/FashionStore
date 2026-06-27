@@ -1,5 +1,6 @@
 package com.fashionstore.controllers.admin;
 
+import com.fashionstore.dto.request.BulkDeleteRequest;
 import com.fashionstore.dto.request.ColorRequest;
 import com.fashionstore.dto.response.ColorResponse;
 import com.fashionstore.dto.response.PageResponse;
@@ -29,8 +30,11 @@ public class AdminColorController {
     @GetMapping
     public ResponseEntity<PageResponse<ColorResponse>> getPagedColors(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(colorService.getPagedColors(page, size));
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String filterColumn,
+            @RequestParam(required = false) String filterValue) {
+        return ResponseEntity.ok(colorService.getPagedColors(page, size, search, filterColumn, filterValue));
     }
 
     @GetMapping("/{id}")
@@ -51,6 +55,12 @@ public class AdminColorController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteColor(@PathVariable Long id) {
         colorService.deleteColor(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/bulk-delete")
+    public ResponseEntity<Void> deleteColors(@Valid @RequestBody BulkDeleteRequest request) {
+        colorService.deleteColors(request.getIds());
         return ResponseEntity.noContent().build();
     }
 }

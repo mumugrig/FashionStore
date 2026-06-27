@@ -45,9 +45,9 @@ class SizeControllerTest extends ControllerTestSupport {
 
     @Test
     void getPagedSizes_whenPageIsRequested_returnsPagedSizes() {
-        when(sizeServiceMock.getPagedSizes(1, 20)).thenReturn(pageResponse(sizeResponse(1L, "L")));
+        when(sizeServiceMock.getPagedSizes(1, 20, null, null, null)).thenReturn(pageResponse(sizeResponse(1L, "L")));
 
-        var response = objectUnderTest.getPagedSizes(1, 20);
+        var response = objectUnderTest.getPagedSizes(1, 20, null, null, null);
 
         assertEquals(1, response.getBody().getContent().size(), "Size page should contain service results");
     }

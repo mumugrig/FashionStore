@@ -1,6 +1,8 @@
 package com.fashionstore.controllers.admin;
 
+import com.fashionstore.dto.request.BulkDeleteRequest;
 import com.fashionstore.dto.request.CategoryRequest;
+import com.fashionstore.dto.response.AdminCategoryResponse;
 import com.fashionstore.dto.response.CategoryResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.services.CategoryService;
@@ -27,10 +29,13 @@ public class AdminCategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public ResponseEntity<PageResponse<CategoryResponse>> getPagedCategories(
+    public ResponseEntity<PageResponse<AdminCategoryResponse>> getPagedCategories(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(categoryService.getPagedCategories(page, size));
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String filterColumn,
+            @RequestParam(required = false) String filterValue) {
+        return ResponseEntity.ok(categoryService.getPagedAdminCategories(page, size, search, filterColumn, filterValue));
     }
 
     @GetMapping("/{id}")
@@ -51,6 +56,12 @@ public class AdminCategoryController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/bulk-delete")
+    public ResponseEntity<Void> deleteCategories(@Valid @RequestBody BulkDeleteRequest request) {
+        categoryService.deleteCategories(request.getIds());
         return ResponseEntity.noContent().build();
     }
 }

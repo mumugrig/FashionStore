@@ -8,7 +8,8 @@ export interface ProfileUpdateRequest {
   lastName: string;
   email: string;
   phoneNumber: string;
-  password: string;
+  currentPassword?: string;
+  newPassword?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -21,5 +22,9 @@ export class AccountService {
 
   updateProfile(payload: ProfileUpdateRequest): Observable<User> {
     return this.api.patch<User>('/users/me', payload);
+  }
+
+  deleteProfile(): Observable<void> {
+    return this.api.delete<void>('/users/me');
   }
 }

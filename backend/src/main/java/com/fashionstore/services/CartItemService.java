@@ -5,17 +5,23 @@ import com.fashionstore.models.CartItem;
 import com.fashionstore.models.ItemVariant;
 import com.fashionstore.models.User;
 import com.fashionstore.dto.request.CartItemRequest;
+import com.fashionstore.dto.response.AdminCartItemResponse;
 import com.fashionstore.dto.response.CartItemResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.repositories.CartItemRepository;
 import com.fashionstore.repositories.ItemVariantRepository;
 import com.fashionstore.repositories.UserRepository;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -85,9 +91,61 @@ public class CartItemService {
     }
 
     @Transactional(readOnly = true)
+    public PageResponse<CartItemResponse> getPagedCartItems(int page, int size, String search, String filterColumn, String filterValue) {
+        if (!AdminFilterSpecification.hasFilters(search, filterColumn, filterValue)) {
+            return getPagedCartItems(page, size);
+        }
+        return PageResponse.from(cartItemRepository.findAll(
+                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                PageRequestFactory.create(page, size)
+        ), CartItemResponse::from);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<AdminCartItemResponse> getPagedAdminCartItems(int page, int size, String search, String filterColumn, String filterValue) {
+        if (!AdminFilterSpecification.hasFilters(search, filterColumn, filterValue)) {
+            return PageResponse.from(cartItemRepository.findAll(PageRequestFactory.create(page, size)), AdminCartItemResponse::from);
+        }
+        return PageResponse.from(cartItemRepository.findAll(
+                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                PageRequestFactory.create(page, size)
+        ), AdminCartItemResponse::from);
+    }
+
+    @Transactional(readOnly = true)
     public PageResponse<CartItemResponse> getPagedCartItems(Authentication authentication, int page, int size) {
+        return getPagedCartItems(authentication, page, size, null);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<CartItemResponse> getPagedCartItems(Authentication authentication, int page, int size, String search) {
         var currentUser = currentUserService.findCurrentUser(authentication);
-        return PageResponse.from(cartItemRepository.findByUserId(currentUser.getId(), PageRequestFactory.create(page, size)), CartItemResponse::from);
+        if (!hasText(search)) {
+            return PageResponse.from(cartItemRepository.findByUserId(currentUser.getId(), PageRequestFactory.create(page, size)), CartItemResponse::from);
+        }
+        return PageResponse.from(cartItemRepository.findAll(
+                cartSearch(currentUser.getId(), search),
+                PageRequestFactory.create(page, size)
+        ), CartItemResponse::from);
+    }
+
+    private Specification<CartItem> cartSearch(Long userId, String search) {
+        return (root, query, criteriaBuilder) -> {
+            query.distinct(true);
+            var item = root.join("itemVariant").join("item");
+            return criteriaBuilder.and(
+                    criteriaBuilder.equal(root.get("user").get("id"), userId),
+                    criteriaBuilder.like(criteriaBuilder.lower(item.get("name")), "%" + normalized(search) + "%")
+            );
+        };
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
+
+    private String normalized(String value) {
+        return value.trim().toLowerCase();
     }
 
     @Transactional(readOnly = true)
@@ -101,6 +159,11 @@ public class CartItemService {
             throw new NotFoundException("CartItem", id);
         }
         cartItemRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void removeCartItems(List<Long> ids) {
+        ids.forEach(this::removeFromCart);
     }
 
     @Transactional
@@ -122,10 +185,29 @@ public class CartItemService {
 
     private void applyCartItemRequest(CartItem cartItem, CartItemRequest cartItemRequest) {
         cartItem.setQuantity(cartItemRequest.getQuantity());
-
         ItemVariant itemVariant = itemVariantRepository.findById(cartItemRequest.getItemVariantId())
                 .orElseThrow(() -> new NotFoundException("ItemVariant", cartItemRequest.getItemVariantId()));
         cartItem.setItemVariant(itemVariant);
     }
-}
 
+    private Map<String, Function<Root<CartItem>, Expression<?>>> adminFields() {
+        return Map.ofEntries(
+                Map.entry("id", root -> root.get("id")),
+                Map.entry("quantity", root -> root.get("quantity")),
+                Map.entry("itemVariantId", root -> root.get("itemVariant").get("id")),
+                Map.entry("userId", root -> root.get("user").get("id")),
+                Map.entry("userFirstName", root -> root.get("user").get("firstName")),
+                Map.entry("userLastName", root -> root.get("user").get("lastName")),
+                Map.entry("userName", root -> root.get("user").get("firstName")),
+                Map.entry("userEmail", root -> root.get("user").get("email")),
+                Map.entry("itemId", root -> root.get("itemVariant").get("item").get("id")),
+                Map.entry("itemName", root -> root.get("itemVariant").get("item").get("name")),
+                Map.entry("sizeLabel", root -> root.get("itemVariant").get("size").get("label")),
+                Map.entry("sizeSystem", root -> root.get("itemVariant").get("size").get("sizeSystem")),
+                Map.entry("colorName", root -> root.get("itemVariant").get("color").get("name")),
+                Map.entry("colorValue", root -> root.get("itemVariant").get("color").get("value")),
+                Map.entry("variantActive", root -> root.get("itemVariant").get("isActive")),
+                Map.entry("variantStockLeft", root -> root.get("itemVariant").get("stockLeft"))
+        );
+    }
+}

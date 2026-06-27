@@ -55,11 +55,12 @@ class ItemControllerTest extends ControllerTestSupport {
 
     @Test
     void getPagedItems_whenPageIsRequested_returnsPagedItems() {
-        when(itemServiceMock.getPagedItems(1, 20)).thenReturn(pageResponse(itemResponse(1L, "Rain Jacket", 1L)));
+        when(itemServiceMock.getPagedAdminItems(1, 20, null, null, null)).thenReturn(pageResponse(adminItemResponse(1L, "Rain Jacket", 1L)));
 
-        var response = objectUnderTest.getPagedItems(1, 20);
+        var response = objectUnderTest.getPagedItems(1, 20, null, null, null);
 
         assertEquals(1, response.getBody().getContent().size(), "Item page should contain service results");
+        assertEquals("Outerwear", response.getBody().getContent().get(0).getCategoryName(), "Admin item response should include category name");
     }
 
     @Test

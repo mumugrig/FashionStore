@@ -28,8 +28,8 @@ export class ApiService {
     return this.http.patch<T>(`${this.baseUrl}${path}`, body);
   }
 
-  delete(path: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}${path}`);
+  delete<T = void>(path: string): Observable<T> {
+    return this.http.delete<T>(`${this.baseUrl}${path}`);
   }
 
   private toParams(params?: Record<string, string | number | boolean | null | undefined>): HttpParams {

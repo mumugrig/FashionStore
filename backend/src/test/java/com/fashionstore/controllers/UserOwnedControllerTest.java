@@ -27,14 +27,14 @@ class UserOwnedControllerTest extends ControllerTestSupport {
     void cartEndpoints_callAuthenticatedUserServiceMethods() {
         var controller = new com.fashionstore.controllers.user.CartController(cartItemServiceMock);
         Authentication authentication = authentication();
-        when(cartItemServiceMock.getPagedCartItems(authentication, 1, 20))
+        when(cartItemServiceMock.getPagedCartItems(authentication, 1, 20, null))
                 .thenReturn(pageResponse(cartItemResponse(1L, 1L, 2L, 3)));
         when(cartItemServiceMock.addToCart(eq(authentication), any()))
                 .thenReturn(cartItemResponse(1L, 1L, 2L, 3));
         when(cartItemServiceMock.updateCartItem(eq(authentication), eq(1L), any()))
                 .thenReturn(cartItemResponse(1L, 1L, 2L, 4));
 
-        assertEquals(1, controller.getPagedCartItems(authentication, 1, 20).getBody().getContent().size());
+        assertEquals(1, controller.getPagedCartItems(authentication, 1, 20, null).getBody().getContent().size());
         assertEquals(HttpStatus.CREATED, controller.addCartItem(authentication, cartItemRequest(99L, 2L, 3)).getStatusCode());
         assertEquals(4, controller.updateCartItem(authentication, 1L, cartItemRequest(99L, 2L, 4)).getBody().getQuantity());
         assertEquals(HttpStatus.NO_CONTENT, controller.deleteCartItem(authentication, 1L).getStatusCode());
@@ -46,12 +46,12 @@ class UserOwnedControllerTest extends ControllerTestSupport {
     void favoriteEndpoints_callAuthenticatedUserServiceMethods() {
         var controller = new com.fashionstore.controllers.user.FavoriteController(favoriteServiceMock);
         Authentication authentication = authentication();
-        when(favoriteServiceMock.getPagedFavorites(authentication, 1, 20))
+        when(favoriteServiceMock.getPagedFavorites(authentication, 1, 20, null))
                 .thenReturn(pageResponse(favoriteResponse(1L, 1L, 2L)));
         when(favoriteServiceMock.addFavorite(eq(authentication), any()))
                 .thenReturn(favoriteResponse(1L, 1L, 2L));
 
-        assertEquals(1, controller.getPagedFavorites(authentication, 1, 20).getBody().getContent().size());
+        assertEquals(1, controller.getPagedFavorites(authentication, 1, 20, null).getBody().getContent().size());
         assertEquals(HttpStatus.CREATED, controller.addFavorite(authentication, favoriteRequest(99L, 2L)).getStatusCode());
         assertEquals(HttpStatus.NO_CONTENT, controller.removeFavorite(authentication, 1L).getStatusCode());
 

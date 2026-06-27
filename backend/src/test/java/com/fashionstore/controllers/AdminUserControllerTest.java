@@ -9,8 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -29,12 +27,13 @@ class AdminUserControllerTest extends ControllerTestSupport {
 
     @Test
     void getAllUsers_returnsUsersFromAdminServiceMethod() {
-        when(userServiceMock.getAllUsers()).thenReturn(List.of(userResponse(1L, "admin-user@example.com")));
+        when(userServiceMock.getPagedAdminUsers(1, 20, null, null, null)).thenReturn(pageResponse(adminUserResponse(1L, "admin-user@example.com")));
 
-        var response = objectUnderTest.getAllUsers();
+        var response = objectUnderTest.getAllUsers(1, 20, null, null, null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(1, response.getBody().size());
+        assertEquals(1, response.getBody().getContent().size());
+        assertEquals("USER", response.getBody().getContent().get(0).getRole());
     }
 
     @Test

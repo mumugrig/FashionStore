@@ -1,6 +1,8 @@
 package com.fashionstore.controllers.admin;
 
+import com.fashionstore.dto.request.BulkDeleteRequest;
 import com.fashionstore.dto.request.CartItemRequest;
+import com.fashionstore.dto.response.AdminCartItemResponse;
 import com.fashionstore.dto.response.CartItemResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.services.CartItemService;
@@ -11,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,10 +28,13 @@ public class AdminCartController {
     private final CartItemService cartItemService;
 
     @GetMapping("/cart")
-    public ResponseEntity<PageResponse<CartItemResponse>> getPagedCartItems(
+    public ResponseEntity<PageResponse<AdminCartItemResponse>> getPagedCartItems(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(cartItemService.getPagedCartItems(page, size));
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String filterColumn,
+            @RequestParam(required = false) String filterValue) {
+        return ResponseEntity.ok(cartItemService.getPagedAdminCartItems(page, size, search, filterColumn, filterValue));
     }
 
     @GetMapping("/users/{userId}/cart")
@@ -47,6 +53,12 @@ public class AdminCartController {
     @DeleteMapping("/cart/items/{id}")
     public ResponseEntity<Void> deleteCartItem(@PathVariable Long id) {
         cartItemService.removeFromCart(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/cart/bulk-delete")
+    public ResponseEntity<Void> deleteCartItems(@Valid @RequestBody BulkDeleteRequest request) {
+        cartItemService.removeCartItems(request.getIds());
         return ResponseEntity.noContent().build();
     }
 }

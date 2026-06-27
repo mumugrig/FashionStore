@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -105,6 +106,27 @@ class CartItemServiceTest extends ServiceTestSupport {
         var response = objectUnderTest.getPagedCartItemsByUser(user.getId(), 1, 20);
 
         assertEquals(1, response.getContent().size(), "Cart item page should contain repository results");
+    }
+
+    @Test
+    void getPagedCartItems_whenSearchIsProvided_filtersCurrentUserCartByItemName() {
+        var user = user(1L, "cart-search@example.com");
+        var category = category(1L, "Shirts");
+        var item = item(1L, "Search Shirt", category);
+        var size = size(1L, "M");
+        var color = color(1L, "Blue", "#0000ff");
+        var variant = itemVariant(1L, item, size, color);
+        var cartItem = cartItem(1L, user, variant, 4);
+        Authentication authentication = authentication(user.getId());
+
+        when(currentUserServiceMock.findCurrentUser(authentication)).thenReturn(user);
+        when(cartItemRepositoryMock.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(cartItem)));
+
+        var response = objectUnderTest.getPagedCartItems(authentication, 1, 20, "shirt");
+
+        assertEquals(1, response.getContent().size(), "Cart search should return repository results");
+        verify(cartItemRepositoryMock).findAll(any(Specification.class), any(Pageable.class));
     }
 
     @Test

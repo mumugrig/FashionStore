@@ -6,6 +6,7 @@ import com.fashionstore.dto.request.CategoryRequest;
 import com.fashionstore.dto.request.ColorRequest;
 import com.fashionstore.dto.request.FavoriteRequest;
 import com.fashionstore.dto.request.ItemRequest;
+import com.fashionstore.dto.request.ItemVariantRequest;
 import com.fashionstore.dto.request.ReviewRequest;
 import com.fashionstore.dto.request.SizeRequest;
 import com.fashionstore.dto.request.UserRequest;
@@ -51,6 +52,17 @@ abstract class ControllerTestSupport {
         request.setImageUrl("https://example.com/item.png");
         request.setAudience(Audience.MEN);
         request.setCategoryId(categoryId);
+        return request;
+    }
+
+    protected ItemVariantRequest itemVariantRequest(long itemId, long sizeId, long colorId) {
+        ItemVariantRequest request = new ItemVariantRequest();
+        request.setActive(true);
+        request.setStockLeft(12);
+        request.setImageUrl("https://example.com/variant.png");
+        request.setItemId(itemId);
+        request.setSizeId(sizeId);
+        request.setColorId(colorId);
         return request;
     }
 
@@ -104,6 +116,15 @@ abstract class ControllerTestSupport {
         return new CategoryResponse(id, name, parentId);
     }
 
+    protected AdminCategoryResponse adminCategoryResponse(long id, String name, Long parentId, String parentName) {
+        AdminCategoryResponse response = new AdminCategoryResponse();
+        response.setId(id);
+        response.setName(name);
+        response.setParentId(parentId);
+        response.setParentName(parentName);
+        return response;
+    }
+
     protected ColorResponse colorResponse(long id, String name, String value) {
         return new ColorResponse(id, name, value, "https://example.com/color.png");
     }
@@ -117,8 +138,61 @@ abstract class ControllerTestSupport {
                 "https://example.com/item.png", "MEN", categoryId, new ArrayList<ItemVariantResponse>());
     }
 
+    protected AdminItemResponse adminItemResponse(long id, String name, long categoryId) {
+        AdminItemResponse response = new AdminItemResponse();
+        response.setId(id);
+        response.setName(name);
+        response.setPrice(BigDecimal.valueOf(19.99));
+        response.setDescription("Valid controller item description");
+        response.setImageUrl("https://example.com/item.png");
+        response.setAudience("MEN");
+        response.setCategoryId(categoryId);
+        response.setVariants(new ArrayList<>());
+        response.setCategoryName("Outerwear");
+        response.setVariantCount(0);
+        return response;
+    }
+
+    protected ItemVariantResponse itemVariantResponse(long id, long itemId, long sizeId, long colorId) {
+        return new ItemVariantResponse(id, true, 12, "https://example.com/variant.png", itemId, sizeId, colorId);
+    }
+
+    protected AdminItemVariantResponse adminItemVariantResponse(long id, long itemId, long sizeId, long colorId) {
+        AdminItemVariantResponse response = new AdminItemVariantResponse();
+        response.setId(id);
+        response.setActive(true);
+        response.setStockLeft(12);
+        response.setImageUrl("https://example.com/variant.png");
+        response.setItemId(itemId);
+        response.setSizeId(sizeId);
+        response.setColorId(colorId);
+        response.setItemName("Rain Jacket");
+        response.setItemPrice(BigDecimal.valueOf(19.99));
+        response.setItemAudience("MEN");
+        response.setSizeLabel("M");
+        response.setSizeSystem("ALPHA");
+        response.setColorName("Black");
+        response.setColorValue("#000000");
+        return response;
+    }
+
     protected AddressResponse addressResponse(long id, long userId, String city) {
         return new AddressResponse(id, "Ukraine", "Region", city, 1000, "123 Test Street", userId);
+    }
+
+    protected AdminAddressResponse adminAddressResponse(long id, long userId, String city) {
+        AdminAddressResponse response = new AdminAddressResponse();
+        response.setId(id);
+        response.setCountry("Ukraine");
+        response.setRegion("Region");
+        response.setCity(city);
+        response.setPostalCode(1000);
+        response.setAddressLine("123 Test Street");
+        response.setUserId(userId);
+        response.setUserName("Test User");
+        response.setUserEmail("test@example.com");
+        response.setUserPhoneNumber("1234567890");
+        return response;
     }
 
     protected FavoriteResponse favoriteResponse(long id, long userId, long variantId) {
@@ -129,12 +203,38 @@ abstract class ControllerTestSupport {
         return new CartItemResponse(id, quantity, variantId, userId);
     }
 
+    protected AdminCartItemResponse adminCartItemResponse(long id, long userId, long variantId, int quantity) {
+        AdminCartItemResponse response = new AdminCartItemResponse();
+        response.setId(id);
+        response.setQuantity(quantity);
+        response.setItemVariantId(variantId);
+        response.setUserId(userId);
+        response.setUserName("Test User");
+        response.setUserEmail("test@example.com");
+        response.setItemId(10L);
+        response.setItemName("Jacket");
+        response.setSizeLabel("M");
+        response.setColorName("Black");
+        return response;
+    }
+
     protected ReviewResponse reviewResponse(long id, long userId, long variantId, String body) {
         return new ReviewResponse(id, body, "TRUE_TO_SIZE", "EXCELLENT", "VERY_COMFORTABLE", userId, variantId);
     }
 
     protected UserResponse userResponse(long id, String email) {
         return new UserResponse(id, "Test", "User", email, "1234567890");
+    }
+
+    protected AdminUserResponse adminUserResponse(long id, String email) {
+        AdminUserResponse response = new AdminUserResponse();
+        response.setId(id);
+        response.setFirstName("Test");
+        response.setLastName("User");
+        response.setEmail(email);
+        response.setPhoneNumber("1234567890");
+        response.setRole("USER");
+        return response;
     }
 
     protected <T> PageResponse<T> pageResponse(T item) {

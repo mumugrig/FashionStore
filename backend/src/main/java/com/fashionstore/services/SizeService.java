@@ -8,10 +8,15 @@ import com.fashionstore.dto.response.SizeResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.repositories.ItemVariantRepository;
 import com.fashionstore.repositories.SizeRepository;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +59,17 @@ public class SizeService {
         return PageResponse.from(sizeRepository.findAll(PageRequestFactory.create(page, size)), SizeResponse::from);
     }
 
+    @Transactional(readOnly = true)
+    public PageResponse<SizeResponse> getPagedSizes(int page, int size, String search, String filterColumn, String filterValue) {
+        if (!AdminFilterSpecification.hasFilters(search, filterColumn, filterValue)) {
+            return getPagedSizes(page, size);
+        }
+        return PageResponse.from(sizeRepository.findAll(
+                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                PageRequestFactory.create(page, size)
+        ), SizeResponse::from);
+    }
+
     @Transactional
     public void deleteSize(Long id) {
         if (!sizeRepository.existsById(id)) {
@@ -63,6 +79,19 @@ public class SizeService {
             throw new ConflictException("Cannot delete size because item variants use it. Reassign or delete them first.");
         }
         sizeRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteSizes(List<Long> ids) {
+        ids.forEach(this::deleteSize);
+    }
+
+    private Map<String, Function<Root<Size>, Expression<?>>> adminFields() {
+        return Map.of(
+                "id", root -> root.get("id"),
+                "label", root -> root.get("label"),
+                "sizeSystem", root -> root.get("sizeSystem")
+        );
     }
 }
 
