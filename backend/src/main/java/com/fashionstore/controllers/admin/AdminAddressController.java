@@ -6,6 +6,8 @@ import com.fashionstore.dto.response.AdminAddressResponse;
 import com.fashionstore.dto.response.AddressResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.services.AddressService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,10 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Admin Addresses", description = "Admin address management")
 public class AdminAddressController {
     private final AddressService addressService;
 
     @GetMapping("/addresses")
+    @Operation(summary = "Get paged addresses with admin details")
     public ResponseEntity<PageResponse<AdminAddressResponse>> getPagedAddresses(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -39,6 +43,7 @@ public class AdminAddressController {
     }
 
     @GetMapping("/users/{userId}/addresses")
+    @Operation(summary = "Get paged addresses for a user")
     public ResponseEntity<PageResponse<AddressResponse>> getPagedAddressesByUserId(
             @PathVariable Long userId,
             @RequestParam(defaultValue = "1") int page,
@@ -47,27 +52,32 @@ public class AdminAddressController {
     }
 
     @GetMapping("/addresses/{id}")
+    @Operation(summary = "Get address by id")
     public ResponseEntity<AddressResponse> getAddressById(@PathVariable Long id) {
         return ResponseEntity.ok(addressService.getAddressById(id));
     }
 
     @PostMapping("/addresses")
+    @Operation(summary = "Create address")
     public ResponseEntity<AddressResponse> createAddress(@Valid @RequestBody AddressRequest addressRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(addressService.addAddress(addressRequest));
     }
 
     @PutMapping("/addresses/{id}")
+    @Operation(summary = "Update address by id")
     public ResponseEntity<AddressResponse> updateAddress(@PathVariable Long id, @Valid @RequestBody AddressRequest addressRequest) {
         return ResponseEntity.ok(addressService.updateAddress(id, addressRequest));
     }
 
     @DeleteMapping("/addresses/{id}")
+    @Operation(summary = "Delete address by id")
     public ResponseEntity<Void> deleteAddress(@PathVariable Long id) {
         addressService.deleteAddress(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/addresses/bulk-delete")
+    @Operation(summary = "Delete multiple addresses")
     public ResponseEntity<Void> deleteAddresses(@Valid @RequestBody BulkDeleteRequest request) {
         addressService.deleteAddresses(request.getIds());
         return ResponseEntity.noContent().build();

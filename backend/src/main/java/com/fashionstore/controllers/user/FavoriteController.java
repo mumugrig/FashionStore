@@ -4,6 +4,8 @@ import com.fashionstore.dto.request.FavoriteRequest;
 import com.fashionstore.dto.response.FavoriteResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.services.FavoriteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,10 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/favorites")
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
+@Tag(name = "Favorites", description = "Current user's favorite item variants")
 public class FavoriteController {
     private final FavoriteService favoriteService;
 
     @GetMapping
+    @Operation(summary = "Get current user's paged favorites")
     public ResponseEntity<PageResponse<FavoriteResponse>> getPagedFavorites(
             Authentication authentication,
             @RequestParam(defaultValue = "1") int page,
@@ -36,11 +40,13 @@ public class FavoriteController {
     }
 
     @PostMapping("/items")
+    @Operation(summary = "Add item variant to current user's favorites")
     public ResponseEntity<FavoriteResponse> addFavorite(Authentication authentication, @Valid @RequestBody FavoriteRequest favoriteRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(favoriteService.addFavorite(authentication, favoriteRequest));
     }
 
     @DeleteMapping("/items/{id}")
+    @Operation(summary = "Delete current user's favorite")
     public ResponseEntity<Void> removeFavorite(Authentication authentication, @PathVariable Long id) {
         favoriteService.deleteFavorite(authentication, id);
         return ResponseEntity.noContent().build();

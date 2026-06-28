@@ -4,6 +4,8 @@ import com.fashionstore.dto.request.AddressRequest;
 import com.fashionstore.dto.response.AddressResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.services.AddressService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,10 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/addresses")
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
+@Tag(name = "Addresses", description = "Current user's address book")
 public class AddressController {
     private final AddressService addressService;
 
     @GetMapping
+    @Operation(summary = "Get current user's paged addresses")
     public ResponseEntity<PageResponse<AddressResponse>> getPagedAddresses(
             Authentication authentication,
             @RequestParam(defaultValue = "1") int page,
@@ -36,21 +40,25 @@ public class AddressController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get current user's address by id")
     public ResponseEntity<AddressResponse> getAddressById(Authentication authentication, @PathVariable Long id) {
         return ResponseEntity.ok(addressService.getAddressById(authentication, id));
     }
 
     @PostMapping
+    @Operation(summary = "Create address for current user")
     public ResponseEntity<AddressResponse> createAddress(Authentication authentication, @Valid @RequestBody AddressRequest addressRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(addressService.addAddress(authentication, addressRequest));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update current user's address")
     public ResponseEntity<AddressResponse> updateAddress(Authentication authentication, @PathVariable Long id, @Valid @RequestBody AddressRequest addressRequest) {
         return ResponseEntity.ok(addressService.updateAddress(authentication, id, addressRequest));
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete current user's address")
     public ResponseEntity<Void> deleteAddress(Authentication authentication, @PathVariable Long id) {
         addressService.deleteAddress(authentication, id);
         return ResponseEntity.noContent().build();

@@ -3,6 +3,8 @@ package com.fashionstore.controllers.user;
 import com.fashionstore.dto.response.CategoryResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.services.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,15 +18,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
+@Tag(name = "Categories", description = "Catalog category browsing")
 public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get category by id")
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long id) {
         return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
 
     @GetMapping
+    @Operation(summary = "Get paged categories")
     public ResponseEntity<PageResponse<CategoryResponse>> getPagedCategories(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {

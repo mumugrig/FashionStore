@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public final class AdminFilterSpecification {
+public class AdminFilterSpecification {
     private AdminFilterSpecification() {}
 
     public static <T> Specification<T> create(

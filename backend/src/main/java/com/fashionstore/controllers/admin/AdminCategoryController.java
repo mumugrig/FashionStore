@@ -6,6 +6,8 @@ import com.fashionstore.dto.response.AdminCategoryResponse;
 import com.fashionstore.dto.response.CategoryResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.services.CategoryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,10 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin/categories")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Admin Categories", description = "Admin category management")
 public class AdminCategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
+    @Operation(summary = "Get paged categories with admin details")
     public ResponseEntity<PageResponse<AdminCategoryResponse>> getPagedCategories(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -39,27 +43,32 @@ public class AdminCategoryController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get category by id")
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long id) {
         return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
 
     @PostMapping
+    @Operation(summary = "Create category")
     public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest categoryRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.createCategory(categoryRequest));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update category by id")
     public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryRequest categoryRequest) {
         return ResponseEntity.ok(categoryService.updateCategory(id, categoryRequest));
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete category by id")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/bulk-delete")
+    @Operation(summary = "Delete multiple categories")
     public ResponseEntity<Void> deleteCategories(@Valid @RequestBody BulkDeleteRequest request) {
         categoryService.deleteCategories(request.getIds());
         return ResponseEntity.noContent().build();

@@ -6,6 +6,8 @@ import com.fashionstore.dto.response.AdminUserResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.dto.response.UserResponse;
 import com.fashionstore.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin/users")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('ADMIN')")
+@Tag(name = "Admin Users", description = "Admin user management")
 public class AdminUserController {
     private final UserService userService;
 
     @GetMapping
+    @Operation(summary = "Get paged users")
     public ResponseEntity<PageResponse<AdminUserResponse>> getAllUsers(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -38,22 +42,26 @@ public class AdminUserController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get user by id")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @PatchMapping("/{id}")
+    @Operation(summary = "Update user by id")
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @Valid @RequestBody UserRequest userRequest) {
         return ResponseEntity.ok(userService.updateUser(id, userRequest));
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete user by id")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/bulk-delete")
+    @Operation(summary = "Delete multiple users")
     public ResponseEntity<Void> deleteUsers(@Valid @RequestBody BulkDeleteRequest request) {
         userService.deleteUsers(request.getIds());
         return ResponseEntity.noContent().build();

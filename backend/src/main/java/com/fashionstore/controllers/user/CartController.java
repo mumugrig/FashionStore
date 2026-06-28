@@ -4,6 +4,8 @@ import com.fashionstore.dto.request.CartItemRequest;
 import com.fashionstore.dto.response.CartItemResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.services.CartItemService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,10 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
+@Tag(name = "Cart", description = "Current user's shopping cart")
 public class CartController {
     private final CartItemService cartItemService;
 
     @GetMapping
+    @Operation(summary = "Get current user's paged cart items")
     public ResponseEntity<PageResponse<CartItemResponse>> getPagedCartItems(
             Authentication authentication,
             @RequestParam(defaultValue = "1") int page,
@@ -37,16 +41,19 @@ public class CartController {
     }
 
     @PostMapping("/items")
+    @Operation(summary = "Add item variant to current user's cart")
     public ResponseEntity<CartItemResponse> addCartItem(Authentication authentication, @Valid @RequestBody CartItemRequest cartItemRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(cartItemService.addToCart(authentication, cartItemRequest));
     }
 
     @PutMapping("/items/{id}")
+    @Operation(summary = "Update current user's cart item")
     public ResponseEntity<CartItemResponse> updateCartItem(Authentication authentication, @PathVariable Long id, @Valid @RequestBody CartItemRequest cartItemRequest) {
         return ResponseEntity.ok(cartItemService.updateCartItem(authentication, id, cartItemRequest));
     }
 
     @DeleteMapping("/items/{id}")
+    @Operation(summary = "Delete current user's cart item")
     public ResponseEntity<Void> deleteCartItem(Authentication authentication, @PathVariable Long id) {
         cartItemService.removeFromCart(authentication, id);
         return ResponseEntity.noContent().build();

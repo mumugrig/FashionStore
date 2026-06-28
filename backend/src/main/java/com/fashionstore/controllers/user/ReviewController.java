@@ -4,6 +4,8 @@ import com.fashionstore.dto.request.ReviewRequest;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.dto.response.ReviewResponse;
 import com.fashionstore.services.ReviewService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,10 +26,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/items/{itemId}/reviews")
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
+@Tag(name = "Reviews", description = "Product reviews")
 public class ReviewController {
     private final ReviewService reviewService;
 
     @GetMapping
+    @Operation(summary = "Get paged reviews for an item")
     public ResponseEntity<PageResponse<ReviewResponse>> getPagedReviews(
             @PathVariable Long itemId,
             @RequestParam(defaultValue = "1") int page,
@@ -36,16 +40,19 @@ public class ReviewController {
     }
 
     @PostMapping
+    @Operation(summary = "Create review for an item variant")
     public ResponseEntity<ReviewResponse> createReview(Authentication authentication, @Valid @RequestBody ReviewRequest reviewRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.createReview(authentication, reviewRequest));
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update current user's review")
     public ResponseEntity<ReviewResponse> updateReview(Authentication authentication, @Valid @RequestBody ReviewRequest reviewRequest, @PathVariable Long id) {
         return ResponseEntity.ok(reviewService.updateReview(authentication, id, reviewRequest));
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete current user's review")
     public ResponseEntity<Void> deleteReview(Authentication authentication, @PathVariable Long id) {
         reviewService.deleteReview(authentication, id);
         return ResponseEntity.noContent().build();

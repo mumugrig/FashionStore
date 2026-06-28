@@ -3,6 +3,8 @@ package com.fashionstore.controllers.user;
 import com.fashionstore.dto.response.ItemResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.services.ItemService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,10 +20,12 @@ import java.math.BigDecimal;
 @RequestMapping("/api/items")
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
+@Tag(name = "Items", description = "Catalog item browsing")
 public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
+    @Operation(summary = "Get paged items", description = "Returns catalog items with optional category, search, size, color, audience, and price filters.")
     public ResponseEntity<PageResponse<ItemResponse>> getPagedItems(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -37,6 +41,7 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get item by id")
     public ResponseEntity<ItemResponse> getItemById(@PathVariable Long id) {
         return ResponseEntity.ok(itemService.getItemById(id));
     }
