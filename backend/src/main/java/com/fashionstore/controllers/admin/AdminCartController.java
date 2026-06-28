@@ -8,6 +8,7 @@ import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.services.CartItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,6 +44,16 @@ public class AdminCartController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "20") int size) {
         return ResponseEntity.ok(cartItemService.getPagedCartItemsByUser(userId, page, size));
+    }
+
+    @GetMapping("/cart/items/{id}")
+    public ResponseEntity<AdminCartItemResponse> getCartItemById(@PathVariable Long id) {
+        return ResponseEntity.ok(cartItemService.getAdminCartItemById(id));
+    }
+
+    @PostMapping("/cart")
+    public ResponseEntity<CartItemResponse> addCartItem(@Valid @RequestBody CartItemRequest cartItemRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(cartItemService.addToCart(cartItemRequest));
     }
 
     @PutMapping("/cart/items/{id}")

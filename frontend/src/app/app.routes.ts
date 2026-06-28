@@ -39,6 +39,18 @@ export const routes: Routes = [
     loadComponent: () => import('@features/account/pages/profile.component').then((m) => m.ProfileComponent)
   },
   {
+    path: 'admin/:resource/new',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('@features/admin/pages/admin-resource-form.component').then((m) => m.AdminResourceFormComponent)
+  },
+  {
+    path: 'admin/:resource/:id/edit',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('@features/admin/pages/admin-resource-form.component').then((m) => m.AdminResourceFormComponent)
+  },
+  {
     path: 'admin/:resource',
     canActivate: [adminGuard],
     loadComponent: () => import('@features/admin/pages/admin-resource.component').then((m) => m.AdminResourceComponent)

@@ -1,0 +1,149 @@
+// FashionStore database structure.
+// Generated from backend/src/main/java/com/fashionstore/models.
+
+Project FashionStore {
+  database_type: 'H2'
+  Note: 'Editable source for the database ER diagram documentation.'
+}
+
+Enum user_role {
+  USER
+  ADMIN
+}
+
+Enum audience {
+  MEN
+  WOMEN
+  KIDS
+  UNISEX
+}
+
+Enum size_system {
+  ALPHA
+  US
+  UK
+  EU
+}
+
+Enum size_fit {
+  RUNS_SMALL
+  TRUE_TO_SIZE
+  RUNS_LARGE
+}
+
+Enum quality {
+  POOR
+  AVERAGE
+  EXCELLENT
+}
+
+Enum comfort {
+  UNCOMFORTABLE
+  COMFORTABLE
+  VERY_COMFORTABLE
+}
+
+Table users {
+  id bigint [pk, increment]
+  first_name varchar [not null]
+  last_name varchar [not null]
+  email varchar [not null, unique]
+  phone_number varchar
+  password_hash varchar [not null]
+  role user_role [not null, default: 'USER']
+}
+
+Table categories {
+  id bigint [pk, increment]
+  name varchar(100) [not null]
+  parent_id bigint
+}
+
+Table items {
+  id bigint [pk, increment]
+  name varchar
+  price decimal(10,2) [not null]
+  description varchar [not null]
+  image_url varchar(2048)
+  audience audience [not null]
+  category_id bigint
+}
+
+Table sizes {
+  id bigint [pk, increment]
+  label varchar(50) [not null]
+  size_system size_system [not null]
+}
+
+Table colors {
+  id bigint [pk, increment]
+  name varchar(50) [not null]
+  color_value varchar(7) [not null]
+  image_url varchar
+}
+
+Table item_variants {
+  id bigint [pk, increment]
+  is_active boolean [not null]
+  stock_left int [not null]
+  image_url varchar(2048)
+  item_id bigint [not null]
+  size_id bigint [not null]
+  color_id bigint [not null]
+}
+
+Table addresses {
+  id bigint [pk, increment]
+  country varchar(50) [not null]
+  region varchar(100) [not null]
+  city varchar(100) [not null]
+  postal_code int [not null]
+  address_line varchar [not null]
+  user_id bigint [not null]
+}
+
+Table cart_items {
+  id bigint [pk, increment]
+  quantity int
+  item_variant_id bigint [not null]
+  user_id bigint [not null]
+}
+
+Table favorites {
+  id bigint [pk, increment]
+  item_variant_id bigint [not null]
+  user_id bigint [not null]
+}
+
+Table reviews {
+  id bigint [pk, increment]
+  body varchar(5000) [not null]
+  size_fit size_fit [not null]
+  quality quality [not null]
+  comfort comfort [not null]
+  user_id bigint [not null]
+  item_variant_id bigint [not null]
+}
+
+Table refresh_tokens {
+  id bigint [pk, increment]
+  token_hash varchar(64) [not null, unique]
+  user_id bigint [not null]
+  expires_at timestamp [not null]
+  revoked_at timestamp
+  created_at timestamp [not null]
+}
+
+Ref: categories.parent_id > categories.id
+Ref: items.category_id > categories.id
+Ref: item_variants.item_id > items.id
+Ref: item_variants.size_id > sizes.id
+Ref: item_variants.color_id > colors.id
+Ref: addresses.user_id > users.id
+Ref: cart_items.item_variant_id > item_variants.id
+Ref: cart_items.user_id > users.id
+Ref: favorites.item_variant_id > item_variants.id
+Ref: favorites.user_id > users.id
+Ref: reviews.user_id > users.id
+Ref: reviews.item_variant_id > item_variants.id
+Ref: refresh_tokens.user_id > users.id

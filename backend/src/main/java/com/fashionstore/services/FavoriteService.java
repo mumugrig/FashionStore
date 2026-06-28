@@ -65,6 +65,13 @@ public class FavoriteService {
     }
 
     @Transactional(readOnly = true)
+    public AdminFavoriteResponse getAdminFavoriteById(Long id) {
+        return favoriteRepository.findById(id)
+                .map(AdminFavoriteResponse::from)
+                .orElseThrow(() -> new NotFoundException("Favorite", id));
+    }
+
+    @Transactional(readOnly = true)
     public PageResponse<FavoriteResponse> getPagedFavoritesByUserId(Long userId, int page, int size){
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("User", userId);

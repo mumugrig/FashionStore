@@ -199,6 +199,20 @@ abstract class ControllerTestSupport {
         return new FavoriteResponse(id, variantId, userId);
     }
 
+    protected AdminFavoriteResponse adminFavoriteResponse(long id, long userId, long variantId) {
+        AdminFavoriteResponse response = new AdminFavoriteResponse();
+        response.setId(id);
+        response.setItemVariantId(variantId);
+        response.setUserId(userId);
+        response.setUserName("Test User");
+        response.setUserEmail("test@example.com");
+        response.setItemId(10L);
+        response.setItemName("Jacket");
+        response.setSizeLabel("M");
+        response.setColorName("Black");
+        return response;
+    }
+
     protected CartItemResponse cartItemResponse(long id, long userId, long variantId, int quantity) {
         return new CartItemResponse(id, quantity, variantId, userId);
     }

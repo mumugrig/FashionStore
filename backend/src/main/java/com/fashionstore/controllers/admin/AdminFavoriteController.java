@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,9 +46,19 @@ public class AdminFavoriteController {
         return ResponseEntity.ok(favoriteService.getPagedFavoritesByUserId(userId, page, size));
     }
 
+    @GetMapping("/favorites/{id}")
+    public ResponseEntity<AdminFavoriteResponse> getFavoriteById(@PathVariable Long id) {
+        return ResponseEntity.ok(favoriteService.getAdminFavoriteById(id));
+    }
+
     @PostMapping("/favorites")
     public ResponseEntity<FavoriteResponse> addFavorite(@Valid @RequestBody FavoriteRequest favoriteRequest) {
         return ResponseEntity.status(HttpStatus.CREATED).body(favoriteService.addFavorite(favoriteRequest));
+    }
+
+    @PutMapping("/favorites/{id}")
+    public ResponseEntity<FavoriteResponse> updateFavorite(@PathVariable Long id, @Valid @RequestBody FavoriteRequest favoriteRequest) {
+        return ResponseEntity.ok(favoriteService.updateFavorite(id, favoriteRequest));
     }
 
     @DeleteMapping("/favorites/{id}")

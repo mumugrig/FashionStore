@@ -23,11 +23,15 @@ export class AdminService {
     return this.api.get<AdminRow[]>(config.endpoint);
   }
 
+  get(config: AdminResourceConfig, id: number): Observable<AdminRow> {
+    return this.api.get<AdminRow>(config.getPath?.(id) ?? `${config.endpoint}/${id}`);
+  }
+
   save(config: AdminResourceConfig, row: AdminRow, body: Record<string, unknown>): Observable<AdminRow> {
     if (!row.id) {
       return this.api.post<AdminRow>(config.endpoint, body);
     }
-    const path = `${config.endpoint}/${row.id}`;
+    const path = config.updatePath?.(row.id) ?? `${config.endpoint}/${row.id}`;
     return config.updateMethod === 'patch'
       ? this.api.patch<AdminRow>(path, body)
       : this.api.put<AdminRow>(path, body);

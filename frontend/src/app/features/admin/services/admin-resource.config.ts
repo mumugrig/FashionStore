@@ -25,6 +25,8 @@ export interface AdminResourceConfig {
   update?: boolean;
   delete?: boolean;
   updateMethod?: 'put' | 'patch';
+  getPath?: (id: number) => string;
+  updatePath?: (id: number) => string;
   deletePath?: (id: number) => string;
   bulkDeletePath?: string;
 }
@@ -236,8 +238,11 @@ export const adminResources: AdminResourceConfig[] = [
       { key: 'itemVariantId', label: 'Product option reference', type: 'number', required: true },
       { key: 'userId', label: 'User reference', type: 'number' }
     ],
+    create: true,
     update: true,
     delete: true,
+    getPath: (id) => `/admin/cart/items/${id}`,
+    updatePath: (id) => `/admin/cart/items/${id}`,
     deletePath: (id) => `/admin/cart/items/${id}`
   },
   {
@@ -266,6 +271,7 @@ export const adminResources: AdminResourceConfig[] = [
       { key: 'userId', label: 'User reference', type: 'number' }
     ],
     create: true,
+    update: true,
     delete: true
   },
   {

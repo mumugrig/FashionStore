@@ -36,6 +36,26 @@ class CartItemControllerTest extends ControllerTestSupport {
     }
 
     @Test
+    void getCartItemById_whenCartItemExists_returnsAdminCartItem() {
+        when(cartItemServiceMock.getAdminCartItemById(1L)).thenReturn(adminCartItemResponse(1L, 1L, 2L, 3));
+
+        var response = objectUnderTest.getCartItemById(1L);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode(), "Cart item lookup should return HTTP 200");
+        assertEquals("Jacket", response.getBody().getItemName(), "Admin cart lookup should include item details");
+    }
+
+    @Test
+    void addCartItem_whenRequestIsValid_returnsCreatedCartItem() {
+        when(cartItemServiceMock.addToCart(any())).thenReturn(cartItemResponse(1L, 1L, 2L, 3));
+
+        var response = objectUnderTest.addCartItem(cartItemRequest(1L, 2L, 3));
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode(), "Cart item creation should return HTTP 201");
+        assertEquals(3, response.getBody().getQuantity(), "Created quantity should match service response");
+    }
+
+    @Test
     void updateCartItem_whenRequestIsValid_returnsUpdatedCartItem() {
         when(cartItemServiceMock.updateCartItem(eq(1L), any())).thenReturn(cartItemResponse(1L, 1L, 2L, 3));
 

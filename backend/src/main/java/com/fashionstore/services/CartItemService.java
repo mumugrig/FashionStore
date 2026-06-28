@@ -86,6 +86,13 @@ public class CartItemService {
     }
 
     @Transactional(readOnly = true)
+    public AdminCartItemResponse getAdminCartItemById(Long id) {
+        return cartItemRepository.findById(id)
+                .map(AdminCartItemResponse::from)
+                .orElseThrow(() -> new NotFoundException("CartItem", id));
+    }
+
+    @Transactional(readOnly = true)
     public PageResponse<CartItemResponse> getPagedCartItems(int page, int size) {
         return PageResponse.from(cartItemRepository.findAll(PageRequestFactory.create(page, size)), CartItemResponse::from);
     }

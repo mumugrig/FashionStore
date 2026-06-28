@@ -1,6 +1,6 @@
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -42,7 +42,7 @@ import { AdminColumn, adminResourceByKey, adminResources } from '@features/admin
         <div class="page-heading">
           <h1>{{ config.label }}</h1>
           @if (config.create) {
-            <button mat-flat-button (click)="newRow()">New {{ config.label }}</button>
+            <a mat-flat-button [routerLink]="['/admin', config.key, 'new']">New {{ config.label }}</a>
           }
         </div>
 
@@ -126,7 +126,7 @@ import { AdminColumn, adminResourceByKey, adminResources } from '@features/admin
                   }
                   <td>
                     @if (config.update) {
-                      <button mat-stroked-button (click)="edit(row)">Edit</button>
+                      <a mat-stroked-button [routerLink]="['/admin', config.key, row.id, 'edit']" [state]="{ row }">Edit</a>
                     }
                     @if (config.delete) {
                       <button mat-flat-button class="danger" (click)="remove(row.id)">Delete</button>
@@ -162,41 +162,6 @@ import { AdminColumn, adminResourceByKey, adminResources } from '@features/admin
           </div>
         }
 
-        @if (editing) {
-          <mat-card class="panel">
-            <mat-card-title>{{ editing.id ? 'Edit' : 'Create' }} {{ config.label }}</mat-card-title>
-            <form [formGroup]="form" (ngSubmit)="save()">
-              @for (field of config.fields; track field.key) {
-                @if (field.type === 'checkbox') {
-                  <mat-checkbox [formControlName]="field.key">{{ field.label }}</mat-checkbox>
-                } @else {
-                  <mat-form-field appearance="outline">
-                    <mat-label>{{ field.label }}</mat-label>
-                  @switch (field.type) {
-                    @case ('textarea') {
-                      <textarea matInput [formControlName]="field.key"></textarea>
-                    }
-                    @case ('select') {
-                      <mat-select [formControlName]="field.key">
-                        @for (option of field.options ?? []; track option) {
-                          <mat-option [value]="option">{{ option }}</mat-option>
-                        }
-                      </mat-select>
-                    }
-                    @default {
-                      <input matInput [type]="field.type" [formControlName]="field.key">
-                    }
-                  }
-                  </mat-form-field>
-                }
-              }
-              <div class="inline-actions">
-                <button mat-flat-button type="submit" [disabled]="form.invalid">Save</button>
-                <button mat-stroked-button type="button" (click)="cancel()">Cancel</button>
-              </div>
-            </form>
-          </mat-card>
-        }
       </section>
     </section>
   `
@@ -205,15 +170,12 @@ export class AdminResourceComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly admin = inject(AdminService);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly fb = inject(FormBuilder);
   readonly resources = adminResources;
   config = adminResourceByKey('items');
   rows: AdminRow[] = [];
   selectedIds = new Set<number>();
   page: PageResponse<AdminRow> | null = null;
-  editing: AdminRow | null = null;
   message = '';
-  form = this.fb.group<Record<string, FormControl<unknown>>>({});
   readonly searchControl = new FormControl('', { nonNullable: true });
   readonly filterColumnControl = new FormControl('', { nonNullable: true });
   readonly filterValueControl = new FormControl('', { nonNullable: true });
@@ -231,7 +193,6 @@ export class AdminResourceComponent implements OnInit {
 
     this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       this.config = adminResourceByKey(params.get('resource'));
-      this.cancel();
       this.clearSelection();
       this.expandedIds.clear();
       this.visibleColumnsControl.setValue(this.loadVisibleColumns(), { emitEvent: false });
@@ -262,28 +223,6 @@ export class AdminResourceComponent implements OnInit {
     });
   }
 
-  newRow(): void {
-    this.startEdit({ id: 0 });
-  }
-
-  edit(row: AdminRow): void {
-    this.startEdit(row);
-  }
-
-  save(): void {
-    if (!this.editing) {
-      return;
-    }
-    const body = this.form.getRawValue();
-    this.admin.save(this.config, this.editing, body).subscribe({
-      next: () => {
-        this.cancel();
-        this.load(this.page?.page ?? 1);
-      },
-      error: (err) => (this.message = err.error?.message ?? 'Could not save record.')
-    });
-  }
-
   remove(id: number): void {
     this.admin.remove(this.config, id).subscribe({
       next: () => {
@@ -310,11 +249,6 @@ export class AdminResourceComponent implements OnInit {
       },
       error: (err) => (this.message = err.error?.message ?? 'Could not delete selected records.')
     });
-  }
-
-  cancel(): void {
-    this.editing = null;
-    this.form = this.fb.group<Record<string, FormControl<unknown>>>({});
   }
 
   clearFilters(reload = true): void {
@@ -380,19 +314,6 @@ export class AdminResourceComponent implements OnInit {
 
   get someVisibleSelected(): boolean {
     return !this.allVisibleSelected && this.rows.some((row) => this.selectedIds.has(row.id));
-  }
-
-  private startEdit(row: AdminRow): void {
-    this.editing = row;
-    const controls: Record<string, FormControl<unknown>> = {};
-    this.config.fields.forEach((field) => {
-      const value = row[field.key] ?? (field.type === 'checkbox' ? false : '');
-      controls[field.key] = new FormControl(
-        value,
-        field.required ? { nonNullable: true, validators: Validators.required } : undefined
-      );
-    });
-    this.form = this.fb.group(controls);
   }
 
   private clearSelection(): void {
