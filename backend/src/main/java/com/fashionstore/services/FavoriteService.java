@@ -4,21 +4,18 @@ import com.fashionstore.dto.request.FavoriteRequest;
 import com.fashionstore.dto.response.AdminFavoriteResponse;
 import com.fashionstore.dto.response.FavoriteResponse;
 import com.fashionstore.dto.response.PageResponse;
+import com.fashionstore.exceptions.ConflictException;
 import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.models.Favorite;
 import com.fashionstore.repositories.FavoriteRepository;
 import com.fashionstore.repositories.ItemVariantRepository;
 import com.fashionstore.repositories.UserRepository;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
 
 @Service
@@ -35,6 +32,7 @@ public class FavoriteService {
         favorite.setUser(userRepository.findById(favoriteRequest.getUserId())
                 .orElseThrow(() -> new NotFoundException("User", favoriteRequest.getUserId())));
         applyFavoriteRequest(favorite, favoriteRequest);
+        assertUniqueFavorite(favorite.getUser().getId(), favorite.getItemVariant().getId(), null);
         Favorite savedFavorite = favoriteRepository.save(favorite);
         return FavoriteResponse.from(savedFavorite);
     }
@@ -44,6 +42,7 @@ public class FavoriteService {
         Favorite favorite = new Favorite();
         favorite.setUser(currentUserService.findCurrentUser(authentication));
         applyFavoriteRequest(favorite, favoriteRequest);
+        assertUniqueFavorite(favorite.getUser().getId(), favorite.getItemVariant().getId(), null);
         Favorite savedFavorite = favoriteRepository.save(favorite);
         return FavoriteResponse.from(savedFavorite);
     }
@@ -54,6 +53,7 @@ public class FavoriteService {
             favorite.setUser(userRepository.findById(favoriteRequest.getUserId())
                     .orElseThrow(() -> new NotFoundException("User", favoriteRequest.getUserId())));
             applyFavoriteRequest(favorite, favoriteRequest);
+            assertUniqueFavorite(favorite.getUser().getId(), favorite.getItemVariant().getId(), id);
             Favorite savedFavorite = favoriteRepository.save(favorite);
             return FavoriteResponse.from(savedFavorite);
         }).orElseThrow(() -> new NotFoundException("Favorite", id));
@@ -107,7 +107,7 @@ public class FavoriteService {
             return getPagedFavorites(page, size);
         }
         return PageResponse.from(favoriteRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.FAVORITES, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), FavoriteResponse::from);
     }
@@ -118,7 +118,7 @@ public class FavoriteService {
             return PageResponse.from(favoriteRepository.findAll(PageRequestFactory.create(page, size)), AdminFavoriteResponse::from);
         }
         return PageResponse.from(favoriteRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.FAVORITES, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), AdminFavoriteResponse::from);
     }
@@ -149,6 +149,15 @@ public class FavoriteService {
                 .orElseThrow(() -> new NotFoundException("ItemVariant", favoriteRequest.getItemVariantId())));
     }
 
+    private void assertUniqueFavorite(Long userId, Long itemVariantId, Long currentFavoriteId) {
+        boolean duplicate = currentFavoriteId == null
+                ? favoriteRepository.existsByUserIdAndItemVariantId(userId, itemVariantId)
+                : favoriteRepository.existsByUserIdAndItemVariantIdAndIdNot(userId, itemVariantId, currentFavoriteId);
+        if (duplicate) {
+            throw new ConflictException("This item is already saved.");
+        }
+    }
+
     private Specification<Favorite> favoriteSearch(Long userId, String search) {
         return (root, query, criteriaBuilder) -> {
             query.distinct(true);
@@ -166,25 +175,5 @@ public class FavoriteService {
 
     private String normalized(String value) {
         return value.trim().toLowerCase();
-    }
-
-    private Map<String, Function<Root<Favorite>, Expression<?>>> adminFields() {
-        return Map.ofEntries(
-                Map.entry("id", root -> root.get("id")),
-                Map.entry("itemVariantId", root -> root.get("itemVariant").get("id")),
-                Map.entry("userId", root -> root.get("user").get("id")),
-                Map.entry("userFirstName", root -> root.get("user").get("firstName")),
-                Map.entry("userLastName", root -> root.get("user").get("lastName")),
-                Map.entry("userName", root -> root.get("user").get("firstName")),
-                Map.entry("userEmail", root -> root.get("user").get("email")),
-                Map.entry("itemId", root -> root.get("itemVariant").get("item").get("id")),
-                Map.entry("itemName", root -> root.get("itemVariant").get("item").get("name")),
-                Map.entry("sizeLabel", root -> root.get("itemVariant").get("size").get("label")),
-                Map.entry("sizeSystem", root -> root.get("itemVariant").get("size").get("sizeSystem")),
-                Map.entry("colorName", root -> root.get("itemVariant").get("color").get("name")),
-                Map.entry("colorValue", root -> root.get("itemVariant").get("color").get("value")),
-                Map.entry("variantActive", root -> root.get("itemVariant").get("isActive")),
-                Map.entry("variantStockLeft", root -> root.get("itemVariant").get("stockLeft"))
-        );
     }
 }

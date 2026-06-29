@@ -20,6 +20,6 @@ export class FavoritesService {
   }
 
   removeItem(id: number): Observable<void> {
-    return this.api.delete(`/favorites/items/${id}`);
+    return this.api.delete(`/favorites/${id}`);
   }
 }

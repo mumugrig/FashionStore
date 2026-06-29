@@ -6,6 +6,8 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +19,7 @@ public class AddressResponse {
     private String city;
     private int postalCode;
     private String addressLine;
-    private Long userId;
+    private List<Long> userIds;
 
     public static AddressResponse from(Address address){
         AddressResponse result = new AddressResponse();
@@ -27,7 +29,7 @@ public class AddressResponse {
         result.city = address.getCity();
         result.postalCode = address.getPostalCode();
         result.addressLine = address.getAddressLine();
-        result.userId = address.getUser().getId();
+        result.userIds = address.getUsers().stream().map(user -> user.getId()).toList();
         return result;
     }
 }

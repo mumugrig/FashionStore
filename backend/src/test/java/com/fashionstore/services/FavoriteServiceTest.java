@@ -58,6 +58,26 @@ class FavoriteServiceTest extends ServiceTestSupport {
     }
 
     @Test
+    void addFavorite_whenVariantIsOutOfStock_returnsCreatedFavorite() {
+        var user = user(1L, "favorite-service@example.com");
+        var category = category(1L, "Shirts");
+        var item = item(1L, "Favorite Shirt", category);
+        var size = size(1L, "M");
+        var color = color(1L, "Blue", "#0000ff");
+        var variant = itemVariant(1L, item, size, color);
+        variant.setStockLeft(0);
+        var favorite = favorite(1L, user, variant);
+
+        when(userRepositoryMock.findById(user.getId())).thenReturn(Optional.of(user));
+        when(itemVariantRepositoryMock.findById(variant.getId())).thenReturn(Optional.of(variant));
+        when(favoriteRepositoryMock.save(any())).thenReturn(favorite);
+
+        FavoriteResponse response = objectUnderTest.addFavorite(favoriteRequest(user.getId(), variant.getId()));
+
+        assertEquals(variant.getId(), response.getItemVariantId(), "Out-of-stock variants should still be saveable");
+    }
+
+    @Test
     void getPagedFavoritesByUserId_whenFavoritesExist_returnsPagedFavorites() {
         var user = user(1L, "favorite-service@example.com");
         var category = category(1L, "Shirts");

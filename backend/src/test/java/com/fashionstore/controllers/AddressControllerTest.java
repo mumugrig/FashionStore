@@ -61,7 +61,7 @@ class AddressControllerTest extends ControllerTestSupport {
         var response = objectUnderTest.getPagedAddresses(1, 20, null, null, null);
 
         assertEquals(1, response.getBody().getContent().size(), "Address page should contain service results");
-        assertEquals("test@example.com", response.getBody().getContent().get(0).getUserEmail(), "Admin address response should include identifying user email");
+        assertEquals("test@example.com", response.getBody().getContent().get(0).getUserEmails().get(0), "Admin address response should include identifying user email");
     }
 
     @Test

@@ -27,7 +27,7 @@ interface CartRow {
           <tr>
             <td>
               <app-line-item
-                [imageUrl]="row.product?.itemImageUrl"
+                [imageUrl]="row.product?.imageUrl ?? row.product?.itemImageUrl"
                 [title]="row.product?.item?.name"
                 [subtitle]="row.product?.label"
                 [price]="row.product?.item?.price"

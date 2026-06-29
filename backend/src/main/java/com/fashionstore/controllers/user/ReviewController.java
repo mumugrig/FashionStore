@@ -40,15 +40,22 @@ public class ReviewController {
     }
 
     @PostMapping
-    @Operation(summary = "Create review for an item variant")
-    public ResponseEntity<ReviewResponse> createReview(Authentication authentication, @Valid @RequestBody ReviewRequest reviewRequest) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.createReview(authentication, reviewRequest));
+    @Operation(summary = "Create review for an item")
+    public ResponseEntity<ReviewResponse> createReview(
+            Authentication authentication,
+            @PathVariable Long itemId,
+            @Valid @RequestBody ReviewRequest reviewRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.createReview(authentication, itemId, reviewRequest));
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update current user's review")
-    public ResponseEntity<ReviewResponse> updateReview(Authentication authentication, @Valid @RequestBody ReviewRequest reviewRequest, @PathVariable Long id) {
-        return ResponseEntity.ok(reviewService.updateReview(authentication, id, reviewRequest));
+    public ResponseEntity<ReviewResponse> updateReview(
+            Authentication authentication,
+            @PathVariable Long itemId,
+            @PathVariable Long id,
+            @Valid @RequestBody ReviewRequest reviewRequest) {
+        return ResponseEntity.ok(reviewService.updateReview(authentication, itemId, id, reviewRequest));
     }
 
     @DeleteMapping("/{id}")

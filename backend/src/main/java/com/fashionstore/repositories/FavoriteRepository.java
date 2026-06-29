@@ -15,6 +15,8 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long>, JpaSp
     List<Favorite> findByUserId(Long userId);
     Page<Favorite> findByUserId(Long userId, Pageable pageable);
     Optional<Favorite> findByIdAndUserId(Long id, Long userId);
+    boolean existsByUserIdAndItemVariantId(Long userId, Long itemVariantId);
+    boolean existsByUserIdAndItemVariantIdAndIdNot(Long userId, Long itemVariantId, Long id);
     boolean existsByItemVariantId(Long itemVariantId);
     boolean existsByItemVariantItemId(Long itemId);
     void deleteByUserId(Long userId);

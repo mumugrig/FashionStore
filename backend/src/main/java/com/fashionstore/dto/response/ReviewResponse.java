@@ -17,7 +17,7 @@ public class ReviewResponse {
     private String quality;
     private String comfort;
     private Long userId;
-    private Long itemVariantId;
+    private Long itemId;
 
     public static ReviewResponse from(Review review){
         ReviewResponse result = new ReviewResponse();
@@ -27,7 +27,7 @@ public class ReviewResponse {
         result.quality = review.getQuality().name();
         result.comfort = review.getComfort().name();
         result.userId = review.getUser().getId();
-        result.itemVariantId = review.getItemVariant().getId();
+        result.itemId = review.getItem().getId();
         return result;
     }
 }

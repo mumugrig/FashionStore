@@ -9,15 +9,11 @@ import com.fashionstore.dto.response.CategoryResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.repositories.CategoryRepository;
 import com.fashionstore.repositories.ItemRepository;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -76,7 +72,7 @@ public class CategoryService {
             return getPagedCategories(page, size);
         }
         return PageResponse.from(categoryRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.CATEGORIES, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), CategoryResponse::from);
     }
@@ -87,7 +83,7 @@ public class CategoryService {
             return PageResponse.from(categoryRepository.findAll(PageRequestFactory.create(page, size)), AdminCategoryResponse::from);
         }
         return PageResponse.from(categoryRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.CATEGORIES, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), AdminCategoryResponse::from);
     }
@@ -109,15 +105,6 @@ public class CategoryService {
     @Transactional
     public void deleteCategories(List<Long> ids) {
         ids.forEach(this::deleteCategory);
-    }
-
-    private Map<String, Function<Root<Category>, Expression<?>>> adminFields() {
-        return Map.ofEntries(
-                Map.entry("id", root -> root.get("id")),
-                Map.entry("name", root -> root.get("name")),
-                Map.entry("parentId", root -> root.get("parent").get("id")),
-                Map.entry("parentName", root -> root.get("parent").get("name"))
-        );
     }
 }
 

@@ -173,6 +173,37 @@ textarea {
   letter-spacing: 0.04em;
 }
 
+.catalog-filter-panel {
+  border: 1px solid #111111;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  max-width: 1180px;
+  width: 100%;
+}
+
+.catalog-filter-panel .mat-expansion-panel-header {
+  border-radius: 0;
+}
+
+.catalog-filter-form {
+  align-items: start;
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  padding-top: 0.75rem;
+}
+
+.catalog-filter-form .mat-mdc-form-field {
+  width: 100%;
+}
+
+.catalog-filter-actions {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  min-height: 56px;
+}
+
 .catalog-empty {
   padding: 2rem;
 }
@@ -295,6 +326,19 @@ textarea {
   margin: 1rem 0;
 }
 
+.profile-layout {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  margin: 0 auto;
+  max-width: 1180px;
+}
+
+.profile-layout .auth-card {
+  margin: 0;
+  max-width: none;
+}
+
 .profile-details div {
   border-bottom: 1px solid #111111;
   padding-bottom: 0.75rem;
@@ -309,6 +353,32 @@ textarea {
 
 .profile-details dd {
   margin: 0.25rem 0 0;
+}
+
+.address-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.address-card {
+  border: 1px solid #111111;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.85rem;
+}
+
+.address-card strong,
+.address-card span,
+.address-card small {
+  display: block;
+}
+
+.address-card small {
+  color: #666666;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .variant-grid {
@@ -326,12 +396,26 @@ textarea {
   outline-offset: 2px;
 }
 
+.variant-grid button.out-of-stock {
+  color: #777777;
+}
+
 .swatch {
   border: 1px solid #111111;
   display: inline-block;
   height: 14px;
   margin-right: 0.5rem;
   width: 14px;
+}
+
+.review-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.review-body-field {
+  width: 100%;
 }
 
 .review-list {
@@ -451,6 +535,12 @@ th {
   margin-bottom: 1rem;
 }
 
+.admin-reference-field {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(180px, 1fr) minmax(220px, 1.4fr);
+}
+
 .column-picker {
   max-width: 420px;
   width: 100%;
@@ -515,7 +605,9 @@ th {
   .topbar,
   .page-heading,
   .admin-tools,
-  .admin-layout {
+  .admin-layout,
+  .admin-reference-field,
+  .profile-layout {
     display: block;
   }
 
@@ -531,6 +623,10 @@ th {
   .product-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     margin-inline: -0.75rem;
+  }
+
+  .catalog-filter-form {
+    grid-template-columns: 1fr;
   }
 
   table {

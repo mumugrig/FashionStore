@@ -1,6 +1,5 @@
 package com.fashionstore.repositories;
 
-import com.fashionstore.models.Address;
 import com.fashionstore.models.CartItem;
 import com.fashionstore.models.Category;
 import com.fashionstore.models.Color;
@@ -38,8 +37,6 @@ class UserRepositoryTest {
     private UserRepository userRepository;
     @Autowired
     private EntityManager entityManager;
-    @Autowired
-    private AddressRepository addressRepository;
     @Autowired
     private CartItemRepository cartItemRepository;
     @Autowired
@@ -131,15 +128,6 @@ class UserRepositoryTest {
         User user = userRepository.save(user("cascade-delete@example.com"));
         ItemVariant variant = itemVariantRepository.save(itemVariant());
 
-        Address address = new Address();
-        address.setUser(user);
-        address.setCountry("Bulgaria");
-        address.setRegion("Sofia");
-        address.setCity("Sofia");
-        address.setPostalCode(1000);
-        address.setAddressLine("1 Cascade Street");
-        Long addressId = addressRepository.save(address).getId();
-
         CartItem cartItem = new CartItem();
         cartItem.setUser(user);
         cartItem.setItemVariant(variant);
@@ -153,7 +141,7 @@ class UserRepositoryTest {
 
         Review review = new Review();
         review.setUser(user);
-        review.setItemVariant(variant);
+        review.setItem(variant.getItem());
         review.setBody("This is a valid cascade delete review body.");
         review.setSizeFit(SizeFit.TRUE_TO_SIZE);
         review.setQuality(Quality.EXCELLENT);
@@ -175,7 +163,6 @@ class UserRepositoryTest {
         userRepository.flush();
 
         assertFalse(userRepository.existsById(userId));
-        assertFalse(addressRepository.existsById(addressId));
         assertFalse(cartItemRepository.existsById(cartItemId));
         assertFalse(favoriteRepository.existsById(favoriteId));
         assertFalse(reviewRepository.existsById(reviewId));

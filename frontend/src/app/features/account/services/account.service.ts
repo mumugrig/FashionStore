@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from '@core/api/api.service';
-import { User } from '@shared/models/models';
+import { Address, AddressRequest, PageResponse, User } from '@shared/models/models';
 
 export interface ProfileUpdateRequest {
   firstName: string;
@@ -26,5 +26,21 @@ export class AccountService {
 
   deleteProfile(): Observable<void> {
     return this.api.delete<void>('/users/me');
+  }
+
+  getAddresses(page = 1, size = 20): Observable<PageResponse<Address>> {
+    return this.api.getPage<Address>('/addresses', page, size);
+  }
+
+  createAddress(payload: AddressRequest): Observable<Address> {
+    return this.api.post<Address>('/addresses', payload);
+  }
+
+  updateAddress(id: number, payload: AddressRequest): Observable<Address> {
+    return this.api.put<Address>(`/addresses/${id}`, payload);
+  }
+
+  deleteAddress(id: number): Observable<void> {
+    return this.api.delete<void>(`/addresses/${id}`);
   }
 }

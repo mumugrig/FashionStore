@@ -48,6 +48,8 @@ class CartItemRepositoryTest {
 
     private User user;
     private ItemVariant itemVariant;
+    private Item item;
+    private Size size;
 
     @BeforeEach
     void setUp() {
@@ -62,7 +64,7 @@ class CartItemRepositoryTest {
         category.setName("Products");
         categoryRepository.save(category);
 
-        Item item = new Item();
+        item = new Item();
         item.setName("Product");
         item.setPrice(BigDecimal.valueOf(29.99f));
         item.setDescription("Cart product description");
@@ -75,7 +77,7 @@ class CartItemRepositoryTest {
         color.setValue("#000000");
         colorRepository.save(color);
 
-        Size size = new Size();
+        size = new Size();
         size.setLabel("M");
         size.setSizeSystem(SizeSystem.ALPHA);
         sizeRepository.save(size);
@@ -133,7 +135,7 @@ class CartItemRepositoryTest {
 
         CartItem cartItem2 = new CartItem();
         cartItem2.setQuantity(2);
-        cartItem2.setItemVariant(itemVariant);
+        cartItem2.setItemVariant(createItemVariant("Navy", "#000080"));
         cartItem2.setUser(user);
         cartItemRepository.save(cartItem2);
 
@@ -201,7 +203,7 @@ class CartItemRepositoryTest {
 
         CartItem cartItem2 = new CartItem();
         cartItem2.setQuantity(2);
-        cartItem2.setItemVariant(itemVariant);
+        cartItem2.setItemVariant(createItemVariant("Navy", "#000080"));
         cartItem2.setUser(user);
 
         cartItemRepository.save(cartItem1);
@@ -209,6 +211,21 @@ class CartItemRepositoryTest {
 
         long count = cartItemRepository.count();
         assertTrue(count >= 2);
+    }
+
+    private ItemVariant createItemVariant(String colorName, String colorValue) {
+        Color color = new Color();
+        color.setName(colorName);
+        color.setValue(colorValue);
+        colorRepository.save(color);
+
+        ItemVariant variant = new ItemVariant();
+        variant.setItem(item);
+        variant.setColor(color);
+        variant.setSize(size);
+        variant.setActive(true);
+        variant.setStockLeft(50);
+        return itemVariantRepository.save(variant);
     }
 }
 

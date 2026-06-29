@@ -16,17 +16,13 @@ import com.fashionstore.repositories.FavoriteRepository;
 import com.fashionstore.repositories.ReviewRepository;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -78,7 +74,10 @@ public class ItemService {
 
     @Transactional(readOnly = true)
     public PageResponse<ItemResponse> getPagedItems(int page, int size) {
-        return PageResponse.from(itemRepository.findAll(PageRequestFactory.create(page, size)), ItemResponse::from);
+        return PageResponse.from(itemRepository.findAll(
+                publicCatalogFilters(null, null, null, null, null, null, null),
+                PageRequestFactory.create(page, size)
+        ), ItemResponse::from);
     }
 
     @Transactional(readOnly = true)
@@ -87,7 +86,7 @@ public class ItemService {
             return getPagedItems(page, size);
         }
         return PageResponse.from(itemRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.ITEMS, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), ItemResponse::from);
     }
@@ -98,7 +97,7 @@ public class ItemService {
             return PageResponse.from(itemRepository.findAll(PageRequestFactory.create(page, size)), AdminItemResponse::from);
         }
         return PageResponse.from(itemRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.ITEMS, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), AdminItemResponse::from);
     }
@@ -119,7 +118,7 @@ public class ItemService {
             return getPagedItems(page, size);
         }
         return PageResponse.from(itemRepository.findAll(
-                itemFilters(category, search, itemSize, color, audience, priceMin, priceMax),
+                publicCatalogFilters(category, search, itemSize, color, audience, priceMin, priceMax),
                 PageRequestFactory.create(page, size)
         ), ItemResponse::from);
     }
@@ -143,8 +142,8 @@ public class ItemService {
         if (favoriteRepository.existsByItemVariantItemId(id)) {
             throw new ConflictException("Cannot delete item because one or more variants are in favourites. Remove those favourites first.");
         }
-        if (reviewRepository.existsByItemVariantItemId(id)) {
-            throw new ConflictException("Cannot delete item because one or more variants have reviews. Delete those reviews first.");
+        if (reviewRepository.existsByItemId(id)) {
+            throw new ConflictException("Cannot delete item because it has reviews. Delete those reviews first.");
         }
         itemRepository.deleteById(id);
     }
@@ -159,7 +158,7 @@ public class ItemService {
                 .orElseThrow(() -> new NotFoundException("Category", id));
     }
 
-    private Specification<Item> itemFilters(
+    private Specification<Item> publicCatalogFilters(
             String category,
             String search,
             String itemSize,
@@ -170,6 +169,8 @@ public class ItemService {
         return (root, query, criteriaBuilder) -> {
             query.distinct(true);
             var predicate = criteriaBuilder.conjunction();
+            Join<Item, ItemVariant> variant = root.join("variants", JoinType.INNER);
+            predicate = criteriaBuilder.and(predicate, criteriaBuilder.isTrue(variant.get("isActive")));
 
             if (hasText(category)) {
                 predicate = criteriaBuilder.and(predicate,
@@ -178,10 +179,6 @@ public class ItemService {
             if (hasText(search)) {
                 predicate = criteriaBuilder.and(predicate,
                         criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), "%" + normalized(search) + "%"));
-            }
-            Join<Item, ItemVariant> variant = null;
-            if (hasText(itemSize) || hasText(color)) {
-                variant = root.join("variants", JoinType.INNER);
             }
             if (hasText(itemSize)) {
                 predicate = criteriaBuilder.and(predicate,
@@ -212,19 +209,6 @@ public class ItemService {
 
     private String normalized(String value) {
         return value.trim().toLowerCase();
-    }
-
-    private Map<String, Function<Root<Item>, Expression<?>>> adminFields() {
-        return Map.ofEntries(
-                Map.entry("id", root -> root.get("id")),
-                Map.entry("name", root -> root.get("name")),
-                Map.entry("price", root -> root.get("price")),
-                Map.entry("description", root -> root.get("description")),
-                Map.entry("imageUrl", root -> root.get("imageUrl")),
-                Map.entry("audience", root -> root.get("audience")),
-                Map.entry("categoryId", root -> root.get("category").get("id")),
-                Map.entry("categoryName", root -> root.get("category").get("name"))
-        );
     }
 }
 

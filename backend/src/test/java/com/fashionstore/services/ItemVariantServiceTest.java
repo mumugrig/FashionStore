@@ -8,7 +8,6 @@ import com.fashionstore.repositories.ColorRepository;
 import com.fashionstore.repositories.FavoriteRepository;
 import com.fashionstore.repositories.ItemRepository;
 import com.fashionstore.repositories.ItemVariantRepository;
-import com.fashionstore.repositories.ReviewRepository;
 import com.fashionstore.repositories.SizeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,13 +34,12 @@ class ItemVariantServiceTest extends ServiceTestSupport {
     @Mock private ColorRepository colorRepositoryMock;
     @Mock private CartItemRepository cartItemRepositoryMock;
     @Mock private FavoriteRepository favoriteRepositoryMock;
-    @Mock private ReviewRepository reviewRepositoryMock;
     private ItemVariantService objectUnderTest;
 
     @BeforeEach
     void setUp() {
         objectUnderTest = new ItemVariantService(itemVariantRepositoryMock, itemRepositoryMock, sizeRepositoryMock,
-                colorRepositoryMock, cartItemRepositoryMock, favoriteRepositoryMock, reviewRepositoryMock);
+                colorRepositoryMock, cartItemRepositoryMock, favoriteRepositoryMock);
     }
 
     @Test
@@ -112,7 +110,6 @@ class ItemVariantServiceTest extends ServiceTestSupport {
         when(itemVariantRepositoryMock.existsById(1L)).thenReturn(true);
         when(cartItemRepositoryMock.existsByItemVariantId(1L)).thenReturn(false);
         when(favoriteRepositoryMock.existsByItemVariantId(1L)).thenReturn(false);
-        when(reviewRepositoryMock.existsByItemVariantId(1L)).thenReturn(false);
 
         objectUnderTest.deleteItemVariant(1L);
 
@@ -138,14 +135,4 @@ class ItemVariantServiceTest extends ServiceTestSupport {
         verify(itemVariantRepositoryMock, never()).deleteById(1L);
     }
 
-    @Test
-    void deleteItemVariant_whenVariantHasReviews_throwsConflictException() {
-        when(itemVariantRepositoryMock.existsById(1L)).thenReturn(true);
-        when(cartItemRepositoryMock.existsByItemVariantId(1L)).thenReturn(false);
-        when(favoriteRepositoryMock.existsByItemVariantId(1L)).thenReturn(false);
-        when(reviewRepositoryMock.existsByItemVariantId(1L)).thenReturn(true);
-
-        assertThrows(ConflictException.class, () -> objectUnderTest.deleteItemVariant(1L));
-        verify(itemVariantRepositoryMock, never()).deleteById(1L);
-    }
 }

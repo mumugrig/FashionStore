@@ -2,7 +2,7 @@ package com.fashionstore.services;
 
 import com.fashionstore.dto.response.ReviewResponse;
 import com.fashionstore.exceptions.NotFoundException;
-import com.fashionstore.repositories.ItemVariantRepository;
+import com.fashionstore.repositories.ItemRepository;
 import com.fashionstore.repositories.ReviewRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,32 +28,30 @@ import static org.mockito.Mockito.when;
 class ReviewServiceTest extends ServiceTestSupport {
     @Mock private CurrentUserService currentUserServiceMock;
     @Mock private ReviewRepository reviewRepositoryMock;
-    @Mock private ItemVariantRepository itemVariantRepositoryMock;
+    @Mock private ItemRepository itemRepositoryMock;
     private ReviewService objectUnderTest;
 
     @BeforeEach
     void setUp() {
-        objectUnderTest = new ReviewService(reviewRepositoryMock, itemVariantRepositoryMock, currentUserServiceMock);
+        objectUnderTest = new ReviewService(reviewRepositoryMock, itemRepositoryMock, currentUserServiceMock);
     }
 
     @Test
-    void createReview_whenUserAndVariantExist_returnsCreatedReview() {
+    void createReview_whenUserAndItemExist_returnsCreatedReview() {
         var user = user(1L, "review-service@example.com");
         var category = category(1L, "Shirts");
         var item = item(1L, "Review Shirt", category);
-        var size = size(1L, "M");
-        var color = color(1L, "Blue", "#0000ff");
-        var variant = itemVariant(1L, item, size, color);
-        var createdReview = review(1L, user, variant, "Original review body");
+        var createdReview = review(1L, user, item, "Original review body");
 
         var authentication = authentication(user.getId());
         when(currentUserServiceMock.findCurrentUser(authentication)).thenReturn(user);
-        when(itemVariantRepositoryMock.findById(variant.getId())).thenReturn(Optional.of(variant));
+        when(itemRepositoryMock.findById(item.getId())).thenReturn(Optional.of(item));
         when(reviewRepositoryMock.save(any())).thenReturn(createdReview);
 
-        ReviewResponse response = objectUnderTest.createReview(authentication, reviewRequest(user.getId(), variant.getId(), "Original review body"));
+        ReviewResponse response = objectUnderTest.createReview(authentication, item.getId(), reviewRequest(user.getId(), item.getId(), "Original review body"));
 
         assertEquals("Original review body", response.getBody(), "Created review body should match saved entity");
+        assertEquals(item.getId(), response.getItemId(), "Created review should reference the route item");
     }
 
     @Test
@@ -61,19 +59,16 @@ class ReviewServiceTest extends ServiceTestSupport {
         var user = user(1L, "review-service@example.com");
         var category = category(1L, "Shirts");
         var item = item(1L, "Review Shirt", category);
-        var size = size(1L, "M");
-        var color = color(1L, "Blue", "#0000ff");
-        var variant = itemVariant(1L, item, size, color);
-        var createdReview = review(1L, user, variant, "Original review body");
-        var updatedReview = review(1L, user, variant, "Updated review body");
+        var createdReview = review(1L, user, item, "Original review body");
+        var updatedReview = review(1L, user, item, "Updated review body");
 
         var authentication = authentication(user.getId());
         when(currentUserServiceMock.findCurrentUser(authentication)).thenReturn(user);
         when(reviewRepositoryMock.findByIdAndUserId(1L, user.getId())).thenReturn(Optional.of(createdReview));
-        when(itemVariantRepositoryMock.findById(variant.getId())).thenReturn(Optional.of(variant));
+        when(itemRepositoryMock.findById(item.getId())).thenReturn(Optional.of(item));
         when(reviewRepositoryMock.save(createdReview)).thenReturn(updatedReview);
 
-        ReviewResponse response = objectUnderTest.updateReview(authentication, 1L, reviewRequest(user.getId(), variant.getId(), "Updated review body"));
+        ReviewResponse response = objectUnderTest.updateReview(authentication, item.getId(), 1L, reviewRequest(user.getId(), item.getId(), "Updated review body"));
 
         assertEquals("Updated review body", response.getBody(), "Updated review body should match saved entity");
     }
@@ -86,7 +81,7 @@ class ReviewServiceTest extends ServiceTestSupport {
         when(reviewRepositoryMock.findByIdAndUserId(1L, user.getId())).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class,
-                () -> objectUnderTest.updateReview(authentication, 1L, reviewRequest(99L, 2L, "Updated review body")));
+                () -> objectUnderTest.updateReview(authentication, 2L, 1L, reviewRequest(99L, 2L, "Updated review body")));
     }
 
     @Test
@@ -94,17 +89,14 @@ class ReviewServiceTest extends ServiceTestSupport {
         var user = user(1L, "review-admin-target@example.com");
         var category = category(1L, "Shirts");
         var item = item(1L, "Review Shirt", category);
-        var size = size(1L, "M");
-        var color = color(1L, "Blue", "#0000ff");
-        var variant = itemVariant(1L, item, size, color);
-        var createdReview = review(1L, user, variant, "Original review body");
-        var updatedReview = review(1L, user, variant, "Admin updated review body");
+        var createdReview = review(1L, user, item, "Original review body");
+        var updatedReview = review(1L, user, item, "Admin updated review body");
 
         when(reviewRepositoryMock.findById(1L)).thenReturn(Optional.of(createdReview));
-        when(itemVariantRepositoryMock.findById(variant.getId())).thenReturn(Optional.of(variant));
+        when(itemRepositoryMock.findById(item.getId())).thenReturn(Optional.of(item));
         when(reviewRepositoryMock.save(createdReview)).thenReturn(updatedReview);
 
-        ReviewResponse response = objectUnderTest.updateReview(1L, reviewRequest(99L, variant.getId(), "Admin updated review body"));
+        ReviewResponse response = objectUnderTest.updateReview(1L, reviewRequest(99L, item.getId(), "Admin updated review body"));
 
         assertEquals("Admin updated review body", response.getBody(), "Admin update should not require ownership");
     }
@@ -114,10 +106,7 @@ class ReviewServiceTest extends ServiceTestSupport {
         var user = user(1L, "review-service@example.com");
         var category = category(1L, "Shirts");
         var item = item(1L, "Review Shirt", category);
-        var size = size(1L, "M");
-        var color = color(1L, "Blue", "#0000ff");
-        var variant = itemVariant(1L, item, size, color);
-        var review = review(1L, user, variant, "Review body");
+        var review = review(1L, user, item, "Review body");
 
         when(reviewRepositoryMock.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(review)));
 
@@ -131,10 +120,7 @@ class ReviewServiceTest extends ServiceTestSupport {
         var user = user(1L, "review-service@example.com");
         var category = category(1L, "Shirts");
         var item = item(1L, "Review Shirt", category);
-        var size = size(1L, "M");
-        var color = color(1L, "Blue", "#0000ff");
-        var variant = itemVariant(1L, item, size, color);
-        var review = review(1L, user, variant, "Review body");
+        var review = review(1L, user, item, "Review body");
         var authentication = authentication(user.getId());
 
         when(currentUserServiceMock.findCurrentUser(authentication)).thenReturn(user);

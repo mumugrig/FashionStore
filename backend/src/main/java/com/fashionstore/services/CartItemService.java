@@ -1,6 +1,7 @@
 package com.fashionstore.services;
 
 import com.fashionstore.exceptions.NotFoundException;
+import com.fashionstore.exceptions.ConflictException;
 import com.fashionstore.models.CartItem;
 import com.fashionstore.models.ItemVariant;
 import com.fashionstore.models.User;
@@ -11,17 +12,13 @@ import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.repositories.CartItemRepository;
 import com.fashionstore.repositories.ItemVariantRepository;
 import com.fashionstore.repositories.UserRepository;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +35,7 @@ public class CartItemService {
         User user = userRepository.findById(cartItemRequest.getUserId())
                 .orElseThrow(() -> new NotFoundException("User", cartItemRequest.getUserId()));
         cartItem.setUser(user);
+        assertUniqueCartItem(user.getId(), cartItem.getItemVariant().getId(), null);
 
         CartItem savedCartItem = cartItemRepository.save(cartItem);
         return CartItemResponse.from(savedCartItem);
@@ -48,6 +46,7 @@ public class CartItemService {
         CartItem cartItem = new CartItem();
         applyCartItemRequest(cartItem, cartItemRequest);
         cartItem.setUser(currentUserService.findCurrentUser(authentication));
+        assertUniqueCartItem(cartItem.getUser().getId(), cartItem.getItemVariant().getId(), null);
 
         CartItem savedCartItem = cartItemRepository.save(cartItem);
         return CartItemResponse.from(savedCartItem);
@@ -62,6 +61,7 @@ public class CartItemService {
             User user = userRepository.findById(cartItemRequest.getUserId())
                     .orElseThrow(() -> new NotFoundException("User", cartItemRequest.getUserId()));
             cartItem.setUser(user);
+            assertUniqueCartItem(user.getId(), cartItem.getItemVariant().getId(), id);
 
             CartItem updatedCartItem = cartItemRepository.save(cartItem);
             return CartItemResponse.from(updatedCartItem);
@@ -75,6 +75,7 @@ public class CartItemService {
         CartItem cartItem = cartItemRepository.findByIdAndUserId(id, currentUser.getId())
                 .orElseThrow(() -> new NotFoundException("CartItem", id));
         applyCartItemRequest(cartItem, cartItemRequest);
+        assertUniqueCartItem(currentUser.getId(), cartItem.getItemVariant().getId(), id);
         CartItem updatedCartItem = cartItemRepository.save(cartItem);
         return CartItemResponse.from(updatedCartItem);
     }
@@ -103,7 +104,7 @@ public class CartItemService {
             return getPagedCartItems(page, size);
         }
         return PageResponse.from(cartItemRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.CART_ITEMS, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), CartItemResponse::from);
     }
@@ -114,7 +115,7 @@ public class CartItemService {
             return PageResponse.from(cartItemRepository.findAll(PageRequestFactory.create(page, size)), AdminCartItemResponse::from);
         }
         return PageResponse.from(cartItemRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.CART_ITEMS, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), AdminCartItemResponse::from);
     }
@@ -194,27 +195,25 @@ public class CartItemService {
         cartItem.setQuantity(cartItemRequest.getQuantity());
         ItemVariant itemVariant = itemVariantRepository.findById(cartItemRequest.getItemVariantId())
                 .orElseThrow(() -> new NotFoundException("ItemVariant", cartItemRequest.getItemVariantId()));
+        assertVariantHasStock(itemVariant, cartItemRequest.getQuantity());
         cartItem.setItemVariant(itemVariant);
     }
 
-    private Map<String, Function<Root<CartItem>, Expression<?>>> adminFields() {
-        return Map.ofEntries(
-                Map.entry("id", root -> root.get("id")),
-                Map.entry("quantity", root -> root.get("quantity")),
-                Map.entry("itemVariantId", root -> root.get("itemVariant").get("id")),
-                Map.entry("userId", root -> root.get("user").get("id")),
-                Map.entry("userFirstName", root -> root.get("user").get("firstName")),
-                Map.entry("userLastName", root -> root.get("user").get("lastName")),
-                Map.entry("userName", root -> root.get("user").get("firstName")),
-                Map.entry("userEmail", root -> root.get("user").get("email")),
-                Map.entry("itemId", root -> root.get("itemVariant").get("item").get("id")),
-                Map.entry("itemName", root -> root.get("itemVariant").get("item").get("name")),
-                Map.entry("sizeLabel", root -> root.get("itemVariant").get("size").get("label")),
-                Map.entry("sizeSystem", root -> root.get("itemVariant").get("size").get("sizeSystem")),
-                Map.entry("colorName", root -> root.get("itemVariant").get("color").get("name")),
-                Map.entry("colorValue", root -> root.get("itemVariant").get("color").get("value")),
-                Map.entry("variantActive", root -> root.get("itemVariant").get("isActive")),
-                Map.entry("variantStockLeft", root -> root.get("itemVariant").get("stockLeft"))
-        );
+    private void assertVariantHasStock(ItemVariant itemVariant, int quantity) {
+        if (itemVariant.getStockLeft() <= 0) {
+            throw new ConflictException("This item variant is out of stock.");
+        }
+        if (quantity > itemVariant.getStockLeft()) {
+            throw new ConflictException("Only " + itemVariant.getStockLeft() + " item(s) left in stock.");
+        }
+    }
+
+    private void assertUniqueCartItem(Long userId, Long itemVariantId, Long currentCartItemId) {
+        boolean duplicate = currentCartItemId == null
+                ? cartItemRepository.existsByUserIdAndItemVariantId(userId, itemVariantId)
+                : cartItemRepository.existsByUserIdAndItemVariantIdAndIdNot(userId, itemVariantId, currentCartItemId);
+        if (duplicate) {
+            throw new ConflictException("This item is already in the bag.");
+        }
     }
 }

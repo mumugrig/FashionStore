@@ -17,12 +17,13 @@ import { Item } from '@shared/models/models';
             mat-stroked-button
             type="button"
             [class.selected]="selected?.variant?.id === option.variant.id"
-            (click)="selected = option">
+            [class.out-of-stock]="isOutOfStock(option)"
+            (click)="selectOption(option)">
             @if (option.color?.value) {
               <span class="swatch" [style.background]="option.color?.value"></span>
             }
             {{ option.label }}
-            <small>{{ option.variant.stockLeft }} left</small>
+            <small>{{ isOutOfStock(option) ? 'Out of stock' : option.variant.stockLeft + ' left' }}</small>
           </button>
         }
       </div>
@@ -30,7 +31,7 @@ import { Item } from '@shared/models/models';
       <p>No product options are currently available.</p>
     }
     <div class="inline-actions">
-      <button mat-flat-button [disabled]="!selected" (click)="addCart()">Add to bag</button>
+      <button mat-flat-button [disabled]="!selected || isOutOfStock(selected)" (click)="addCart()">Add to bag</button>
       <button mat-stroked-button [disabled]="!selected" (click)="addFavorite()">Save</button>
     </div>
     @if (message) {
@@ -43,6 +44,7 @@ export class ProductActionsWidgetComponent implements OnInit {
   private readonly favorites = inject(FavoritesService);
   private readonly lookup = inject(VariantLookupService);
   @Input({ required: true }) item!: Item;
+  @Input() variantImageSelected: ((imageUrl: string | null) => void) | null = null;
   options: VariantOption[] = [];
   selected: VariantOption | null = null;
   message = '';
@@ -50,12 +52,17 @@ export class ProductActionsWidgetComponent implements OnInit {
   ngOnInit(): void {
     this.lookup.options(this.item.variants).subscribe((options) => {
       this.options = options;
-      this.selected = options[0] ?? null;
+      this.selectOption(options.find((option) => !this.isOutOfStock(option)) ?? null);
     });
   }
 
+  selectOption(option: VariantOption | null): void {
+    this.selected = option;
+    this.variantImageSelected?.(option?.imageUrl ?? this.item.imageUrl ?? null);
+  }
+
   addCart(): void {
-    if (!this.selected) {
+    if (!this.selected || this.isOutOfStock(this.selected)) {
       return;
     }
     this.cart.addItem(this.selected.variant.id).subscribe({
@@ -72,5 +79,9 @@ export class ProductActionsWidgetComponent implements OnInit {
       next: () => (this.message = 'Saved.'),
       error: (err) => (this.message = err.error?.message ?? 'Could not save item.')
     });
+  }
+
+  isOutOfStock(option: VariantOption | null): boolean {
+    return !option || option.variant.stockLeft <= 0;
   }
 }

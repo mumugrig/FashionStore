@@ -123,12 +123,19 @@ INSERT INTO item_variants (is_active, stock_left, image_url, item_id, size_id, c
 (TRUE, 7, 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80', 20, 2, 2);
 
 -- Addresses
-INSERT INTO addresses (country, region, city, postal_code, address_line, user_id) VALUES
-('Bulgaria', 'Sofia City', 'Sofia', 1000, '12 Vitosha Boulevard', 1),
-('Bulgaria', 'Sofia City', 'Sofia', 1000, '24 Graf Ignatiev Street', 3),
-('Bulgaria', 'Plovdiv', 'Plovdiv', 4000, '8 Knyaz Alexander I Street', 4),
-('Bulgaria', 'Varna', 'Varna', 9000, '15 Slivnitsa Boulevard', 5),
-('Bulgaria', 'Burgas', 'Burgas', 8000, '7 Alexandrovska Street', 6);
+INSERT INTO addresses (country, region, city, postal_code, address_line) VALUES
+('Bulgaria', 'Sofia City', 'Sofia', 1000, '12 Vitosha Boulevard'),
+('Bulgaria', 'Sofia City', 'Sofia', 1000, '24 Graf Ignatiev Street'),
+('Bulgaria', 'Plovdiv', 'Plovdiv', 4000, '8 Knyaz Alexander I Street'),
+('Bulgaria', 'Varna', 'Varna', 9000, '15 Slivnitsa Boulevard'),
+('Bulgaria', 'Burgas', 'Burgas', 8000, '7 Alexandrovska Street');
+
+INSERT INTO user_addresses (user_id, address_id) VALUES
+(1, 1),
+(3, 2),
+(4, 3),
+(5, 4),
+(6, 5);
 
 -- Favorites
 INSERT INTO favorites (item_variant_id, user_id) VALUES
@@ -153,17 +160,17 @@ INSERT INTO cart_items (quantity, item_variant_id, user_id) VALUES
 (1, 42, 6);
 
 -- Reviews
-INSERT INTO reviews (body, size_fit, quality, comfort, user_id, item_variant_id) VALUES
+INSERT INTO reviews (body, size_fit, quality, comfort, user_id, item_id) VALUES
 ('The fabric feels substantial and the shirt keeps its shape after washing.', 'TRUE_TO_SIZE', 'EXCELLENT', 'VERY_COMFORTABLE', 3, 1),
-('Clean cut and easy to style, but I would size up for a looser fit.', 'RUNS_SMALL', 'AVERAGE', 'COMFORTABLE', 4, 4),
-('The heavyweight cotton is exactly what I wanted for everyday wear.', 'TRUE_TO_SIZE', 'EXCELLENT', 'VERY_COMFORTABLE', 5, 7),
-('Soft knit with a flattering fit and no scratchy seams.', 'TRUE_TO_SIZE', 'EXCELLENT', 'VERY_COMFORTABLE', 6, 10),
-('Great jacket for transitional weather, especially with denim and trainers.', 'TRUE_TO_SIZE', 'EXCELLENT', 'COMFORTABLE', 3, 15),
-('The coat looks more expensive than it is and feels warm enough for winter.', 'TRUE_TO_SIZE', 'EXCELLENT', 'VERY_COMFORTABLE', 4, 17),
-('Jeans are sturdy and the wash looks natural, though the first wear is firm.', 'RUNS_SMALL', 'AVERAGE', 'COMFORTABLE', 5, 21),
-('The trousers drape nicely and work well with both shirts and knitwear.', 'TRUE_TO_SIZE', 'EXCELLENT', 'VERY_COMFORTABLE', 6, 23),
-('Comfortable sneakers for long city walks with a very minimal look.', 'TRUE_TO_SIZE', 'EXCELLENT', 'COMFORTABLE', 3, 31),
-('The tote is light, practical, and fits a laptop plus daily essentials.', 'TRUE_TO_SIZE', 'AVERAGE', 'COMFORTABLE', 4, 37),
-('My child likes the print and the cotton is soft after washing.', 'TRUE_TO_SIZE', 'EXCELLENT', 'VERY_COMFORTABLE', 5, 39),
-('Durable kids jacket with enough room for a hoodie underneath.', 'RUNS_LARGE', 'EXCELLENT', 'COMFORTABLE', 6, 41);
+('Clean cut and easy to style, but I would size up for a looser fit.', 'RUNS_SMALL', 'AVERAGE', 'COMFORTABLE', 4, 2),
+('The heavyweight cotton is exactly what I wanted for everyday wear.', 'TRUE_TO_SIZE', 'EXCELLENT', 'VERY_COMFORTABLE', 5, 3),
+('Soft knit with a flattering fit and no scratchy seams.', 'TRUE_TO_SIZE', 'EXCELLENT', 'VERY_COMFORTABLE', 6, 4),
+('Great jacket for transitional weather, especially with denim and trainers.', 'TRUE_TO_SIZE', 'EXCELLENT', 'COMFORTABLE', 3, 7),
+('The coat looks more expensive than it is and feels warm enough for winter.', 'TRUE_TO_SIZE', 'EXCELLENT', 'VERY_COMFORTABLE', 4, 8),
+('Jeans are sturdy and the wash looks natural, though the first wear is firm.', 'RUNS_SMALL', 'AVERAGE', 'COMFORTABLE', 5, 10),
+('The trousers drape nicely and work well with both shirts and knitwear.', 'TRUE_TO_SIZE', 'EXCELLENT', 'VERY_COMFORTABLE', 6, 11),
+('Comfortable sneakers for long city walks with a very minimal look.', 'TRUE_TO_SIZE', 'EXCELLENT', 'COMFORTABLE', 3, 15),
+('The tote is light, practical, and fits a laptop plus daily essentials.', 'TRUE_TO_SIZE', 'AVERAGE', 'COMFORTABLE', 4, 18),
+('My child likes the print and the cotton is soft after washing.', 'TRUE_TO_SIZE', 'EXCELLENT', 'VERY_COMFORTABLE', 5, 19),
+('Durable kids jacket with enough room for a hoodie underneath.', 'RUNS_LARGE', 'EXCELLENT', 'COMFORTABLE', 6, 20);
 

@@ -6,6 +6,7 @@ D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\C
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\ControllerTestSupport.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\FavoriteControllerTest.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\ItemControllerTest.java
+D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\ItemVariantControllerTest.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\ReviewControllerTest.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\SizeControllerTest.java
 D:\GitHubRepos\FashionStore\backend\src\test\java\com\fashionstore\controllers\UserControllerAuthTest.java

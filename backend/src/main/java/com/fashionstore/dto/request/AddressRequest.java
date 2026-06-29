@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Min;
+import java.util.List;
 
 @Getter
 @Setter
@@ -33,4 +34,6 @@ public class AddressRequest {
     private String addressLine;
 
     private Long userId;
+
+    private List<Long> userIds;
 }

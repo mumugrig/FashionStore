@@ -12,11 +12,10 @@ import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecificationExecutor<Review> {
-    List<Review> findByItemVariantId(Long itemVariantId);
-    Page<Review> findByItemVariantItemId(Long itemId, Pageable pageable);
+    List<Review> findByItemId(Long itemId);
+    Page<Review> findByItemId(Long itemId, Pageable pageable);
     Optional<Review> findByIdAndUserId(Long id, Long userId);
-    boolean existsByItemVariantId(Long itemVariantId);
-    boolean existsByItemVariantItemId(Long itemId);
+    boolean existsByItemId(Long itemId);
     void deleteByUserId(Long userId);
 }
 

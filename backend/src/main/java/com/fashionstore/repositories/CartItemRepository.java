@@ -15,6 +15,8 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long>, JpaSp
     List<CartItem> findByUserId(Long userId);
     Page<CartItem> findByUserId(Long userId, Pageable pageable);
     Optional<CartItem> findByIdAndUserId(Long id, Long userId);
+    boolean existsByUserIdAndItemVariantId(Long userId, Long itemVariantId);
+    boolean existsByUserIdAndItemVariantIdAndIdNot(Long userId, Long itemVariantId, Long id);
     boolean existsByItemVariantId(Long itemVariantId);
     boolean existsByItemVariantItemId(Long itemId);
     void deleteByUserId(Long userId);

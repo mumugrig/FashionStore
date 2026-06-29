@@ -46,6 +46,6 @@ public class Review {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "item_variant_id", nullable = false)
-    private ItemVariant itemVariant;
+    @JoinColumn(name = "item_id", nullable = false)
+    private Item item;
 }

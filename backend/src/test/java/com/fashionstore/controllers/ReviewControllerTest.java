@@ -29,10 +29,10 @@ class ReviewControllerTest extends ControllerTestSupport {
     @Test
     void createReview_whenRequestIsValid_returnsCreatedReview() {
         Authentication authentication = authentication();
-        when(reviewServiceMock.createReview(eq(authentication), any()))
+        when(reviewServiceMock.createReview(eq(authentication), eq(2L), any()))
                 .thenReturn(reviewResponse(1L, 1L, 2L, "Comfortable enough for daily wear."));
 
-        var response = objectUnderTest.createReview(authentication, reviewRequest(1L, 2L, "Comfortable enough for daily wear."));
+        var response = objectUnderTest.createReview(authentication, 2L, reviewRequest(1L, 2L, "Comfortable enough for daily wear."));
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode(), "Review creation should return HTTP 201");
         assertEquals("Comfortable enough for daily wear.", response.getBody().getBody(), "Created review body should match service response");
@@ -41,10 +41,10 @@ class ReviewControllerTest extends ControllerTestSupport {
     @Test
     void updateReview_whenReviewExists_returnsUpdatedReview() {
         Authentication authentication = authentication();
-        when(reviewServiceMock.updateReview(eq(authentication), eq(1L), any()))
+        when(reviewServiceMock.updateReview(eq(authentication), eq(2L), eq(1L), any()))
                 .thenReturn(reviewResponse(1L, 1L, 2L, "Updated review body with enough text."));
 
-        var response = objectUnderTest.updateReview(authentication, reviewRequest(1L, 2L, "Updated review body with enough text."), 1L);
+        var response = objectUnderTest.updateReview(authentication, 2L, 1L, reviewRequest(1L, 2L, "Updated review body with enough text."));
 
         assertEquals("Updated review body with enough text.", response.getBody().getBody(), "Updated review body should match service response");
     }

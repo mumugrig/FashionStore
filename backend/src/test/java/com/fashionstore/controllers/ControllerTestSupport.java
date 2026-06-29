@@ -92,9 +92,9 @@ abstract class ControllerTestSupport {
         return request;
     }
 
-    protected ReviewRequest reviewRequest(long userId, long variantId, String body) {
+    protected ReviewRequest reviewRequest(long userId, long itemId, String body) {
         ReviewRequest request = new ReviewRequest();
-        request.setItemVariantId(variantId);
+        request.setItemId(itemId);
         request.setBody(body);
         request.setSizeFit(SizeFit.TRUE_TO_SIZE);
         request.setQuality(Quality.EXCELLENT);
@@ -177,7 +177,7 @@ abstract class ControllerTestSupport {
     }
 
     protected AddressResponse addressResponse(long id, long userId, String city) {
-        return new AddressResponse(id, "Ukraine", "Region", city, 1000, "123 Test Street", userId);
+        return new AddressResponse(id, "Ukraine", "Region", city, 1000, "123 Test Street", List.of(userId));
     }
 
     protected AdminAddressResponse adminAddressResponse(long id, long userId, String city) {
@@ -188,10 +188,10 @@ abstract class ControllerTestSupport {
         response.setCity(city);
         response.setPostalCode(1000);
         response.setAddressLine("123 Test Street");
-        response.setUserId(userId);
-        response.setUserName("Test User");
-        response.setUserEmail("test@example.com");
-        response.setUserPhoneNumber("1234567890");
+        response.setUserIds(List.of(userId));
+        response.setUserNames(List.of("Test User"));
+        response.setUserEmails(List.of("test@example.com"));
+        response.setUserPhoneNumbers(List.of("1234567890"));
         return response;
     }
 
@@ -232,8 +232,8 @@ abstract class ControllerTestSupport {
         return response;
     }
 
-    protected ReviewResponse reviewResponse(long id, long userId, long variantId, String body) {
-        return new ReviewResponse(id, body, "TRUE_TO_SIZE", "EXCELLENT", "VERY_COMFORTABLE", userId, variantId);
+    protected ReviewResponse reviewResponse(long id, long userId, long itemId, String body) {
+        return new ReviewResponse(id, body, "TRUE_TO_SIZE", "EXCELLENT", "VERY_COMFORTABLE", userId, itemId);
     }
 
     protected UserResponse userResponse(long id, String email) {

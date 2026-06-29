@@ -9,31 +9,35 @@ import com.fashionstore.dto.request.UserRequest;
 import com.fashionstore.dto.response.AdminUserResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.dto.response.UserResponse;
+import com.fashionstore.models.Address;
+import com.fashionstore.repositories.AddressRepository;
 import com.fashionstore.repositories.UserRepository;
 import com.fashionstore.vo.UserRole;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final AddressRepository addressRepository;
     private final CurrentUserService currentUserService;
     private final PasswordEncoder passwordEncoder;
 
 
     @Transactional
     public UserResponse createUser(UserRequest userRequest) {
+        if (!hasText(userRequest.getPassword())) {
+            throw new ValidationException("Password is required");
+        }
+        validatePasswordLength(userRequest.getPassword());
         if (userRepository.findByEmail(userRequest.getEmail()).isPresent()) {
             throw new ConflictException("Email is already registered");
         }
@@ -60,7 +64,16 @@ public class UserService {
             user.setLastName(userRequest.getLastName());
             user.setEmail(userRequest.getEmail());
             user.setPhoneNumber(userRequest.getPhoneNumber());
-            user.setPasswordHash(passwordEncoder.encode(userRequest.getPassword()));
+            if (hasText(userRequest.getPassword())) {
+                validatePasswordLength(userRequest.getPassword());
+                user.setPasswordHash(passwordEncoder.encode(userRequest.getPassword()));
+            }
+            if (userRequest.getRole() != null) {
+                user.setRole(userRequest.getRole());
+            }
+            if (userRequest.getAddressIds() != null) {
+                syncAddresses(user, userRequest.getAddressIds());
+            }
 
             User updatedUser = userRepository.save(user);
             return UserResponse.from(updatedUser);
@@ -100,6 +113,13 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public AdminUserResponse getAdminUserById(Long id) {
+        return userRepository.findById(id)
+                .map(AdminUserResponse::from)
+                .orElseThrow(() -> new NotFoundException("User", id));
+    }
+
+    @Transactional(readOnly = true)
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll()
                 .stream()
@@ -113,7 +133,7 @@ public class UserService {
             return PageResponse.from(userRepository.findAll(PageRequestFactory.create(page, size)), UserResponse::from);
         }
         return PageResponse.from(userRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.USERS, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), UserResponse::from);
     }
@@ -124,7 +144,7 @@ public class UserService {
             return PageResponse.from(userRepository.findAll(PageRequestFactory.create(page, size)), AdminUserResponse::from);
         }
         return PageResponse.from(userRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.USERS, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), AdminUserResponse::from);
     }
@@ -139,6 +159,7 @@ public class UserService {
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User", id));
+        unlinkAddresses(user);
         userRepository.delete(user);
     }
 
@@ -150,7 +171,40 @@ public class UserService {
     @Transactional
     public void deleteAuthenticatedUser(Authentication authentication) {
         User user = currentUserService.findCurrentUser(authentication);
+        unlinkAddresses(user);
         userRepository.delete(user);
+    }
+
+    private void unlinkAddresses(User user) {
+        List<Address> addresses = new ArrayList<>(addressRepository.findByUsersId(user.getId()));
+        for (Address address : addresses) {
+            address.getUsers().removeIf(linkedUser -> linkedUser.getId().equals(user.getId()));
+            if (address.getUsers().isEmpty()) {
+                addressRepository.delete(address);
+            } else {
+                addressRepository.save(address);
+            }
+        }
+    }
+
+    private void syncAddresses(User user, List<Long> addressIds) {
+        List<Address> currentAddresses = new ArrayList<>(addressRepository.findByUsersId(user.getId()));
+        for (Address address : currentAddresses) {
+            if (!addressIds.contains(address.getId())) {
+                address.getUsers().removeIf(linkedUser -> linkedUser.getId().equals(user.getId()));
+                addressRepository.save(address);
+            }
+        }
+        for (Long addressId : addressIds) {
+            Address address = addressRepository.findById(addressId)
+                    .orElseThrow(() -> new NotFoundException("Address", addressId));
+            boolean alreadyLinked = address.getUsers().stream()
+                    .anyMatch(linkedUser -> linkedUser.getId().equals(user.getId()));
+            if (!alreadyLinked) {
+                address.getUsers().add(user);
+                addressRepository.save(address);
+            }
+        }
     }
 
     private void ensureEmailAvailableForUser(String email, Long userId) {
@@ -165,14 +219,9 @@ public class UserService {
         return value != null && !value.trim().isEmpty();
     }
 
-    private Map<String, Function<Root<User>, Expression<?>>> adminFields() {
-        return Map.ofEntries(
-                Map.entry("id", root -> root.get("id")),
-                Map.entry("firstName", root -> root.get("firstName")),
-                Map.entry("lastName", root -> root.get("lastName")),
-                Map.entry("email", root -> root.get("email")),
-                Map.entry("phoneNumber", root -> root.get("phoneNumber")),
-                Map.entry("role", root -> root.get("role"))
-        );
+    private void validatePasswordLength(String password) {
+        if (password.length() < 6 || password.length() > 100) {
+            throw new ValidationException("Password must be between 6 and 100 characters");
+        }
     }
 }

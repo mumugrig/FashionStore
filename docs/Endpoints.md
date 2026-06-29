@@ -1,13 +1,15 @@
 # API Endpoints
 
-All endpoints are prefixed with `/api`. User endpoints require an authenticated user unless marked `Everyone`. Admin endpoints require `ADMIN`.
+Base path: `/api`
+
+Authentication uses bearer JWT access tokens. All endpoints require an authenticated user unless marked `Public`. Admin endpoints require role `ADMIN`.
 
 ## Authentication
 | Method | Endpoint | Description | Permissions |
 |--------|----------|-------------|-------------|
-| POST | `/api/auth/register` | Register a new user | Everyone |
-| POST | `/api/auth/login` | Log in an existing user | Everyone |
-| POST | `/api/auth/refresh` | Refresh an access token | Refresh token |
+| POST | `/api/auth/register` | Register a new user and return access/refresh tokens | Public |
+| POST | `/api/auth/login` | Log in an existing user and return access/refresh tokens | Public |
+| POST | `/api/auth/refresh` | Refresh an access token using a refresh token | Public |
 | POST | `/api/auth/logout` | Log out the current user | User |
 
 ## User Profile
@@ -18,6 +20,8 @@ All endpoints are prefixed with `/api`. User endpoints require an authenticated 
 | DELETE | `/api/users/me` | Delete current user account | User |
 
 ## Catalog
+Catalog item lists only return items with at least one active variant.
+
 | Method | Endpoint | Description | Permissions |
 |--------|----------|-------------|-------------|
 | GET | `/api/items` | Get paged items | User |
@@ -30,13 +34,17 @@ All endpoints are prefixed with `/api`. User endpoints require an authenticated 
 | GET | `/api/sizes/{id}` | Get size by id | User |
 
 ## Addresses
+Address rows are shared. User endpoints manage the authenticated user's link to an address, not private ownership of the row.
+
 | Method | Endpoint | Description | Permissions |
 |--------|----------|-------------|-------------|
 | GET | `/api/addresses` | Get current user's paged addresses | User |
 | GET | `/api/addresses/{id}` | Get current user's address by id | User |
-| POST | `/api/addresses` | Create address for current user | User |
-| PUT | `/api/addresses/{id}` | Update current user's address | User |
-| DELETE | `/api/addresses/{id}` | Delete current user's address | User |
+| POST | `/api/addresses` | Find/create address and link it to current user | User |
+| PUT | `/api/addresses/{id}` | Repoint current user's link to requested address fields | User |
+| DELETE | `/api/addresses/{id}` | Unlink current user; delete row only if no users remain linked | User |
+
+
 
 ## Cart
 | Method | Endpoint | Description | Permissions |
@@ -45,6 +53,7 @@ All endpoints are prefixed with `/api`. User endpoints require an authenticated 
 | POST | `/api/cart/items` | Add item variant to current user's cart | User |
 | PUT | `/api/cart/items/{id}` | Update current user's cart item by cart item id | User |
 | DELETE | `/api/cart/items/{id}` | Delete current user's cart item by cart item id | User |
+
 
 ## Favorites
 | Method | Endpoint | Description | Permissions |
@@ -57,9 +66,10 @@ All endpoints are prefixed with `/api`. User endpoints require an authenticated 
 | Method | Endpoint | Description | Permissions |
 |--------|----------|-------------|-------------|
 | GET | `/api/items/{itemId}/reviews` | Get paged reviews for an item | User |
-| POST | `/api/items/{itemId}/reviews` | Create review for an item variant | User |
+| POST | `/api/items/{itemId}/reviews` | Create review for an item | User |
 | PUT | `/api/items/{itemId}/reviews/{id}` | Update current user's review | User |
 | DELETE | `/api/items/{itemId}/reviews/{id}` | Delete current user's review | User |
+
 
 ## Admin Users
 | Method | Endpoint | Description | Permissions |
@@ -113,15 +123,17 @@ All endpoints are prefixed with `/api`. User endpoints require an authenticated 
 | POST | `/api/admin/sizes/bulk-delete` | Delete multiple sizes | Admin |
 
 ## Admin Addresses
+Admin address updates mutate the canonical address row globally. Admin deletes remove the address row and its user links.
+
 | Method | Endpoint | Description | Permissions |
 |--------|----------|-------------|-------------|
 | GET | `/api/admin/addresses` | Get paged addresses with admin details | Admin |
 | GET | `/api/admin/users/{userId}/addresses` | Get paged addresses for a user | Admin |
 | GET | `/api/admin/addresses/{id}` | Get address by id | Admin |
-| POST | `/api/admin/addresses` | Create address | Admin |
-| PUT | `/api/admin/addresses/{id}` | Update address by id | Admin |
-| DELETE | `/api/admin/addresses/{id}` | Delete address by id | Admin |
-| POST | `/api/admin/addresses/bulk-delete` | Delete multiple addresses | Admin |
+| POST | `/api/admin/addresses` | Find/create address and link it to `userId` | Admin |
+| PUT | `/api/admin/addresses/{id}` | Update address row by id | Admin |
+| DELETE | `/api/admin/addresses/{id}` | Delete address row globally | Admin |
+| POST | `/api/admin/addresses/bulk-delete` | Delete multiple address rows globally | Admin |
 
 ## Admin Cart
 | Method | Endpoint | Description | Permissions |
@@ -188,6 +200,10 @@ Pagination uses one-based page numbers. If omitted, `page` defaults to `1` and `
 | `audience` | String | Filter by audience | No |
 | `pricemin` | Number | Minimum price | No |
 | `pricemax` | Number | Maximum price | No |
+| `priceMin` | Number | Alias for `pricemin` | No |
+| `priceMax` | Number | Alias for `pricemax` | No |
+
+Valid `audience` values: `MEN`, `WOMEN`, `KIDS`, `UNISEX`.
 
 ### User Paged Collections
 | Endpoint | Extra parameters |
@@ -214,8 +230,146 @@ Admin paged collection endpoints support:
 
 Bulk delete endpoints accept:
 
-```json
+```jsonc
 {
   "ids": [1, 2, 3]
 }
 ```
+
+---
+
+# Request Bodies
+
+## Auth And Profile
+
+```jsonc
+// RegisterRequest
+{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "email": "jane@example.com",
+  "phoneNumber": "+359888123456",
+  "password": "password"
+}
+
+// LoginRequest
+{
+  "email": "jane@example.com",
+  "password": "password"
+}
+
+// RefreshTokenRequest
+{
+  "refreshToken": "..."
+}
+
+// ProfileUpdateRequest
+{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "email": "jane@example.com",
+  "phoneNumber": "+359888123456",
+  "currentPassword": "password",
+  "newPassword": "newpassword"
+}
+```
+
+## User-Owned Resources
+
+```jsonc
+// AddressRequest
+{
+  "country": "Bulgaria",
+  "region": "Sofia City",
+  "city": "Sofia",
+  "postalCode": 1000,
+  "addressLine": "1 Vitosha Boulevard",
+  "userId": 1
+}
+
+// CartItemRequest
+{
+  "quantity": 1,
+  "itemVariantId": 1,
+  "userId": 1
+}
+
+// FavoriteRequest
+{
+  "itemVariantId": 1,
+  "userId": 1
+}
+
+// ReviewRequest
+{
+  "body": "Review text with at least ten characters.",
+  "sizeFit": "TRUE_TO_SIZE",
+  "quality": "EXCELLENT",
+  "comfort": "VERY_COMFORTABLE",
+  "itemId": 1
+}
+```
+
+## Admin Catalog Resources
+
+```json
+// ItemRequest
+{
+  "name": "Jacket",
+  "price": 129.99,
+  "description": "A detailed item description.",
+  "imageUrl": "https://example.com/item.jpg",
+  "audience": "UNISEX",
+  "categoryId": 1
+}
+
+// ItemVariantRequest
+{
+  "isActive": true,
+  "stockLeft": 10,
+  "imageUrl": "https://example.com/variant.jpg",
+  "itemId": 1,
+  "sizeId": 1,
+  "colorId": 1
+}
+
+// CategoryRequest
+{
+  "name": "Outerwear",
+  "parentId": null
+}
+
+// ColorRequest
+{
+  "name": "Black",
+  "value": "#111111",
+  "imageUrl": "https://example.com/black.jpg"
+}
+
+// SizeRequest
+{
+  "label": "M",
+  "sizeSystem": "ALPHA"
+}
+
+// UserRequest
+{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "email": "jane@example.com",
+  "phoneNumber": "+359888123456",
+  "password": "new-password-or-omit-for-no-change",
+  "role": "USER"
+}
+```
+
+## Enum Values
+
+| Field | Values |
+|-------|--------|
+| `audience` | `MEN`, `WOMEN`, `KIDS`, `UNISEX` |
+| `sizeSystem` | `ALPHA`, `US`, `UK`, `EU` |
+| `sizeFit` | `RUNS_SMALL`, `TRUE_TO_SIZE`, `RUNS_LARGE` |
+| `quality` | `POOR`, `AVERAGE`, `EXCELLENT` |
+| `comfort` | `UNCOMFORTABLE`, `COMFORTABLE`, `VERY_COMFORTABLE` |
+| `role` | `USER`, `ADMIN` |

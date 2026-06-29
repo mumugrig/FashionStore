@@ -86,6 +86,20 @@ class ItemServiceTest extends ServiceTestSupport {
     }
 
     @Test
+    void getPagedItems_whenNoFiltersProvided_usesPublicCatalogSpecification() {
+        var category = category(1L, "Shirts");
+        var item = item(1L, "Catalog Shirt", category);
+
+        when(itemRepositoryMock.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(item)));
+
+        var response = objectUnderTest.getPagedItems(1, 20);
+
+        assertEquals(1, response.getContent().size(), "Public catalog query should return repository results");
+        verify(itemRepositoryMock).findAll(any(Specification.class), any(Pageable.class));
+    }
+
+    @Test
     void getPagedItems_whenFiltersAreProvided_usesFilteredRepositoryQuery() {
         var category = category(1L, "Shirts");
         var item = item(1L, "Filtered Shirt", category);
@@ -113,7 +127,7 @@ class ItemServiceTest extends ServiceTestSupport {
         when(itemRepositoryMock.existsById(1L)).thenReturn(true);
         when(cartItemRepositoryMock.existsByItemVariantItemId(1L)).thenReturn(false);
         when(favoriteRepositoryMock.existsByItemVariantItemId(1L)).thenReturn(false);
-        when(reviewRepositoryMock.existsByItemVariantItemId(1L)).thenReturn(false);
+        when(reviewRepositoryMock.existsByItemId(1L)).thenReturn(false);
 
         objectUnderTest.deleteItem(1L);
 
@@ -144,7 +158,7 @@ class ItemServiceTest extends ServiceTestSupport {
         when(itemRepositoryMock.existsById(1L)).thenReturn(true);
         when(cartItemRepositoryMock.existsByItemVariantItemId(1L)).thenReturn(false);
         when(favoriteRepositoryMock.existsByItemVariantItemId(1L)).thenReturn(false);
-        when(reviewRepositoryMock.existsByItemVariantItemId(1L)).thenReturn(true);
+        when(reviewRepositoryMock.existsByItemId(1L)).thenReturn(true);
 
         assertThrows(ConflictException.class, () -> objectUnderTest.deleteItem(1L));
         verify(itemRepositoryMock, never()).deleteById(1L);

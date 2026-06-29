@@ -8,12 +8,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.Generated;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "favorites")
+@Table(
+        name = "favorites",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_favorites_user_variant",
+                columnNames = {"user_id", "item_variant_id"}
+        )
+)
 @Getter
 @Setter
 public class Favorite {

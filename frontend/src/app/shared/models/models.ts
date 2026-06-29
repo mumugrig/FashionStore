@@ -14,6 +14,8 @@ export interface User {
   lastName: string;
   email: string;
   phoneNumber: string;
+  addressIds?: number[];
+  role?: string;
 }
 
 export interface AuthResponse {
@@ -72,7 +74,17 @@ export interface Address {
   city: string;
   postalCode: number;
   addressLine: string;
-  userId: number;
+  userIds: number[];
+}
+
+export interface AddressRequest {
+  country: string;
+  region: string;
+  city: string;
+  postalCode: number;
+  addressLine: string;
+  userId?: number | null;
+  userIds?: number[];
 }
 
 export interface CartItem {
@@ -95,7 +107,7 @@ export interface Review {
   quality: string;
   comfort: string;
   userId: number;
-  itemVariantId: number;
+  itemId: number;
 }
 
 export type ApiCollection<T> = PageResponse<T> | T[];

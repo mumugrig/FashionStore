@@ -5,20 +5,19 @@ import com.fashionstore.dto.response.AdminAddressResponse;
 import com.fashionstore.dto.response.AddressResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.exceptions.NotFoundException;
+import com.fashionstore.exceptions.ValidationException;
+import com.fashionstore.models.User;
 import org.springframework.stereotype.Service;
 import com.fashionstore.models.Address;
 import com.fashionstore.repositories.AddressRepository;
 import com.fashionstore.repositories.UserRepository;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,21 +28,14 @@ public class AddressService {
 
     @Transactional
     public AddressResponse addAddress(AddressRequest addressRequest) {
-        Address newAddress = new Address();
-        applyAddressRequest(newAddress, addressRequest);
-        newAddress.setUser(userRepository.findById(addressRequest.getUserId())
-                .orElseThrow(() -> new NotFoundException("User", addressRequest.getUserId())));
-        Address savedAddress = addressRepository.save(newAddress);
-        return AddressResponse.from(savedAddress);
+        List<User> users = findRequestedUsers(addressRequest);
+        return AddressResponse.from(findOrCreateAndLink(addressRequest, users));
     }
 
     @Transactional
     public AddressResponse addAddress(Authentication authentication, AddressRequest addressRequest) {
-        Address newAddress = new Address();
-        applyAddressRequest(newAddress, addressRequest);
-        newAddress.setUser(currentUserService.findCurrentUser(authentication));
-        Address savedAddress = addressRepository.save(newAddress);
-        return AddressResponse.from(savedAddress);
+        User currentUser = currentUserService.findCurrentUser(authentication);
+        return AddressResponse.from(findOrCreateAndLink(addressRequest, List.of(currentUser)));
     }
 
     @Transactional(readOnly = true)
@@ -55,7 +47,7 @@ public class AddressService {
     @Transactional(readOnly = true)
     public AddressResponse getAddressById(Authentication authentication, Long id) {
         var currentUser = currentUserService.findCurrentUser(authentication);
-        return addressRepository.findByIdAndUserId(id, currentUser.getId())
+        return addressRepository.findByIdAndUsersId(id, currentUser.getId())
                 .map(AddressResponse::from)
                 .orElseThrow(() -> new NotFoundException("Address", id));
     }
@@ -71,7 +63,7 @@ public class AddressService {
             return getPagedAddresses(page, size);
         }
         return PageResponse.from(addressRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.ADDRESSES, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), AddressResponse::from);
     }
@@ -82,7 +74,7 @@ public class AddressService {
             return PageResponse.from(addressRepository.findAll(PageRequestFactory.create(page, size)), AdminAddressResponse::from);
         }
         return PageResponse.from(addressRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.ADDRESSES, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), AdminAddressResponse::from);
     }
@@ -90,7 +82,7 @@ public class AddressService {
     @Transactional(readOnly = true)
     public PageResponse<AddressResponse> getPagedAddresses(Authentication authentication, int page, int size) {
         var currentUser = currentUserService.findCurrentUser(authentication);
-        return PageResponse.from(addressRepository.findByUserId(currentUser.getId(), PageRequestFactory.create(page, size)), AddressResponse::from);
+        return PageResponse.from(addressRepository.findByUsersId(currentUser.getId(), PageRequestFactory.create(page, size)), AddressResponse::from);
     }
 
     @Transactional(readOnly = true)
@@ -98,31 +90,31 @@ public class AddressService {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("User", userId);
         }
-        return PageResponse.from(addressRepository.findByUserId(userId, PageRequestFactory.create(page, size)), AddressResponse::from);
+        return PageResponse.from(addressRepository.findByUsersId(userId, PageRequestFactory.create(page, size)), AddressResponse::from);
     }
 
     @Transactional
     public AddressResponse updateAddress(Long id, AddressRequest addressRequest){
-        Optional<Address> address = addressRepository.findById(id);
-        if (address.isPresent()) {
-            Address updatedAddress = address.get();
-            applyAddressRequest(updatedAddress, addressRequest);
-            updatedAddress.setUser(userRepository.findById(addressRequest.getUserId())
-                    .orElseThrow(() -> new NotFoundException("User", addressRequest.getUserId())));
-            Address savedAddress = addressRepository.save(updatedAddress);
-            return AddressResponse.from(savedAddress);
+        Address updatedAddress = addressRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Address", id));
+        applyAddressRequest(updatedAddress, addressRequest);
+        if (addressRequest.getUserIds() != null) {
+            syncUsers(updatedAddress, addressRequest.getUserIds());
+        } else if (addressRequest.getUserId() != null) {
+            linkUser(updatedAddress, findRequestedUser(addressRequest.getUserId()));
         }
-        throw new NotFoundException("Address", id);
+        return AddressResponse.from(addressRepository.save(updatedAddress));
     }
 
     @Transactional
     public AddressResponse updateAddress(Authentication authentication, Long id, AddressRequest addressRequest){
-        var currentUser = currentUserService.findCurrentUser(authentication);
-        Address updatedAddress = addressRepository.findByIdAndUserId(id, currentUser.getId())
+        User currentUser = currentUserService.findCurrentUser(authentication);
+        Address oldAddress = addressRepository.findByIdAndUsersId(id, currentUser.getId())
                 .orElseThrow(() -> new NotFoundException("Address", id));
-        applyAddressRequest(updatedAddress, addressRequest);
-        Address savedAddress = addressRepository.save(updatedAddress);
-        return AddressResponse.from(savedAddress);
+        unlinkUser(oldAddress, currentUser);
+        Address newAddress = findOrCreateAndLink(addressRequest, List.of(currentUser));
+        deleteIfUnlinked(oldAddress);
+        return AddressResponse.from(newAddress);
     }
 
     @Transactional
@@ -140,34 +132,80 @@ public class AddressService {
 
     @Transactional
     public void deleteAddress(Authentication authentication, Long id){
-        var currentUser = currentUserService.findCurrentUser(authentication);
-        Address address = addressRepository.findByIdAndUserId(id, currentUser.getId())
+        User currentUser = currentUserService.findCurrentUser(authentication);
+        Address address = addressRepository.findByIdAndUsersId(id, currentUser.getId())
                 .orElseThrow(() -> new NotFoundException("Address", id));
-        addressRepository.delete(address);
+        unlinkUser(address, currentUser);
+        deleteIfUnlinked(address);
     }
 
     private void applyAddressRequest(Address address, AddressRequest addressRequest) {
-        address.setCity(addressRequest.getCity());
-        address.setAddressLine(addressRequest.getAddressLine());
-        address.setCountry(addressRequest.getCountry());
-        address.setRegion(addressRequest.getRegion());
+        address.setCity(normalize(addressRequest.getCity()));
+        address.setAddressLine(normalize(addressRequest.getAddressLine()));
+        address.setCountry(normalize(addressRequest.getCountry()));
+        address.setRegion(normalize(addressRequest.getRegion()));
         address.setPostalCode(addressRequest.getPostalCode());
     }
 
-    private Map<String, Function<Root<Address>, Expression<?>>> adminFields() {
-        return Map.ofEntries(
-                Map.entry("id", root -> root.get("id")),
-                Map.entry("country", root -> root.get("country")),
-                Map.entry("region", root -> root.get("region")),
-                Map.entry("city", root -> root.get("city")),
-                Map.entry("postalCode", root -> root.get("postalCode")),
-                Map.entry("addressLine", root -> root.get("addressLine")),
-                Map.entry("userId", root -> root.get("user").get("id")),
-                Map.entry("userFirstName", root -> root.get("user").get("firstName")),
-                Map.entry("userLastName", root -> root.get("user").get("lastName")),
-                Map.entry("userName", root -> root.get("user").get("firstName")),
-                Map.entry("userEmail", root -> root.get("user").get("email")),
-                Map.entry("userPhoneNumber", root -> root.get("user").get("phoneNumber"))
-        );
+    private Address findOrCreateAndLink(AddressRequest addressRequest, List<User> users) {
+        String country = normalize(addressRequest.getCountry());
+        String region = normalize(addressRequest.getRegion());
+        String city = normalize(addressRequest.getCity());
+        String addressLine = normalize(addressRequest.getAddressLine());
+
+        Address address = addressRepository.findByCountryAndRegionAndCityAndPostalCodeAndAddressLine(
+                        country, region, city, addressRequest.getPostalCode(), addressLine)
+                .orElseGet(() -> {
+                    Address newAddress = new Address();
+                    newAddress.setCountry(country);
+                    newAddress.setRegion(region);
+                    newAddress.setCity(city);
+                    newAddress.setPostalCode(addressRequest.getPostalCode());
+                    newAddress.setAddressLine(addressLine);
+                    return newAddress;
+                });
+        users.forEach(user -> linkUser(address, user));
+        return addressRepository.save(address);
+    }
+
+    private List<User> findRequestedUsers(AddressRequest addressRequest) {
+        if (addressRequest.getUserIds() != null) {
+            return addressRequest.getUserIds().stream().map(this::findRequestedUser).toList();
+        }
+        return List.of(findRequestedUser(addressRequest.getUserId()));
+    }
+
+    private User findRequestedUser(Long userId) {
+        if (userId == null) {
+            throw new ValidationException("User reference is required");
+        }
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User", userId));
+    }
+
+    private void linkUser(Address address, User user) {
+        if (address.getUsers().stream().noneMatch(existing -> existing.getId().equals(user.getId()))) {
+            address.getUsers().add(user);
+        }
+    }
+
+    private void unlinkUser(Address address, User user) {
+        address.getUsers().removeIf(existing -> existing.getId().equals(user.getId()));
+        addressRepository.save(address);
+    }
+
+    private void syncUsers(Address address, List<Long> userIds) {
+        List<User> users = userIds.stream().map(this::findRequestedUser).collect(Collectors.toList());
+        address.getUsers().clear();
+        users.forEach(user -> linkUser(address, user));
+    }
+
+    private void deleteIfUnlinked(Address address) {
+        if (address.getUsers().isEmpty()) {
+            addressRepository.delete(address);
+        }
+    }
+
+    private String normalize(String value) {
+        return value == null ? null : value.trim();
     }
 }

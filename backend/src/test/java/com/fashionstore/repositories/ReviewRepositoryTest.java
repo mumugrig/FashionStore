@@ -102,7 +102,7 @@ class ReviewRepositoryTest {
         review.setQuality(Quality.EXCELLENT);
         review.setComfort(Comfort.VERY_COMFORTABLE);
         review.setUser(user);
-        review.setItemVariant(itemVariant);
+        review.setItem(itemVariant.getItem());
 
         Review savedReview = reviewRepository.save(review);
 
@@ -119,7 +119,7 @@ class ReviewRepositoryTest {
         review.setQuality(Quality.AVERAGE);
         review.setComfort(Comfort.COMFORTABLE);
         review.setUser(user);
-        review.setItemVariant(itemVariant);
+        review.setItem(itemVariant.getItem());
         Review savedReview = reviewRepository.save(review);
 
         Review foundReview = reviewRepository.findById(savedReview.getId()).orElse(null);
@@ -129,22 +129,14 @@ class ReviewRepositoryTest {
     }
 
     @Test
-    void findByItemVariantId_whenReviewsExist_returnsVariantReviews() {
-        ItemVariant itemVariant2 = new ItemVariant();
-        itemVariant2.setItem(itemVariant.getItem());
-        itemVariant2.setColor(itemVariant.getColor());
-        itemVariant2.setSize(itemVariant.getSize());
-        itemVariant2.setActive(true);
-        itemVariant2.setStockLeft(30);
-        itemVariantRepository.save(itemVariant2);
-
+    void findByItemId_whenReviewsExist_returnsItemReviews() {
         Review review1 = new Review();
         review1.setBody("Review 1");
         review1.setSizeFit(SizeFit.TRUE_TO_SIZE);
         review1.setQuality(Quality.EXCELLENT);
         review1.setComfort(Comfort.VERY_COMFORTABLE);
         review1.setUser(user);
-        review1.setItemVariant(itemVariant);
+        review1.setItem(itemVariant.getItem());
         reviewRepository.save(review1);
 
         Review review2 = new Review();
@@ -153,7 +145,7 @@ class ReviewRepositoryTest {
         review2.setQuality(Quality.AVERAGE);
         review2.setComfort(Comfort.COMFORTABLE);
         review2.setUser(user);
-        review2.setItemVariant(itemVariant);
+        review2.setItem(itemVariant.getItem());
         reviewRepository.save(review2);
 
         Review review3 = new Review();
@@ -162,29 +154,28 @@ class ReviewRepositoryTest {
         review3.setQuality(Quality.EXCELLENT);
         review3.setComfort(Comfort.VERY_COMFORTABLE);
         review3.setUser(user);
-        review3.setItemVariant(itemVariant2);
+        review3.setItem(itemVariant.getItem());
         reviewRepository.save(review3);
 
-        List<Review> variantReviews = reviewRepository.findByItemVariantId(itemVariant.getId());
+        List<Review> itemReviews = reviewRepository.findByItemId(itemVariant.getItem().getId());
 
-        assertEquals(2, variantReviews.size());
-        assertEquals(3, reviewRepository.findByItemVariantItemId(itemVariant.getItem().getId(), PageRequest.of(0, 20)).getTotalElements());
-        assertTrue(variantReviews.stream().allMatch(r -> r.getItemVariant().getId().equals(itemVariant.getId())));
-        assertTrue(reviewRepository.existsByItemVariantId(itemVariant.getId()));
-        assertTrue(reviewRepository.existsByItemVariantItemId(itemVariant.getItem().getId()));
+        assertEquals(3, itemReviews.size());
+        assertEquals(3, reviewRepository.findByItemId(itemVariant.getItem().getId(), PageRequest.of(0, 20)).getTotalElements());
+        assertTrue(itemReviews.stream().allMatch(r -> r.getItem().getId().equals(itemVariant.getItem().getId())));
+        assertTrue(reviewRepository.existsByItemId(itemVariant.getItem().getId()));
     }
 
     @Test
-    void findByItemVariantId_whenReviewsAreMissing_returnsEmptyList() {
-        ItemVariant emptyVariant = new ItemVariant();
-        emptyVariant.setItem(itemVariant.getItem());
-        emptyVariant.setColor(itemVariant.getColor());
-        emptyVariant.setSize(itemVariant.getSize());
-        emptyVariant.setActive(true);
-        emptyVariant.setStockLeft(10);
-        itemVariantRepository.save(emptyVariant);
+    void findByItemId_whenReviewsAreMissing_returnsEmptyList() {
+        Item emptyItem = new Item();
+        emptyItem.setName("Empty Review Item");
+        emptyItem.setPrice(BigDecimal.valueOf(39.99));
+        emptyItem.setDescription("Item without reviews");
+        emptyItem.setAudience(Audience.UNISEX);
+        emptyItem.setCategory(itemVariant.getItem().getCategory());
+        itemRepository.save(emptyItem);
 
-        List<Review> reviews = reviewRepository.findByItemVariantId(emptyVariant.getId());
+        List<Review> reviews = reviewRepository.findByItemId(emptyItem.getId());
 
         assertEquals(0, reviews.size());
     }
@@ -197,7 +188,7 @@ class ReviewRepositoryTest {
         review.setQuality(Quality.EXCELLENT);
         review.setComfort(Comfort.VERY_COMFORTABLE);
         review.setUser(user);
-        review.setItemVariant(itemVariant);
+        review.setItem(itemVariant.getItem());
         Review savedReview = reviewRepository.save(review);
 
         reviewRepository.deleteById(savedReview.getId());
@@ -213,7 +204,7 @@ class ReviewRepositoryTest {
         review.setQuality(Quality.EXCELLENT);
         review.setComfort(Comfort.VERY_COMFORTABLE);
         review.setUser(user);
-        review.setItemVariant(itemVariant);
+        review.setItem(itemVariant.getItem());
         reviewRepository.save(review);
 
         reviewRepository.deleteByUserId(user.getId());
@@ -229,7 +220,7 @@ class ReviewRepositoryTest {
         review1.setQuality(Quality.EXCELLENT);
         review1.setComfort(Comfort.VERY_COMFORTABLE);
         review1.setUser(user);
-        review1.setItemVariant(itemVariant);
+        review1.setItem(itemVariant.getItem());
 
         Review review2 = new Review();
         review2.setBody("Second");
@@ -237,7 +228,7 @@ class ReviewRepositoryTest {
         review2.setQuality(Quality.AVERAGE);
         review2.setComfort(Comfort.COMFORTABLE);
         review2.setUser(user);
-        review2.setItemVariant(itemVariant);
+        review2.setItem(itemVariant.getItem());
 
         reviewRepository.save(review1);
         reviewRepository.save(review2);

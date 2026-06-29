@@ -16,7 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class AdminUserControllerTest extends ControllerTestSupport {
+class nnmAdminUserControllerTest extends ControllerTestSupport {
     @Mock private UserService userServiceMock;
     private AdminUserController objectUnderTest;
 
@@ -38,11 +38,12 @@ class AdminUserControllerTest extends ControllerTestSupport {
 
     @Test
     void getUserById_returnsRequestedUser() {
-        when(userServiceMock.getUserById(1L)).thenReturn(userResponse(1L, "admin-user@example.com"));
+        when(userServiceMock.getAdminUserById(1L)).thenReturn(adminUserResponse(1L, "admin-user@example.com"));
 
         var response = objectUnderTest.getUserById(1L);
 
         assertEquals(1L, response.getBody().getId());
+        assertEquals("USER", response.getBody().getRole());
     }
 
     @Test

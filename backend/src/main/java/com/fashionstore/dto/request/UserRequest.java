@@ -1,5 +1,6 @@
 package com.fashionstore.dto.request;
 
+import com.fashionstore.vo.UserRole;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.AllArgsConstructor;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 
 @Getter
 @Setter
@@ -29,8 +31,10 @@ public class UserRequest {
     @Size(min = 10, max = 20, message = "Phone number must be between 10 and 20 characters")
     private String phoneNumber;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
     private String password;
+
+    private UserRole role;
+
+    private List<Long> addressIds;
 }
 

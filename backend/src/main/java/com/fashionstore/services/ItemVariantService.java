@@ -16,16 +16,11 @@ import com.fashionstore.repositories.SizeRepository;
 import com.fashionstore.repositories.ColorRepository;
 import com.fashionstore.repositories.CartItemRepository;
 import com.fashionstore.repositories.FavoriteRepository;
-import com.fashionstore.repositories.ReviewRepository;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +32,6 @@ public class ItemVariantService {
     private final ColorRepository colorRepository;
     private final CartItemRepository cartItemRepository;
     private final FavoriteRepository favoriteRepository;
-    private final ReviewRepository reviewRepository;
 
     @Transactional
     public ItemVariantResponse createItemVariant(ItemVariantRequest itemVariantRequest) {
@@ -114,7 +108,7 @@ public class ItemVariantService {
             return PageResponse.from(itemVariantRepository.findAll(PageRequestFactory.create(page, size)), AdminItemVariantResponse::from);
         }
         return PageResponse.from(itemVariantRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.ITEM_VARIANTS, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), AdminItemVariantResponse::from);
     }
@@ -138,35 +132,12 @@ public class ItemVariantService {
         if (favoriteRepository.existsByItemVariantId(id)) {
             throw new ConflictException("Cannot delete item variant because it is in favourites. Remove those favourites first.");
         }
-        if (reviewRepository.existsByItemVariantId(id)) {
-            throw new ConflictException("Cannot delete item variant because it has reviews. Delete those reviews first.");
-        }
         itemVariantRepository.deleteById(id);
     }
 
     @Transactional
     public void deleteItemVariants(List<Long> ids) {
         ids.forEach(this::deleteItemVariant);
-    }
-
-    private Map<String, Function<Root<ItemVariant>, Expression<?>>> adminFields() {
-        return Map.ofEntries(
-                Map.entry("id", root -> root.get("id")),
-                Map.entry("active", root -> root.get("isActive")),
-                Map.entry("isActive", root -> root.get("isActive")),
-                Map.entry("stockLeft", root -> root.get("stockLeft")),
-                Map.entry("imageUrl", root -> root.get("imageUrl")),
-                Map.entry("itemId", root -> root.get("item").get("id")),
-                Map.entry("itemName", root -> root.get("item").get("name")),
-                Map.entry("itemPrice", root -> root.get("item").get("price")),
-                Map.entry("itemAudience", root -> root.get("item").get("audience")),
-                Map.entry("sizeId", root -> root.get("size").get("id")),
-                Map.entry("sizeLabel", root -> root.get("size").get("label")),
-                Map.entry("sizeSystem", root -> root.get("size").get("sizeSystem")),
-                Map.entry("colorId", root -> root.get("color").get("id")),
-                Map.entry("colorName", root -> root.get("color").get("name")),
-                Map.entry("colorValue", root -> root.get("color").get("value"))
-        );
     }
 }
 

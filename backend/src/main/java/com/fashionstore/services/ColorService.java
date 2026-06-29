@@ -8,15 +8,11 @@ import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.exceptions.ConflictException;
 import com.fashionstore.repositories.ColorRepository;
 import com.fashionstore.repositories.ItemVariantRepository;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +63,7 @@ public class ColorService {
             return getPagedColors(page, size);
         }
         return PageResponse.from(colorRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.COLORS, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), ColorResponse::from);
     }
@@ -86,15 +82,6 @@ public class ColorService {
     @Transactional
     public void deleteColors(List<Long> ids) {
         ids.forEach(this::deleteColor);
-    }
-
-    private Map<String, Function<Root<Color>, Expression<?>>> adminFields() {
-        return Map.of(
-                "id", root -> root.get("id"),
-                "name", root -> root.get("name"),
-                "value", root -> root.get("value"),
-                "imageUrl", root -> root.get("imageUrl")
-        );
     }
 }
 

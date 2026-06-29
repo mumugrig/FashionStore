@@ -4,6 +4,7 @@ D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\controllers\a
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\controllers\admin\AdminColorController.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\controllers\admin\AdminFavoriteController.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\controllers\admin\AdminItemController.java
+D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\controllers\admin\AdminItemVariantController.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\controllers\admin\AdminReviewController.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\controllers\admin\AdminSizeController.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\controllers\admin\AdminUserController.java
@@ -19,6 +20,7 @@ D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\controllers\u
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\controllers\user\SizeController.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\controllers\user\UserProfileController.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\request\AddressRequest.java
+D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\request\BulkDeleteRequest.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\request\CartItemRequest.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\request\CategoryRequest.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\request\ColorRequest.java
@@ -26,12 +28,21 @@ D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\request\F
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\request\ItemRequest.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\request\ItemVariantRequest.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\request\LoginRequest.java
+D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\request\ProfileUpdateRequest.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\request\RefreshTokenRequest.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\request\RegisterRequest.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\request\ReviewRequest.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\request\SizeRequest.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\request\UserRequest.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\response\AddressResponse.java
+D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\response\AdminAddressResponse.java
+D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\response\AdminCartItemResponse.java
+D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\response\AdminCategoryResponse.java
+D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\response\AdminFavoriteResponse.java
+D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\response\AdminItemResponse.java
+D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\response\AdminItemVariantResponse.java
+D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\response\AdminReviewResponse.java
+D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\response\AdminUserResponse.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\response\AuthResponse.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\response\CartItemResponse.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\dto\response\CategoryResponse.java
@@ -75,6 +86,8 @@ D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\security\Fash
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\security\JwtService.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\security\SecurityConfig.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\services\AddressService.java
+D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\services\AdminFilterSpecification.java
+D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\services\AdminSearchFields.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\services\AuthService.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\services\CartItemService.java
 D:\GitHubRepos\FashionStore\backend\src\main\java\com\fashionstore\services\CategoryService.java

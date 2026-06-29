@@ -6,6 +6,15 @@ export interface AdminField {
   type: FieldType;
   required?: boolean;
   options?: string[];
+  reference?: AdminReference;
+  multiple?: boolean;
+  requestKey?: string;
+}
+
+export interface AdminReference {
+  resourceKey: string;
+  valueKey: string;
+  labelKeys: string[];
 }
 
 export interface AdminColumn {
@@ -36,6 +45,7 @@ const sizeSystems = ['ALPHA', 'US', 'UK', 'EU'];
 const sizeFit = ['RUNS_SMALL', 'TRUE_TO_SIZE', 'RUNS_LARGE'];
 const quality = ['POOR', 'AVERAGE', 'EXCELLENT'];
 const comfort = ['UNCOMFORTABLE', 'COMFORTABLE', 'VERY_COMFORTABLE'];
+const userRoles = ['USER', 'ADMIN'];
 
 export const adminResources: AdminResourceConfig[] = [
   {
@@ -60,7 +70,7 @@ export const adminResources: AdminResourceConfig[] = [
       { key: 'description', label: 'Description', type: 'textarea', required: true },
       { key: 'imageUrl', label: 'Image URL', type: 'text' },
       { key: 'audience', label: 'Audience', type: 'select', required: true, options: audience },
-      { key: 'categoryId', label: 'Category reference', type: 'number', required: true }
+      { key: 'categoryId', label: 'Category reference', type: 'number', required: true, reference: { resourceKey: 'categories', valueKey: 'id', labelKeys: ['name'] } }
     ],
     create: true,
     update: true,
@@ -79,7 +89,7 @@ export const adminResources: AdminResourceConfig[] = [
     ],
     fields: [
       { key: 'name', label: 'Name', type: 'text', required: true },
-      { key: 'parentId', label: 'Parent category reference', type: 'number' }
+      { key: 'parentId', label: 'Parent category reference', type: 'number', reference: { resourceKey: 'categories', valueKey: 'id', labelKeys: ['name'] } }
     ],
     create: true,
     update: true,
@@ -134,14 +144,17 @@ export const adminResources: AdminResourceConfig[] = [
       { key: 'lastName', label: 'Last name', defaultVisible: true },
       { key: 'email', label: 'Email', defaultVisible: true },
       { key: 'phoneNumber', label: 'Phone', defaultVisible: true },
-      { key: 'role', label: 'Role', defaultVisible: true }
+      { key: 'role', label: 'Role', defaultVisible: true },
+      { key: 'addressIds', label: 'Address IDs' }
     ],
     fields: [
       { key: 'firstName', label: 'First name', type: 'text', required: true },
       { key: 'lastName', label: 'Last name', type: 'text', required: true },
       { key: 'email', label: 'Email', type: 'email', required: true },
       { key: 'phoneNumber', label: 'Phone', type: 'text', required: true },
-      { key: 'password', label: 'Password', type: 'password', required: true }
+      { key: 'password', label: 'New password', type: 'password' },
+      { key: 'role', label: 'Role', type: 'select', required: true, options: userRoles },
+      { key: 'addressIds', label: 'Addresses', type: 'number', multiple: true, reference: { resourceKey: 'addresses', valueKey: 'id', labelKeys: ['addressLine', 'city', 'country'] } }
     ],
     update: true,
     delete: true,
@@ -158,26 +171,18 @@ export const adminResources: AdminResourceConfig[] = [
       { key: 'userId', label: 'User ID' },
       { key: 'userName', label: 'User', defaultVisible: true },
       { key: 'userEmail', label: 'User email', defaultVisible: true },
-      { key: 'itemVariantId', label: 'Variant ID' },
       { key: 'itemId', label: 'Item ID' },
       { key: 'itemName', label: 'Item', defaultVisible: true },
       { key: 'sizeFit', label: 'Size fit' },
       { key: 'quality', label: 'Quality' },
-      { key: 'comfort', label: 'Comfort' },
-      { key: 'sizeLabel', label: 'Size' },
-      { key: 'sizeSystem', label: 'Size system' },
-      { key: 'colorName', label: 'Color' },
-      { key: 'colorValue', label: 'Color value' },
-      { key: 'variantActive', label: 'Variant active' },
-      { key: 'variantStockLeft', label: 'Variant stock' },
-      { key: 'variantImageUrl', label: 'Variant image' }
+      { key: 'comfort', label: 'Comfort' }
     ],
     fields: [
       { key: 'body', label: 'Body', type: 'textarea', required: true },
       { key: 'sizeFit', label: 'Size fit', type: 'select', required: true, options: sizeFit },
       { key: 'quality', label: 'Quality', type: 'select', required: true, options: quality },
       { key: 'comfort', label: 'Comfort', type: 'select', required: true, options: comfort },
-      { key: 'itemVariantId', label: 'Product option reference', type: 'number', required: true }
+      { key: 'itemId', label: 'Item reference', type: 'number', required: true, reference: { resourceKey: 'items', valueKey: 'id', labelKeys: ['name'] } }
     ],
     update: true,
     delete: true
@@ -194,10 +199,10 @@ export const adminResources: AdminResourceConfig[] = [
       { key: 'city', label: 'City', defaultVisible: true },
       { key: 'postalCode', label: 'Postal code', defaultVisible: true },
       { key: 'addressLine', label: 'Address line', defaultVisible: true },
-      { key: 'userId', label: 'User ID' },
-      { key: 'userName', label: 'User', defaultVisible: true },
-      { key: 'userEmail', label: 'User email' },
-      { key: 'userPhoneNumber', label: 'User phone' }
+      { key: 'userIds', label: 'User IDs' },
+      { key: 'userNames', label: 'Users', defaultVisible: true },
+      { key: 'userEmails', label: 'User emails' },
+      { key: 'userPhoneNumbers', label: 'User phones' }
     ],
     fields: [
       { key: 'country', label: 'Country', type: 'text', required: true },
@@ -205,7 +210,7 @@ export const adminResources: AdminResourceConfig[] = [
       { key: 'city', label: 'City', type: 'text', required: true },
       { key: 'postalCode', label: 'Postal code', type: 'number', required: true },
       { key: 'addressLine', label: 'Address line', type: 'text', required: true },
-      { key: 'userId', label: 'User reference', type: 'number' }
+      { key: 'userIds', label: 'Linked users', type: 'number', multiple: true, reference: { resourceKey: 'users', valueKey: 'id', labelKeys: ['firstName', 'lastName', 'email'] } }
     ],
     create: true,
     update: true,
@@ -235,8 +240,8 @@ export const adminResources: AdminResourceConfig[] = [
     ],
     fields: [
       { key: 'quantity', label: 'Quantity', type: 'number', required: true },
-      { key: 'itemVariantId', label: 'Product option reference', type: 'number', required: true },
-      { key: 'userId', label: 'User reference', type: 'number' }
+      { key: 'itemVariantId', label: 'Product option reference', type: 'number', required: true, reference: { resourceKey: 'item-variants', valueKey: 'id', labelKeys: ['itemName', 'sizeLabel', 'colorName'] } },
+      { key: 'userId', label: 'User reference', type: 'number', reference: { resourceKey: 'users', valueKey: 'id', labelKeys: ['firstName', 'lastName', 'email'] } }
     ],
     create: true,
     update: true,
@@ -267,8 +272,8 @@ export const adminResources: AdminResourceConfig[] = [
       { key: 'variantImageUrl', label: 'Variant image' }
     ],
     fields: [
-      { key: 'itemVariantId', label: 'Product option reference', type: 'number', required: true },
-      { key: 'userId', label: 'User reference', type: 'number' }
+      { key: 'itemVariantId', label: 'Product option reference', type: 'number', required: true, reference: { resourceKey: 'item-variants', valueKey: 'id', labelKeys: ['itemName', 'sizeLabel', 'colorName'] } },
+      { key: 'userId', label: 'User reference', type: 'number', reference: { resourceKey: 'users', valueKey: 'id', labelKeys: ['firstName', 'lastName', 'email'] } }
     ],
     create: true,
     update: true,
@@ -297,12 +302,12 @@ export const adminResources: AdminResourceConfig[] = [
       { key: 'imageUrl', label: 'Variant image' }
     ],
     fields: [
-      { key: 'active', label: 'Active', type: 'checkbox' },
+      { key: 'active', label: 'Active', type: 'checkbox', requestKey: 'isActive' },
       { key: 'stockLeft', label: 'Stock left', type: 'number', required: true },
       { key: 'imageUrl', label: 'Image URL', type: 'text' },
-      { key: 'itemId', label: 'Item reference', type: 'number', required: true },
-      { key: 'sizeId', label: 'Size reference', type: 'number', required: true },
-      { key: 'colorId', label: 'Color reference', type: 'number', required: true }
+      { key: 'itemId', label: 'Item reference', type: 'number', required: true, reference: { resourceKey: 'items', valueKey: 'id', labelKeys: ['name'] } },
+      { key: 'sizeId', label: 'Size reference', type: 'number', required: true, reference: { resourceKey: 'sizes', valueKey: 'id', labelKeys: ['label', 'sizeSystem'] } },
+      { key: 'colorId', label: 'Color reference', type: 'number', required: true, reference: { resourceKey: 'colors', valueKey: 'id', labelKeys: ['name', 'value'] } }
     ],
     create: true,
     update: true,

@@ -372,11 +372,26 @@ export class AdminResourceComponent implements OnInit {
       return '-';
     }
     if (Array.isArray(value)) {
-      return `${value.length} item${value.length === 1 ? '' : 's'}`;
+      if (!value.length) {
+        return '-';
+      }
+      return value.map((item) => this.displayArrayItem(item)).join(', ');
     }
     if (typeof value === 'object') {
       return JSON.stringify(value);
     }
     return String(value);
+  }
+
+  private displayArrayItem(value: unknown): string {
+    if (value === null || value === undefined || value === '') {
+      return '-';
+    }
+    if (typeof value !== 'object') {
+      return String(value);
+    }
+    const row = value as Record<string, unknown>;
+    const label = row['name'] ?? row['email'] ?? row['id'];
+    return label === null || label === undefined ? JSON.stringify(value) : String(label);
   }
 }

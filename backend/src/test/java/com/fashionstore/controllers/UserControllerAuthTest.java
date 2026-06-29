@@ -123,6 +123,24 @@ class UserControllerAuthTest {
     }
 
     @Test
+    void refreshEndpointRotatesRefreshTokenAndReturnsNewAccessToken() throws Exception {
+        AuthResponse authResponse = authService.register(registerRequest("refresh-endpoint@example.com"));
+        String refreshBody = objectMapper.writeValueAsString(Map.of("refreshToken", authResponse.getRefreshToken()));
+        HttpRequest request = HttpRequest.newBuilder(URI.create(url("/api/auth/refresh")))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(refreshBody))
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        JsonNode body = objectMapper.readTree(response.body());
+
+        assertEquals(200, response.statusCode());
+        assertNotNull(body.get("accessToken").asText());
+        assertNotNull(body.get("refreshToken").asText());
+        assertTrue(!authResponse.getRefreshToken().equals(body.get("refreshToken").asText()));
+    }
+
+    @Test
     void logoutRequiresAuthentication() throws Exception {
         HttpRequest request = HttpRequest.newBuilder(URI.create(url("/api/auth/logout")))
                 .header("Content-Type", "application/json")

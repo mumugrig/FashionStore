@@ -7,7 +7,9 @@ import com.fashionstore.exceptions.ConflictException;
 import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.exceptions.ValidationException;
 import com.fashionstore.models.User;
+import com.fashionstore.repositories.AddressRepository;
 import com.fashionstore.repositories.UserRepository;
+import com.fashionstore.vo.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,24 +19,28 @@ import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest extends ServiceTestSupport {
     @Mock private UserRepository userRepositoryMock;
+    @Mock private AddressRepository addressRepositoryMock;
     @Mock private CurrentUserService currentUserServiceMock;
     @Mock private PasswordEncoder passwordEncoderMock;
     private UserService objectUnderTest;
 
     @BeforeEach
     void setUp() {
-        objectUnderTest = new UserService(userRepositoryMock, currentUserServiceMock, passwordEncoderMock);
+        objectUnderTest = new UserService(userRepositoryMock, addressRepositoryMock, currentUserServiceMock, passwordEncoderMock);
     }
 
     @Test
@@ -95,6 +101,64 @@ class UserServiceTest extends ServiceTestSupport {
         UserResponse response = objectUnderTest.updateUser(1L, userRequest("service-user@example.com", "Updated"));
 
         assertEquals("Updated", response.getFirstName(), "Same-user email update should be allowed");
+    }
+
+    @Test
+    void updateUser_whenRoleIsProvided_updatesRoleWithoutRequiringPassword() {
+        User existing = user(1L, "service-user@example.com");
+        existing.setPasswordHash("existing-password-hash");
+        User updatedUser = user(1L, "service-user@example.com");
+        updatedUser.setRole(UserRole.ADMIN);
+
+        UserRequest updateRequest = userRequest("service-user@example.com", "Updated");
+        updateRequest.setPassword("");
+        updateRequest.setRole(UserRole.ADMIN);
+
+        when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(existing));
+        when(userRepositoryMock.findByEmail("service-user@example.com")).thenReturn(Optional.of(existing));
+        when(userRepositoryMock.save(existing)).thenReturn(updatedUser);
+
+        objectUnderTest.updateUser(1L, updateRequest);
+
+        assertEquals(UserRole.ADMIN, existing.getRole(), "Admin update should apply requested user role");
+        assertEquals("existing-password-hash", existing.getPasswordHash(), "Blank password should keep existing password hash");
+        verify(passwordEncoderMock, never()).encode("");
+    }
+
+    @Test
+    void updateUser_whenAddressIdsAreProvided_replacesLinkedAddresses() {
+        User existing = user(1L, "service-user@example.com");
+        var removedAddress = address(1L, existing, "Kyiv");
+        var keptAddress = address(2L, existing, "Lviv");
+        var addedAddress = address(3L, user(2L, "other@example.com"), "Odesa");
+        UserRequest updateRequest = userRequest("service-user@example.com", "Updated");
+        updateRequest.setPassword("");
+        updateRequest.setAddressIds(List.of(keptAddress.getId(), addedAddress.getId()));
+
+        when(userRepositoryMock.findById(existing.getId())).thenReturn(Optional.of(existing));
+        when(userRepositoryMock.findByEmail(existing.getEmail())).thenReturn(Optional.of(existing));
+        when(addressRepositoryMock.findByUsersId(existing.getId())).thenReturn(List.of(removedAddress, keptAddress));
+        when(addressRepositoryMock.findById(keptAddress.getId())).thenReturn(Optional.of(keptAddress));
+        when(addressRepositoryMock.findById(addedAddress.getId())).thenReturn(Optional.of(addedAddress));
+        when(userRepositoryMock.save(existing)).thenReturn(existing);
+
+        objectUnderTest.updateUser(existing.getId(), updateRequest);
+
+        assertFalse(removedAddress.getUsers().stream().anyMatch(user -> user.getId().equals(existing.getId())));
+        assertTrue(keptAddress.getUsers().stream().anyMatch(user -> user.getId().equals(existing.getId())));
+        assertTrue(addedAddress.getUsers().stream().anyMatch(user -> user.getId().equals(existing.getId())));
+    }
+
+    @Test
+    void updateUser_whenNewPasswordIsTooShort_throwsValidationException() {
+        User existing = user(1L, "service-user@example.com");
+        UserRequest updateRequest = userRequest("service-user@example.com", "Updated");
+        updateRequest.setPassword("short");
+
+        when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(existing));
+        when(userRepositoryMock.findByEmail("service-user@example.com")).thenReturn(Optional.of(existing));
+
+        assertThrows(ValidationException.class, () -> objectUnderTest.updateUser(1L, updateRequest));
     }
 
     @Test
@@ -199,6 +263,7 @@ class UserServiceTest extends ServiceTestSupport {
     void deleteUser_whenUserExists_deletesUserEntityAndLetsCascadeRemoveOwnedData() {
         User user = user(1L, "delete-me@example.com");
         when(userRepositoryMock.findById(1L)).thenReturn(Optional.of(user));
+        when(addressRepositoryMock.findByUsersId(user.getId())).thenReturn(List.of());
 
         objectUnderTest.deleteUser(1L);
 
@@ -211,6 +276,7 @@ class UserServiceTest extends ServiceTestSupport {
         TestingAuthenticationToken authentication = new TestingAuthenticationToken("delete-me-service@example.com", null);
 
         when(currentUserServiceMock.findCurrentUser(authentication)).thenReturn(currentUser);
+        when(addressRepositoryMock.findByUsersId(currentUser.getId())).thenReturn(List.of());
 
         objectUnderTest.deleteAuthenticatedUser(authentication);
 

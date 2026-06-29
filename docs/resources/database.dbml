@@ -99,7 +99,11 @@ Table addresses {
   city varchar(100) [not null]
   postal_code int [not null]
   address_line varchar [not null]
+}
+
+Table user_addresses {
   user_id bigint [not null]
+  address_id bigint [not null]
 }
 
 Table cart_items {
@@ -122,7 +126,7 @@ Table reviews {
   quality quality [not null]
   comfort comfort [not null]
   user_id bigint [not null]
-  item_variant_id bigint [not null]
+  item_id bigint [not null]
 }
 
 Table refresh_tokens {
@@ -139,11 +143,12 @@ Ref: items.category_id > categories.id
 Ref: item_variants.item_id > items.id
 Ref: item_variants.size_id > sizes.id
 Ref: item_variants.color_id > colors.id
-Ref: addresses.user_id > users.id
+Ref: user_addresses.user_id > users.id
+Ref: user_addresses.address_id > addresses.id
 Ref: cart_items.item_variant_id > item_variants.id
 Ref: cart_items.user_id > users.id
 Ref: favorites.item_variant_id > item_variants.id
 Ref: favorites.user_id > users.id
 Ref: reviews.user_id > users.id
-Ref: reviews.item_variant_id > item_variants.id
+Ref: reviews.item_id > items.id
 Ref: refresh_tokens.user_id > users.id

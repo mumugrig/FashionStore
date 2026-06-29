@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
+import java.math.BigDecimal;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -61,6 +63,38 @@ class ItemControllerTest extends ControllerTestSupport {
 
         assertEquals(1, response.getBody().getContent().size(), "Item page should contain service results");
         assertEquals("Outerwear", response.getBody().getContent().get(0).getCategoryName(), "Admin item response should include category name");
+    }
+
+    @Test
+    void getPagedItems_whenCamelCasePriceFiltersProvided_passesResolvedPriceRangeToService() {
+        var userController = new com.fashionstore.controllers.user.ItemController(itemServiceMock);
+        when(itemServiceMock.getPagedItems(
+                org.mockito.ArgumentMatchers.eq(1),
+                org.mockito.ArgumentMatchers.eq(20),
+                org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.eq(BigDecimal.valueOf(10)),
+                org.mockito.ArgumentMatchers.eq(BigDecimal.valueOf(50))))
+                .thenReturn(pageResponse(itemResponse(1L, "Rain Jacket", 1L)));
+
+        var response = userController.getPagedItems(
+                1, 20, null, null, null, null, null,
+                null, null, BigDecimal.valueOf(10), BigDecimal.valueOf(50));
+
+        assertEquals(1, response.getBody().getContent().size(), "Price range query should return service results");
+        verify(itemServiceMock).getPagedItems(
+                org.mockito.ArgumentMatchers.eq(1),
+                org.mockito.ArgumentMatchers.eq(20),
+                org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.eq(BigDecimal.valueOf(10)),
+                org.mockito.ArgumentMatchers.eq(BigDecimal.valueOf(50)));
     }
 
     @Test

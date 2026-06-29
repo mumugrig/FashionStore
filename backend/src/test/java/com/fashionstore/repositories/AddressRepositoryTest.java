@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,13 +39,7 @@ class AddressRepositoryTest {
 
     @Test
     void save_whenAddressIsValid_persistsAddress() {
-        Address address = new Address();
-        address.setCountry("USA");
-        address.setRegion("California");
-        address.setCity("San Francisco");
-        address.setPostalCode(94103);
-        address.setAddressLine("123 Main St");
-        address.setUser(user);
+        Address address = address("USA", "California", "San Francisco", 94103, "123 Main St", user);
 
         Address savedAddress = addressRepository.save(address);
 
@@ -54,13 +49,7 @@ class AddressRepositoryTest {
 
     @Test
     void findById_whenAddressExists_returnsAddress() {
-        Address address = new Address();
-        address.setCountry("USA");
-        address.setRegion("NY");
-        address.setCity("New York");
-        address.setPostalCode(10001);
-        address.setAddressLine("456 Park Ave");
-        address.setUser(user);
+        Address address = address("USA", "NY", "New York", 10001, "456 Park Ave", user);
         Address savedAddress = addressRepository.save(address);
 
         Address foundAddress = addressRepository.findById(savedAddress.getId()).orElse(null);
@@ -70,7 +59,7 @@ class AddressRepositoryTest {
     }
 
     @Test
-    void findByUserId_whenRecordsExist_returnsUserRecords() {
+    void findByUsersId_whenRecordsExist_returnsUserRecords() {
         User user2 = new User();
         user2.setFirstName("Jane");
         user2.setLastName("Smith");
@@ -78,41 +67,24 @@ class AddressRepositoryTest {
         user2.setPasswordHash("hashedPassword");
         userRepository.save(user2);
 
-        Address address1 = new Address();
-        address1.setCountry("USA");
-        address1.setRegion("TX");
-        address1.setCity("Houston");
-        address1.setPostalCode(77001);
-        address1.setAddressLine("789 Road");
-        address1.setUser(user);
+        Address address1 = address("USA", "TX", "Houston", 77001, "789 Road", user);
         addressRepository.save(address1);
 
-        Address address2 = new Address();
-        address2.setCountry("USA");
-        address2.setRegion("TX");
-        address2.setCity("Dallas");
-        address2.setPostalCode(75201);
-        address2.setAddressLine("321 Ave");
-        address2.setUser(user);
+        Address address2 = address("USA", "TX", "Dallas", 75201, "321 Ave", user);
         addressRepository.save(address2);
 
-        Address address3 = new Address();
-        address3.setCountry("Canada");
-        address3.setRegion("ON");
-        address3.setCity("Toronto");
-        address3.setPostalCode(10001);
-        address3.setAddressLine("555 Street");
-        address3.setUser(user2);
+        Address address3 = address("Canada", "ON", "Toronto", 10001, "555 Street", user2);
         addressRepository.save(address3);
 
-        List<Address> userAddresses = addressRepository.findByUserId(user.getId());
+        List<Address> userAddresses = addressRepository.findByUsersId(user.getId());
 
         assertEquals(2, userAddresses.size());
-        assertTrue(userAddresses.stream().allMatch(a -> a.getUser().getId().equals(user.getId())));
+        assertEquals(2, addressRepository.findByUsersId(user.getId(), PageRequest.of(0, 20)).getTotalElements());
+        assertTrue(userAddresses.stream().allMatch(a -> a.getUsers().stream().anyMatch(u -> u.getId().equals(user.getId()))));
     }
 
     @Test
-    void findByUserId_whenRecordsAreMissing_returnsEmptyList() {
+    void findByUsersId_whenRecordsAreMissing_returnsEmptyList() {
         User user3 = new User();
         user3.setFirstName("Bob");
         user3.setLastName("Brown");
@@ -120,20 +92,14 @@ class AddressRepositoryTest {
         user3.setPasswordHash("hashedPassword");
         userRepository.save(user3);
 
-        List<Address> addresses = addressRepository.findByUserId(user3.getId());
+        List<Address> addresses = addressRepository.findByUsersId(user3.getId());
 
         assertEquals(0, addresses.size());
     }
 
     @Test
     void deleteById_whenAddressExists_removesAddress() {
-        Address address = new Address();
-        address.setCountry("USA");
-        address.setRegion("FL");
-        address.setCity("Miami");
-        address.setPostalCode(33101);
-        address.setAddressLine("999 Beach");
-        address.setUser(user);
+        Address address = address("USA", "FL", "Miami", 33101, "999 Beach", user);
         Address savedAddress = addressRepository.save(address);
 
         addressRepository.deleteById(savedAddress.getId());
@@ -142,44 +108,66 @@ class AddressRepositoryTest {
     }
 
     @Test
-    void deleteByUserId_whenUserHasRecords_removesUserRecords() {
-        Address address = new Address();
-        address.setCountry("USA");
-        address.setRegion("FL");
-        address.setCity("Miami");
-        address.setPostalCode(33101);
-        address.setAddressLine("999 Beach");
-        address.setUser(user);
+    void deleteLinksByUserId_whenUserHasRecords_removesUserLinks() {
+        Address address = address("USA", "FL", "Miami", 33101, "999 Beach", user);
         addressRepository.save(address);
 
-        addressRepository.deleteByUserId(user.getId());
+        addressRepository.deleteLinksByUserId(user.getId());
 
-        assertTrue(addressRepository.findByUserId(user.getId()).isEmpty());
+        assertTrue(addressRepository.findByUsersId(user.getId()).isEmpty());
+        assertTrue(addressRepository.existsById(address.getId()));
     }
 
     @Test
     void count_whenAddressesExist_returnsAddressCount() {
-        Address address1 = new Address();
-        address1.setCountry("USA");
-        address1.setRegion("WA");
-        address1.setCity("Seattle");
-        address1.setPostalCode(98101);
-        address1.setAddressLine("111 Pine");
-        address1.setUser(user);
-
-        Address address2 = new Address();
-        address2.setCountry("USA");
-        address2.setRegion("OR");
-        address2.setCity("Portland");
-        address2.setPostalCode(97204);
-        address2.setAddressLine("222 Oak");
-        address2.setUser(user);
+        Address address1 = address("USA", "WA", "Seattle", 98101, "111 Pine", user);
+        Address address2 = address("USA", "OR", "Portland", 97204, "222 Oak", user);
 
         addressRepository.save(address1);
         addressRepository.save(address2);
 
         long count = addressRepository.count();
         assertTrue(count >= 2);
+    }
+
+    @Test
+    void findByCanonicalFields_whenAddressExists_returnsAddress() {
+        Address savedAddress = addressRepository.save(address("USA", "FL", "Miami", 33101, "999 Beach", user));
+
+        var foundAddress = addressRepository.findByCountryAndRegionAndCityAndPostalCodeAndAddressLine(
+                "USA", "FL", "Miami", 33101, "999 Beach");
+
+        assertTrue(foundAddress.isPresent());
+        assertEquals(savedAddress.getId(), foundAddress.get().getId());
+    }
+
+    @Test
+    void sharedAddress_canBeLinkedToMultipleUsers() {
+        User user2 = new User();
+        user2.setFirstName("Jane");
+        user2.setLastName("Smith");
+        user2.setEmail("jane-shared@example.com");
+        user2.setPasswordHash("hashedPassword");
+        userRepository.save(user2);
+
+        Address sharedAddress = address("USA", "WA", "Seattle", 98101, "111 Pine", user);
+        sharedAddress.getUsers().add(user2);
+        Address savedAddress = addressRepository.save(sharedAddress);
+
+        assertEquals(2, addressRepository.findById(savedAddress.getId()).orElseThrow().getUsers().size());
+        assertEquals(1, addressRepository.findByUsersId(user.getId()).size());
+        assertEquals(1, addressRepository.findByUsersId(user2.getId()).size());
+    }
+
+    private Address address(String country, String region, String city, int postalCode, String addressLine, User user) {
+        Address address = new Address();
+        address.setCountry(country);
+        address.setRegion(region);
+        address.setCity(city);
+        address.setPostalCode(postalCode);
+        address.setAddressLine(addressLine);
+        address.getUsers().add(user);
+        return address;
     }
 }
 

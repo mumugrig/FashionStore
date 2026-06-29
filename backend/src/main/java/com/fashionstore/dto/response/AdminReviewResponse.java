@@ -1,6 +1,5 @@
 package com.fashionstore.dto.response;
 
-import com.fashionstore.models.ItemVariant;
 import com.fashionstore.models.Review;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,13 +15,6 @@ public class AdminReviewResponse extends ReviewResponse {
     private String userEmail;
     private Long itemId;
     private String itemName;
-    private String sizeLabel;
-    private String sizeSystem;
-    private String colorName;
-    private String colorValue;
-    private boolean variantActive;
-    private int variantStockLeft;
-    private String variantImageUrl;
 
     public AdminReviewResponse(ReviewResponse base) {
         setId(base.getId());
@@ -31,7 +23,7 @@ public class AdminReviewResponse extends ReviewResponse {
         setQuality(base.getQuality());
         setComfort(base.getComfort());
         setUserId(base.getUserId());
-        setItemVariantId(base.getItemVariantId());
+        setItemId(base.getItemId());
     }
 
     public static AdminReviewResponse from(Review review) {
@@ -40,20 +32,9 @@ public class AdminReviewResponse extends ReviewResponse {
         result.userLastName = review.getUser().getLastName();
         result.userName = fullName(result.userFirstName, result.userLastName);
         result.userEmail = review.getUser().getEmail();
-        applyVariant(result, review.getItemVariant());
+        result.itemId = review.getItem().getId();
+        result.itemName = review.getItem().getName();
         return result;
-    }
-
-    private static void applyVariant(AdminReviewResponse result, ItemVariant variant) {
-        result.itemId = variant.getItem().getId();
-        result.itemName = variant.getItem().getName();
-        result.sizeLabel = variant.getSize().getLabel();
-        result.sizeSystem = variant.getSize().getSizeSystem().name();
-        result.colorName = variant.getColor().getName();
-        result.colorValue = variant.getColor().getValue();
-        result.variantActive = variant.isActive();
-        result.variantStockLeft = variant.getStockLeft();
-        result.variantImageUrl = variant.getImageUrl();
     }
 
     private static String fullName(String firstName, String lastName) {

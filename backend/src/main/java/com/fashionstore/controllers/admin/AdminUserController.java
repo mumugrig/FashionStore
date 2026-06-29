@@ -43,8 +43,8 @@ public class AdminUserController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get user by id")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    public ResponseEntity<AdminUserResponse> getUserById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getAdminUserById(id));
     }
 
     @PatchMapping("/{id}")

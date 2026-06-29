@@ -1,6 +1,7 @@
 package com.fashionstore.services;
 
 import com.fashionstore.dto.response.CartItemResponse;
+import com.fashionstore.exceptions.ConflictException;
 import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.repositories.CartItemRepository;
 import com.fashionstore.repositories.ItemVariantRepository;
@@ -56,6 +57,36 @@ class CartItemServiceTest extends ServiceTestSupport {
         CartItemResponse response = objectUnderTest.addToCart(cartItemRequest(user.getId(), variant.getId(), 2));
 
         assertEquals(2, response.getQuantity(), "Created cart item quantity should match saved entity");
+    }
+
+    @Test
+    void addToCart_whenVariantIsOutOfStock_throwsConflictException() {
+        var user = user(1L, "cart-service@example.com");
+        var category = category(1L, "Shirts");
+        var item = item(1L, "Cart Shirt", category);
+        var size = size(1L, "M");
+        var color = color(1L, "Blue", "#0000ff");
+        var variant = itemVariant(1L, item, size, color);
+        variant.setStockLeft(0);
+
+        when(itemVariantRepositoryMock.findById(variant.getId())).thenReturn(Optional.of(variant));
+
+        assertThrows(ConflictException.class, () -> objectUnderTest.addToCart(cartItemRequest(user.getId(), variant.getId(), 1)));
+    }
+
+    @Test
+    void addToCart_whenQuantityExceedsStock_throwsConflictException() {
+        var user = user(1L, "cart-service@example.com");
+        var category = category(1L, "Shirts");
+        var item = item(1L, "Cart Shirt", category);
+        var size = size(1L, "M");
+        var color = color(1L, "Blue", "#0000ff");
+        var variant = itemVariant(1L, item, size, color);
+        variant.setStockLeft(1);
+
+        when(itemVariantRepositoryMock.findById(variant.getId())).thenReturn(Optional.of(variant));
+
+        assertThrows(ConflictException.class, () -> objectUnderTest.addToCart(cartItemRequest(user.getId(), variant.getId(), 2)));
     }
 
     @Test

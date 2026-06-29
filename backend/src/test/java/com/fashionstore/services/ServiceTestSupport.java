@@ -103,9 +103,9 @@ abstract class ServiceTestSupport {
         return request;
     }
 
-    protected ReviewRequest reviewRequest(Long userId, Long itemVariantId, String body) {
+    protected ReviewRequest reviewRequest(Long userId, Long itemId, String body) {
         ReviewRequest request = new ReviewRequest();
-        request.setItemVariantId(itemVariantId);
+        request.setItemId(itemId);
         request.setBody(body);
         request.setSizeFit(SizeFit.TRUE_TO_SIZE);
         request.setQuality(Quality.EXCELLENT);
@@ -201,11 +201,11 @@ abstract class ServiceTestSupport {
         return favorite;
     }
 
-    protected Review review(Long id, User user, ItemVariant variant, String body) {
+    protected Review review(Long id, User user, Item item, String body) {
         Review review = new Review();
         review.setId(id);
         review.setUser(user);
-        review.setItemVariant(variant);
+        review.setItem(item);
         review.setBody(body);
         review.setSizeFit(SizeFit.TRUE_TO_SIZE);
         review.setQuality(Quality.EXCELLENT);
@@ -216,7 +216,7 @@ abstract class ServiceTestSupport {
     protected Address address(Long id, User user, String city) {
         Address address = new Address();
         address.setId(id);
-        address.setUser(user);
+        address.getUsers().add(user);
         address.setCountry("Ukraine");
         address.setRegion("Region");
         address.setCity(city);

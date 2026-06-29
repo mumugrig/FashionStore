@@ -50,6 +50,8 @@ class FavoriteRepositoryTest {
 
     private User user;
     private ItemVariant itemVariant;
+    private Item item;
+    private Size size;
 
     @BeforeEach
     void setUp() {
@@ -64,7 +66,7 @@ class FavoriteRepositoryTest {
         category.setName("Favorites");
         categoryRepository.save(category);
 
-        Item item = new Item();
+        item = new Item();
         item.setName("Favorite Item");
         item.setPrice(BigDecimal.valueOf(99.99f));
         item.setDescription("Favorite item description");
@@ -77,7 +79,7 @@ class FavoriteRepositoryTest {
         color.setValue("#ffffff");
         colorRepository.save(color);
 
-        Size size = new Size();
+        size = new Size();
         size.setLabel("M");
         size.setSizeSystem(SizeSystem.ALPHA);
         sizeRepository.save(size);
@@ -131,7 +133,7 @@ class FavoriteRepositoryTest {
         favoriteRepository.save(favorite1);
 
         Favorite favorite2 = new Favorite();
-        favorite2.setItemVariant(itemVariant);
+        favorite2.setItemVariant(createItemVariant("Cream", "#fffdd0"));
         favorite2.setUser(user);
         favoriteRepository.save(favorite2);
 
@@ -194,7 +196,7 @@ class FavoriteRepositoryTest {
         favorite1.setUser(user);
 
         Favorite favorite2 = new Favorite();
-        favorite2.setItemVariant(itemVariant);
+        favorite2.setItemVariant(createItemVariant("Cream", "#fffdd0"));
         favorite2.setUser(user);
 
         favoriteRepository.save(favorite1);
@@ -202,6 +204,21 @@ class FavoriteRepositoryTest {
 
         long count = favoriteRepository.count();
         assertTrue(count >= 2);
+    }
+
+    private ItemVariant createItemVariant(String colorName, String colorValue) {
+        Color color = new Color();
+        color.setName(colorName);
+        color.setValue(colorValue);
+        colorRepository.save(color);
+
+        ItemVariant variant = new ItemVariant();
+        variant.setItem(item);
+        variant.setColor(color);
+        variant.setSize(size);
+        variant.setActive(true);
+        variant.setStockLeft(100);
+        return itemVariantRepository.save(variant);
     }
 }
 

@@ -13,6 +13,14 @@ export interface ProductFilters {
   pricemax?: number;
 }
 
+export interface ReviewRequest {
+  body: string;
+  sizeFit: string;
+  quality: string;
+  comfort: string;
+  itemId: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ProductsService {
   private readonly api = inject(ApiService);
@@ -27,5 +35,17 @@ export class ProductsService {
 
   getReviews(itemId: number, page = 1, size = 20): Observable<PageResponse<Review>> {
     return this.api.get<PageResponse<Review>>(`/items/${itemId}/reviews`, { page, size });
+  }
+
+  createReview(itemId: number, request: ReviewRequest): Observable<Review> {
+    return this.api.post<Review>(`/items/${itemId}/reviews`, request);
+  }
+
+  updateReview(itemId: number, reviewId: number, request: ReviewRequest): Observable<Review> {
+    return this.api.put<Review>(`/items/${itemId}/reviews/${reviewId}`, request);
+  }
+
+  deleteReview(itemId: number, reviewId: number): Observable<void> {
+    return this.api.delete<void>(`/items/${itemId}/reviews/${reviewId}`);
   }
 }

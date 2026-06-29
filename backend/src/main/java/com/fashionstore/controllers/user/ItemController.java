@@ -35,9 +35,13 @@ public class ItemController {
             @RequestParam(required = false) String color,
             @RequestParam(required = false) String audience,
             @RequestParam(required = false) BigDecimal pricemin,
-            @RequestParam(required = false) BigDecimal pricemax) {
+            @RequestParam(required = false) BigDecimal pricemax,
+            @RequestParam(required = false) BigDecimal priceMin,
+            @RequestParam(required = false) BigDecimal priceMax) {
         return ResponseEntity.ok(itemService.getPagedItems(
-                page, size, category, search, itemSize, color, audience, pricemin, pricemax));
+                page, size, category, search, itemSize, color, audience,
+                priceMin != null ? priceMin : pricemin,
+                priceMax != null ? priceMax : pricemax));
     }
 
     @GetMapping("/{id}")

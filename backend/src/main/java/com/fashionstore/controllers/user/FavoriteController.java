@@ -46,7 +46,13 @@ public class FavoriteController {
     }
 
     @DeleteMapping("/items/{id}")
-    @Operation(summary = "Delete current user's favorite")
+    @Operation(summary = "Delete current user's favorite by favorite id")
+    public ResponseEntity<Void> removeFavoriteLegacy(Authentication authentication, @PathVariable Long id) {
+        return removeFavorite(authentication, id);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete current user's favorite by favorite id")
     public ResponseEntity<Void> removeFavorite(Authentication authentication, @PathVariable Long id) {
         favoriteService.deleteFavorite(authentication, id);
         return ResponseEntity.noContent().build();

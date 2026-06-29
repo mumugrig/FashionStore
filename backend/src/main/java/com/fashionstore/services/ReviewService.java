@@ -6,41 +6,38 @@ import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.dto.response.ReviewResponse;
 import com.fashionstore.exceptions.NotFoundException;
 import com.fashionstore.models.Review;
-import com.fashionstore.repositories.ItemVariantRepository;
+import com.fashionstore.repositories.ItemRepository;
 import com.fashionstore.repositories.ReviewRepository;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewRepository reviewRepository;
-    private final ItemVariantRepository itemVariantRepository;
+    private final ItemRepository itemRepository;
     private final CurrentUserService currentUserService;
 
     @Transactional
-    public ReviewResponse createReview(Authentication authentication, ReviewRequest reviewRequest) {
+    public ReviewResponse createReview(Authentication authentication, Long itemId, ReviewRequest reviewRequest) {
         Review review = new Review();
-        applyReviewRequest(review, reviewRequest);
+        applyReviewRequest(review, reviewRequest, itemId);
         review.setUser(currentUserService.findCurrentUser(authentication));
         Review savedReview = reviewRepository.save(review);
         return ReviewResponse.from(savedReview);
     }
 
     @Transactional
-    public ReviewResponse updateReview(Authentication authentication, Long id, ReviewRequest reviewRequest){
+    public ReviewResponse updateReview(Authentication authentication, Long itemId, Long id, ReviewRequest reviewRequest){
         var currentUser = currentUserService.findCurrentUser(authentication);
         Review review = reviewRepository.findByIdAndUserId(id, currentUser.getId())
                 .orElseThrow(() -> new NotFoundException("Review", id));
 
-        applyReviewRequest(review, reviewRequest);
+        applyReviewRequest(review, reviewRequest, itemId);
 
         Review updatedReview = reviewRepository.save(review);
         return ReviewResponse.from(updatedReview);
@@ -51,7 +48,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Review", id));
 
-        applyReviewRequest(review, reviewRequest);
+        applyReviewRequest(review, reviewRequest, null);
 
         Review updatedReview = reviewRepository.save(review);
         return ReviewResponse.from(updatedReview);
@@ -75,7 +72,7 @@ public class ReviewService {
             return getPagedReviews(page, size);
         }
         return PageResponse.from(reviewRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.REVIEWS, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), ReviewResponse::from);
     }
@@ -86,14 +83,14 @@ public class ReviewService {
             return PageResponse.from(reviewRepository.findAll(PageRequestFactory.create(page, size)), AdminReviewResponse::from);
         }
         return PageResponse.from(reviewRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.REVIEWS, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), AdminReviewResponse::from);
     }
 
     @Transactional(readOnly = true)
     public PageResponse<ReviewResponse> getPagedReviewsByItem(Long itemId, int page, int size) {
-        return PageResponse.from(reviewRepository.findByItemVariantItemId(itemId, PageRequestFactory.create(page, size)), ReviewResponse::from);
+        return PageResponse.from(reviewRepository.findByItemId(itemId, PageRequestFactory.create(page, size)), ReviewResponse::from);
     }
 
     @Transactional
@@ -117,36 +114,16 @@ public class ReviewService {
         ids.forEach(this::deleteReview);
     }
 
-    private void applyReviewRequest(Review review, ReviewRequest reviewRequest) {
+    private void applyReviewRequest(Review review, ReviewRequest reviewRequest, Long routeItemId) {
         review.setBody(reviewRequest.getBody());
         review.setComfort(reviewRequest.getComfort());
         review.setQuality(reviewRequest.getQuality());
         review.setSizeFit(reviewRequest.getSizeFit());
-        review.setItemVariant(itemVariantRepository.findById(reviewRequest.getItemVariantId())
-                .orElseThrow(() -> new NotFoundException("ItemVariant", reviewRequest.getItemVariantId())));
-    }
-
-    private Map<String, Function<Root<Review>, Expression<?>>> adminFields() {
-        return Map.ofEntries(
-                Map.entry("id", root -> root.get("id")),
-                Map.entry("body", root -> root.get("body")),
-                Map.entry("sizeFit", root -> root.get("sizeFit")),
-                Map.entry("quality", root -> root.get("quality")),
-                Map.entry("comfort", root -> root.get("comfort")),
-                Map.entry("userId", root -> root.get("user").get("id")),
-                Map.entry("userFirstName", root -> root.get("user").get("firstName")),
-                Map.entry("userLastName", root -> root.get("user").get("lastName")),
-                Map.entry("userName", root -> root.get("user").get("firstName")),
-                Map.entry("userEmail", root -> root.get("user").get("email")),
-                Map.entry("itemVariantId", root -> root.get("itemVariant").get("id")),
-                Map.entry("itemId", root -> root.get("itemVariant").get("item").get("id")),
-                Map.entry("itemName", root -> root.get("itemVariant").get("item").get("name")),
-                Map.entry("sizeLabel", root -> root.get("itemVariant").get("size").get("label")),
-                Map.entry("sizeSystem", root -> root.get("itemVariant").get("size").get("sizeSystem")),
-                Map.entry("colorName", root -> root.get("itemVariant").get("color").get("name")),
-                Map.entry("colorValue", root -> root.get("itemVariant").get("color").get("value")),
-                Map.entry("variantActive", root -> root.get("itemVariant").get("isActive")),
-                Map.entry("variantStockLeft", root -> root.get("itemVariant").get("stockLeft"))
-        );
+        Long itemId = routeItemId != null ? routeItemId : reviewRequest.getItemId();
+        if (itemId == null) {
+            throw new ValidationException("Item ID is required");
+        }
+        review.setItem(itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Item", itemId)));
     }
 }

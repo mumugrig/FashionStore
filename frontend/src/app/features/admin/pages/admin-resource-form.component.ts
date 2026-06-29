@@ -2,8 +2,10 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
@@ -15,12 +17,20 @@ import {
   adminResources
 } from '@features/admin/services/admin-resource.config';
 
+interface ReferenceOption {
+  value: number;
+  label: string;
+  searchText: string;
+}
+
 @Component({
   standalone: true,
   imports: [
     MatButtonModule,
+    MatAutocompleteModule,
     MatCardModule,
     MatCheckboxModule,
+    MatChipsModule,
     MatFormFieldModule,
     MatInputModule,
     MatListModule,
@@ -55,6 +65,62 @@ import {
               @for (field of config.fields; track field.key) {
                 @if (field.type === 'checkbox') {
                   <mat-checkbox [formControlName]="field.key">{{ field.label }}</mat-checkbox>
+                } @else if (field.reference) {
+                  @if (field.multiple) {
+                    <mat-form-field appearance="outline">
+                      <mat-label>{{ field.label }}</mat-label>
+                      <mat-chip-grid #multiReferenceChipGrid>
+                        @for (option of selectedMultiReferenceOptions(field); track option.value) {
+                          <mat-chip-row (removed)="removeMultiReferenceOption(field, option.value)">
+                            {{ option.label }}
+                            <button matChipRemove type="button" [attr.aria-label]="'Remove ' + option.label">x</button>
+                          </mat-chip-row>
+                        }
+                      </mat-chip-grid>
+                      <input
+                        matInput
+                        type="text"
+                        [formControl]="multiReferenceSearchControl(field)"
+                        [matChipInputFor]="multiReferenceChipGrid"
+                        [matAutocomplete]="multiReferenceAuto">
+                      <mat-autocomplete
+                        #multiReferenceAuto="matAutocomplete"
+                        (optionSelected)="selectMultiReferenceOption(field, $event.option.value)">
+                        @for (option of filteredMultiReferenceOptions(field); track option.value) {
+                          <mat-option [value]="option">{{ option.label }}</mat-option>
+                        }
+                      </mat-autocomplete>
+                      @if (control(field).hasError('required')) {
+                        <mat-error>{{ field.label }} is required.</mat-error>
+                      }
+                    </mat-form-field>
+                  } @else {
+                    <mat-form-field appearance="outline">
+                      <mat-label>{{ field.label }}</mat-label>
+                      <input
+                        matInput
+                        type="text"
+                        [formControl]="referenceSearchControl(field)"
+                        [matAutocomplete]="referenceAuto"
+                        (keydown)="clearReferenceSelectionForTyping(field, $event)">
+                      <mat-autocomplete
+                        #referenceAuto="matAutocomplete"
+                        [displayWith]="referenceDisplay(field)"
+                        (optionSelected)="selectReferenceOption(field, $event.option.value)">
+                        @if (!isFieldRequired(field)) {
+                          <mat-option [value]="null">None</mat-option>
+                        }
+                        @for (option of filteredReferenceOptions(field); track option.value) {
+                          <mat-option [value]="option">{{ option.label }}</mat-option>
+                        }
+                      </mat-autocomplete>
+                      @if (control(field).hasError('required')) {
+                        <mat-error>{{ field.label }} is required.</mat-error>
+                      } @else if (control(field).hasError('min')) {
+                        <mat-error>Choose a valid option.</mat-error>
+                      }
+                    </mat-form-field>
+                  }
                 } @else {
                   <mat-form-field appearance="outline">
                     <mat-label>{{ field.label }}</mat-label>
@@ -111,6 +177,9 @@ export class AdminResourceFormComponent implements OnInit {
   loading = true;
   saving = false;
   message = '';
+  referenceOptions: Record<string, ReferenceOption[]> = {};
+  referenceSearch: Record<string, FormControl<string | ReferenceOption | null>> = {};
+  multiReferenceSearch: Record<string, FormControl<string>> = {};
 
   ngOnInit(): void {
     const resource = this.route.snapshot.paramMap.get('resource');
@@ -153,6 +222,101 @@ export class AdminResourceFormComponent implements OnInit {
     return this.form.controls[field.key];
   }
 
+  isFieldRequired(field: AdminField): boolean {
+    return !!field.required;
+  }
+
+  referenceSearchControl(field: AdminField): FormControl<string | ReferenceOption | null> {
+    let control = this.referenceSearch[field.key];
+    if (!control) {
+      control = new FormControl<string | ReferenceOption | null>('');
+      this.referenceSearch[field.key] = control;
+    }
+    return control;
+  }
+
+  filteredReferenceOptions(field: AdminField): ReferenceOption[] {
+    const options = this.referenceOptions[field.key] ?? [];
+    const searchValue = this.referenceSearchControl(field).value;
+    const search = typeof searchValue === 'string' ? searchValue.trim().toLowerCase() : '';
+    if (!search) {
+      return options;
+    }
+    return options.filter((option) => option.searchText.includes(search));
+  }
+
+  referenceOptionsFor(field: AdminField): ReferenceOption[] {
+    return this.referenceOptions[field.key] ?? [];
+  }
+
+  multiReferenceSearchControl(field: AdminField): FormControl<string> {
+    let control = this.multiReferenceSearch[field.key];
+    if (!control) {
+      control = new FormControl('', { nonNullable: true });
+      this.multiReferenceSearch[field.key] = control;
+    }
+    return control;
+  }
+
+  filteredMultiReferenceOptions(field: AdminField): ReferenceOption[] {
+    const options = this.referenceOptionsFor(field);
+    const search = this.multiReferenceSearchControl(field).value.trim().toLowerCase();
+    const selected = new Set(this.selectedMultiReferenceIds(field));
+    const available = options.filter((option) => !selected.has(option.value));
+    if (!search) {
+      return available;
+    }
+    return available.filter((option) => option.searchText.includes(search));
+  }
+
+  selectedMultiReferenceOptions(field: AdminField): ReferenceOption[] {
+    const selected = new Set(this.selectedMultiReferenceIds(field));
+    return this.referenceOptionsFor(field).filter((option) => selected.has(option.value));
+  }
+
+  selectMultiReferenceOption(field: AdminField, option: ReferenceOption): void {
+    const selected = this.selectedMultiReferenceIds(field);
+    if (!selected.includes(option.value)) {
+      this.control(field).setValue([...selected, option.value]);
+    }
+    this.multiReferenceSearchControl(field).setValue('');
+  }
+
+  removeMultiReferenceOption(field: AdminField, value: number): void {
+    this.control(field).setValue(this.selectedMultiReferenceIds(field).filter((id) => id !== value));
+  }
+
+  referenceDisplay(field: AdminField): (value: ReferenceOption | string | null) => string {
+    return (value) => {
+      if (!value) {
+        return '';
+      }
+      if (typeof value !== 'string') {
+        return value.label;
+      }
+      const selected = this.selectedReferenceOption(field);
+      return selected?.label ?? value;
+    };
+  }
+
+  selectReferenceOption(field: AdminField, option: ReferenceOption | null): void {
+    this.control(field).setValue(option?.value ?? null);
+    this.referenceSearchControl(field).setValue(option);
+  }
+
+  syncReferenceSearchLabel(field: AdminField): void {
+    const selected = this.selectedReferenceOption(field);
+    this.referenceSearchControl(field).setValue(selected ?? '');
+  }
+
+  clearReferenceSelectionForTyping(field: AdminField, event: KeyboardEvent): void {
+    if (!this.isTextEditingKey(event.key) || typeof this.referenceSearchControl(field).value === 'string') {
+      return;
+    }
+    this.control(field).setValue(null);
+    this.referenceSearchControl(field).setValue('');
+  }
+
   save(): void {
     if (this.form.invalid || this.saving) {
       this.form.markAllAsTouched();
@@ -188,10 +352,17 @@ export class AdminResourceFormComponent implements OnInit {
 
   private buildForm(row: AdminRow): void {
     const controls: Record<string, FormControl<unknown>> = {};
+    this.referenceOptions = {};
+    this.referenceSearch = {};
+    this.multiReferenceSearch = {};
     this.config.fields.forEach((field) => {
-      controls[field.key] = new FormControl(this.initialValue(field, row), this.validators(field));
+      controls[field.key] = new FormControl(this.initialValue(field, row), this.validators(field, row));
     });
     this.form = this.fb.group(controls);
+    this.config.fields
+      .filter((field) => field.reference && !field.multiple)
+      .forEach((field) => this.watchReferenceSearch(field));
+    this.loadReferenceOptions();
   }
 
   private initialValue(field: AdminField, row: AdminRow): unknown {
@@ -199,13 +370,16 @@ export class AdminResourceFormComponent implements OnInit {
     if (value !== null && value !== undefined) {
       return value;
     }
+    if (field.multiple) {
+      return [];
+    }
     if (field.type === 'checkbox') {
       return false;
     }
     return '';
   }
 
-  private validators(field: AdminField): ValidatorFn[] {
+  private validators(field: AdminField, row: AdminRow): ValidatorFn[] {
     const validators: ValidatorFn[] = [];
     if (field.required) {
       validators.push(Validators.required);
@@ -213,7 +387,7 @@ export class AdminResourceFormComponent implements OnInit {
     if (field.type === 'email') {
       validators.push(Validators.email);
     }
-    if (field.type === 'number') {
+    if (field.type === 'number' && !field.multiple) {
       validators.push(Validators.min(0));
     }
     if (field.type === 'color') {
@@ -222,14 +396,100 @@ export class AdminResourceFormComponent implements OnInit {
     return validators;
   }
 
+  private loadReferenceOptions(): void {
+    this.config.fields
+      .filter((field) => field.reference)
+      .forEach((field) => {
+        const reference = field.reference!;
+        const resource = adminResourceByKey(reference.resourceKey);
+        this.admin.list(resource, 1, 100).subscribe({
+          next: (result) => {
+            const rows = Array.isArray(result) ? result : result.content;
+            this.referenceOptions[field.key] = rows
+              .map((row) => this.toReferenceOption(field, row))
+              .filter((option): option is ReferenceOption => option !== null);
+            if (!field.multiple) {
+              this.syncReferenceSearchLabel(field);
+            }
+          },
+          error: () => {
+            this.referenceOptions[field.key] = [];
+          }
+        });
+      });
+  }
+
+  private watchReferenceSearch(field: AdminField): void {
+    this.referenceSearchControl(field).valueChanges.subscribe((value) => {
+      if (typeof value === 'string') {
+        this.control(field).setValue(null);
+      }
+    });
+  }
+
+  private toReferenceOption(field: AdminField, row: AdminRow): ReferenceOption | null {
+    const reference = field.reference;
+    if (!reference) {
+      return null;
+    }
+    const rawValue = row[reference.valueKey];
+    const value = typeof rawValue === 'number' ? rawValue : Number(rawValue);
+    if (!Number.isFinite(value)) {
+      return null;
+    }
+    const details = reference.labelKeys
+      .map((key) => row[key])
+      .filter((value) => value !== null && value !== undefined && value !== '')
+      .map((value) => String(value));
+    const label = details.length ? `#${value} - ${details.join(' / ')}` : `#${value}`;
+    return {
+      value,
+      label,
+      searchText: `${value} ${details.join(' ')}`.toLowerCase()
+    };
+  }
+
+  private selectedReferenceOption(field: AdminField): ReferenceOption | null {
+    const selectedValue = this.control(field).value;
+    const numericValue = typeof selectedValue === 'number' ? selectedValue : Number(selectedValue);
+    if (!Number.isFinite(numericValue)) {
+      return null;
+    }
+    return (this.referenceOptions[field.key] ?? []).find((option) => option.value === numericValue) ?? null;
+  }
+
+  private selectedMultiReferenceIds(field: AdminField): number[] {
+    return this.toNumberArray(this.control(field).value);
+  }
+
+  private isTextEditingKey(key: string): boolean {
+    return key.length === 1 || key === 'Backspace' || key === 'Delete';
+  }
+
   private formValue(): Record<string, unknown> {
     const raw = this.form.getRawValue();
     const body: Record<string, unknown> = {};
     this.config.fields.forEach((field) => {
       const value = raw[field.key];
-      body[field.key] = field.type === 'number' ? this.toNumberOrNull(value) : value;
+      if (this.config.key === 'users' && field.key === 'password' && this.row.id && !String(value ?? '').trim()) {
+        return;
+      }
+      body[field.requestKey ?? field.key] = field.multiple
+        ? this.toNumberArray(value)
+        : field.type === 'number'
+          ? this.toNumberOrNull(value)
+          : value;
     });
     return body;
+  }
+
+  private toNumberArray(value: unknown): number[] {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+    return value
+      .map((item) => Number(item))
+      .filter((item) => Number.isFinite(item));
   }
 
   private toNumberOrNull(value: unknown): number | null {

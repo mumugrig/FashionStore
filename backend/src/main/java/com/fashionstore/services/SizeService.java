@@ -8,15 +8,11 @@ import com.fashionstore.dto.response.SizeResponse;
 import com.fashionstore.dto.response.PageResponse;
 import com.fashionstore.repositories.ItemVariantRepository;
 import com.fashionstore.repositories.SizeRepository;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -65,7 +61,7 @@ public class SizeService {
             return getPagedSizes(page, size);
         }
         return PageResponse.from(sizeRepository.findAll(
-                AdminFilterSpecification.create(adminFields(), search, filterColumn, filterValue),
+                AdminFilterSpecification.create(AdminSearchFields.SIZES, search, filterColumn, filterValue),
                 PageRequestFactory.create(page, size)
         ), SizeResponse::from);
     }
@@ -84,14 +80,6 @@ public class SizeService {
     @Transactional
     public void deleteSizes(List<Long> ids) {
         ids.forEach(this::deleteSize);
-    }
-
-    private Map<String, Function<Root<Size>, Expression<?>>> adminFields() {
-        return Map.of(
-                "id", root -> root.get("id"),
-                "label", root -> root.get("label"),
-                "sizeSystem", root -> root.get("sizeSystem")
-        );
     }
 }
 
